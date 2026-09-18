@@ -1,0 +1,32 @@
+artifact_kind: review2_frozen_visual_state_adapter_followup
+benchmark_claim: false
+hypothesis: A small residual state adapter can add flight context without rewriting the stronger image detector.
+seed: 17
+steps_per_arm: 18523
+training_frame_count: 18523
+equivalent_adapter_epochs: 1.0
+batch_size_per_gpu: 1
+precision: 16-mixed
+optimizer: AdamW
+film_learning_rate: 0.00003
+visual_detector_frozen: true
+gradient_clip_norm: 1.0
+parent_model: imagenet-e1-full-pass
+parent_checkpoint_sha256: 7cea7f2cd4c6eef1c26e0fdc2df98df9267b8c23b6dc02d38c194661509bd5e2
+normalizer_sha256: 11b40c1ce508a4a644a71708f6a6709ae81ed81b4618689b59b2954383a48678
+protocol_sha256: c848194b212301de811fc835eb561bfbc6d4ee60bf9f39fb7497c06b97f7a1cc
+final_test_unsealed: false
+arms:
+  E3_frozen_visual_film:
+    physical_gpu_id: 0
+    state_dropout_probability: 0.0
+  E4_frozen_visual_film_dropout50:
+    physical_gpu_id: 1
+    state_dropout_probability: 0.5
+evaluation:
+  partition: development
+  selection_metric: AP50
+  compare_against: imagenet-e1-full-pass
+  final_test_access: forbidden
+safety_property:
+  masked_state_behavior: The FiLM residual is exactly disabled, so the frozen E1 visual path is preserved.

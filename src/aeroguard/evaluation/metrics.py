@@ -15,7 +15,7 @@ same-class, greedy in descending score order.  AP uses the deterministic COCO
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Any
 
 import numpy as np
@@ -36,6 +36,23 @@ class ClassMetrics:
     false_positives: int
     false_negatives: int
 
+    @property
+    def precision(self) -> float:
+        denominator = self.true_positives + self.false_positives
+        return self.true_positives / denominator if denominator else 0.0
+
+    @property
+    def f1(self) -> float:
+        denominator = 2 * self.true_positives + self.false_positives + self.false_negatives
+        return 2 * self.true_positives / denominator if denominator else 0.0
+
+    @property
+    def detection_accuracy(self) -> float:
+        """Return TP / (TP + FP + FN), the detection analogue requested by judges."""
+
+        denominator = self.true_positives + self.false_positives + self.false_negatives
+        return self.true_positives / denominator if denominator else 0.0
+
 
 @dataclass(frozen=True)
 class AggregateMetrics:
@@ -50,6 +67,23 @@ class AggregateMetrics:
     false_positives: int
     false_negatives: int
     per_class: dict[int, ClassMetrics]
+
+    @property
+    def precision(self) -> float:
+        denominator = self.true_positives + self.false_positives
+        return self.true_positives / denominator if denominator else 0.0
+
+    @property
+    def f1(self) -> float:
+        denominator = 2 * self.true_positives + self.false_positives + self.false_negatives
+        return 2 * self.true_positives / denominator if denominator else 0.0
+
+    @property
+    def detection_accuracy(self) -> float:
+        """Return TP / (TP + FP + FN), not image-classification accuracy."""
+
+        denominator = self.true_positives + self.false_positives + self.false_negatives
+        return self.true_positives / denominator if denominator else 0.0
 
 
 @dataclass(frozen=True)
@@ -80,16 +114,27 @@ class EvaluationResult:
         """Return JSON-friendly metrics without losing the configured semantics."""
 
         def aggregate(value: AggregateMetrics) -> dict[str, Any]:
+            def class_metrics(item: ClassMetrics) -> dict[str, Any]:
+                return {
+                    **vars(item),
+                    "precision": item.precision,
+                    "f1": item.f1,
+                    "detection_accuracy": item.detection_accuracy,
+                }
+
             return {
                 "name": value.name,
                 "support": value.support,
                 "ap50": value.ap50,
                 "ap50_95": value.ap50_95,
+                "precision": value.precision,
                 "recall": value.recall,
+                "f1": value.f1,
+                "detection_accuracy": value.detection_accuracy,
                 "true_positives": value.true_positives,
                 "false_positives": value.false_positives,
                 "false_negatives": value.false_negatives,
-                "per_class": {str(k): vars(v) for k, v in value.per_class.items()},
+                "per_class": {str(k): class_metrics(v) for k, v in value.per_class.items()},
             }
 
         return {
@@ -205,15 +250,20 @@ def _ap(correct: np.ndarray, scores: np.ndarray, support: int) -> float:
     return float(np.mean(sampled))
 
 
-def _match(records: list[dict[str, Any]], label: int, threshold: float) -> tuple[np.ndarray, np.ndarray, int]:
+def _match_label_records(
+    records: list[dict[str, Any]], threshold: float
+) -> tuple[np.ndarray, np.ndarray, int]:
+    """Match records whose prediction and target lists already contain one class."""
+
     entries: list[tuple[float, int, bool]] = []
     support = 0
     for record_index, record in enumerate(records):
-        targets = [x for x in record["targets"] if x["label"] == label]
+        targets = record["targets"]
         support += len(targets)
         unmatched = set(range(len(targets)))
-        predictions = [x for x in record["predictions"] if x["label"] == label]
-        for prediction in sorted(predictions, key=lambda x: (-x["score"], x["index"])):
+        for prediction in sorted(
+            record["predictions"], key=lambda x: (-x["score"], x["index"])
+        ):
             candidates = [(j, _iou(prediction["box"], target["box"])) for j, target in enumerate(targets) if j in unmatched]
             match = max(candidates, key=lambda pair: pair[1]) if candidates else (-1, 0.0)
             correct = match[1] >= threshold
@@ -236,11 +286,25 @@ def _aggregate(
     labels = sorted({x["label"] for r in records for x in r["targets"]} | {x["label"] for r in records for x in r["predictions"]})
     per_class: dict[int, ClassMetrics] = {}
     for label in labels:
+        label_records = [
+            {
+                **record,
+                "predictions": [
+                    item for item in record["predictions"] if item["label"] == label
+                ],
+                "targets": [item for item in record["targets"] if item["label"] == label],
+            }
+            for record in records
+        ]
+        fixed_records = _filter_and_cap(
+            label_records,
+            fixed_floor,
+            max((len(r["predictions"]) for r in label_records), default=1),
+        )
         aps = []
-        fixed_records = _filter_and_cap(records, fixed_floor, max(len(r["predictions"]) for r in records) if records else 1)
-        fixed_correct, _, support = _match(fixed_records, label, fixed_iou)
+        fixed_correct, _, support = _match_label_records(fixed_records, fixed_iou)
         for threshold in thresholds:
-            correct, scores, _ = _match(records, label, float(threshold))
+            correct, scores, _ = _match_label_records(label_records, float(threshold))
             aps.append(_ap(correct, scores, support))
         tp = int(fixed_correct.sum())
         fp = int(fixed_correct.size - tp)
@@ -298,10 +362,20 @@ def evaluate_detections(
     normalized = _filter_and_cap(_records(records), floor, int(max_detections_per_image))
     pooled = _aggregate(normalized, "pooled", thresholds, fixed_iou, fixed_floor)
     roots = sorted({r["recording_root"] for r in normalized})
-    by_root = {
-        root: _aggregate([r for r in normalized if r["recording_root"] == root], root, thresholds, fixed_iou, fixed_floor)
-        for root in roots
-    }
+    if len(roots) == 1:
+        # Pooled and per-root records are identical for a one-flight partition.
+        by_root = {roots[0]: replace(pooled, name=roots[0])}
+    else:
+        by_root = {
+            root: _aggregate(
+                [r for r in normalized if r["recording_root"] == root],
+                root,
+                thresholds,
+                fixed_iou,
+                fixed_floor,
+            )
+            for root in roots
+        }
     return EvaluationResult(floor, int(max_detections_per_image), tuple(float(x) for x in thresholds), fixed_floor, fixed_iou, pooled, by_root)
 
 

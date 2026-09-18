@@ -40,22 +40,36 @@ class AeroGuardDetectorModule(L.LightningModule):
         total = sum(losses.values())
         if not torch.isfinite(total):
             raise RuntimeError(f"non-finite training loss at batch {batch_index}")
+        self._aeroguard_last_train_step = int(self.global_step) + 1
+        self._aeroguard_last_train_metrics = {
+            "loss": float(total.detach().cpu()),
+            **{name: float(value.detach().cpu()) for name, value in losses.items()},
+        }
         self.log("train/loss", total, prog_bar=True, on_step=True, on_epoch=True, batch_size=len(batch["images"]))
         for name, value in losses.items():
             self.log(f"train/{name}", value, on_step=True, on_epoch=True, batch_size=len(batch["images"]))
         return total
 
     def configure_optimizers(self):
-        backbone = list(self.detector.detector.backbone.parameters())
+        backbone = [
+            parameter
+            for parameter in self.detector.detector.backbone.parameters()
+            if parameter.requires_grad
+        ]
         backbone_ids = {id(parameter) for parameter in backbone}
-        other = [parameter for parameter in self.detector.parameters() if id(parameter) not in backbone_ids]
-        optimizer = torch.optim.AdamW(
-            [
-                {"params": backbone, "lr": self.backbone_lr},
-                {"params": other, "lr": self.head_and_film_lr},
-            ],
-            weight_decay=self.weight_decay,
-        )
+        other = [
+            parameter
+            for parameter in self.detector.parameters()
+            if parameter.requires_grad and id(parameter) not in backbone_ids
+        ]
+        parameter_groups = []
+        if backbone:
+            parameter_groups.append({"params": backbone, "lr": self.backbone_lr})
+        if other:
+            parameter_groups.append({"params": other, "lr": self.head_and_film_lr})
+        if not parameter_groups:
+            raise RuntimeError("detector has no trainable parameters")
+        optimizer = torch.optim.AdamW(parameter_groups, weight_decay=self.weight_decay)
         scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
             optimizer,
             T_max=max(1, int(self.trainer.estimated_stepping_batches)),

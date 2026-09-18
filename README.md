@@ -7,27 +7,43 @@ AeroGuard combines a TorchVision FCOS detector with gated FiLM conditioning so t
 ## What works in this repository
 
 - Leakage-safe AU-AIR parsing, state conversion, grouped protocol, and FiLM components with tests.
-- A strict FastAPI inference/replay/review contract with honest fixture, cache, and computed provenance.
+- A strict [FastAPI backend](docs/BACKEND_API.md) for health, capability discovery, model reports, inference/replay, and idempotent human review.
 - A responsive React review console that can start from bundled fixtures and connect to the API.
 - Reproducible Kaggle scripts for protocol construction, matched training, evaluation, and artifact capture.
 - A dual-T4 Lightning gate that ran matched E1 masked-state and E2 paired-state arms from one hashed initialization and image schedule.
 - A deterministic evaluator for AP50, AP50:95, per-class support, per-root results, fixed-point recall, calibration, and VisDrone ignore regions.
-- A judge-ready [Review 1 overview](docs/REVIEW1_OVERVIEW.md), [team presentation script](docs/REVIEW1_PRESENTATION_SCRIPT.md), [system architecture](docs/assets/aeroguard-review1-architecture.png), and [E1/E2 model architecture](docs/assets/aeroguard-model-architecture.png).
+- Judge-ready [Review 1 materials](docs/REVIEW1_OVERVIEW.md), [next-review evidence](docs/REVIEW2_EVIDENCE.md), [Review 2 deck](docs/AeroGuard_Review2_Evidence_Deck.pptx), [presentation script](docs/REVIEW2_PRESENTATION_SCRIPT.md), [system architecture](docs/assets/aeroguard-review1-architecture.png), and [E1/E2 model architecture](docs/assets/aeroguard-model-architecture.png).
 
 Training and benchmark values appear only after a run writes machine-generated result artifacts. Missing values remain unavailable; the UI never substitutes invented metrics.
 
 ## Measured engineering evidence
 
 - AU-AIR manifest: 32,823 frames, 131,977 valid boxes, 54 rejected nonpositive boxes.
-- Random-init FCOS overfit gate: loss 2.87 → 1.28 over 24 updates on one real frame.
+- Random-init FCOS overfit gate: loss 2.87 to 1.28 over 24 updates on one real frame.
 - Matched Lightning gate: 40 updates per arm, concurrently on physical T4 GPUs 0 and 1, with the same warmstart and eight-frame schedule hashes.
 - Masked E1 kept FiLM projections at exactly zero; paired E2 moved their L1 norm from 0 to 120.735.
 - Matched random-control and ImageNet-backbone development-training pairs each completed 5,000 updates per arm on physical T4 GPUs 0 and 1. Their saved reports remain training evidence, not held-out accuracy.
 - On the frozen development root, the matched ImageNet E2 flight-state arm reached AP50 0.0692 and AP50:95 0.0234 versus E1's 0.0120 and 0.0024. This supports E2 on development only; the final test remains sealed.
+- The Review 2 pair completed one full pass over all 18,523 training frames per arm. Every optimizer-step loss is stored and hashed, both arms use the same frame order and ImageNet warmstart, and physical GPUs 0 and 1 ran concurrently.
+- On the same held-out development flight after the full pass, E1 reached AP50 0.1698, best F1 0.4503, and detection accuracy 0.2906. Jointly trained E2 reached AP50 0.1146, best F1 0.2515, and detection accuracy 0.1438. E2 with correct, masked, and shifted state stayed near AP50 0.114, pointing to visual-weight drift rather than a single bad telemetry value.
 
 The smoke and 40-step runs are implementation gates. The separate [development results](docs/DEVELOPMENT_RESULTS.md) are real held-out development evidence, not final-test or safety evidence.
 
 ## Training and development graphs
+
+![AU-AIR split by complete flight recording](docs/assets/review2-data-split.png)
+
+![Complete full-pass training loss for both matched arms](docs/assets/review2-full-training-loss.png)
+
+![Training loss components](docs/assets/review2-loss-components.png)
+
+![Held-out development metrics](docs/assets/review2-development-metrics.png)
+
+![Development confidence-threshold sweep](docs/assets/review2-threshold-sweep.png)
+
+![Per-class development results](docs/assets/review2-per-class-metrics.png)
+
+![Flight-state robustness checks](docs/assets/review2-state-robustness.png)
 
 ![Training completion and final logged loss](docs/assets/training-summary.png)
 
@@ -35,7 +51,7 @@ The smoke and 40-step runs are implementation gates. The separate [development r
 
 ![ImageNet-pair calibration comparison](docs/assets/calibration-comparison.png)
 
-These plots are generated from the committed JSON artifacts by `python scripts/generate_judge_graphs.py`. The repository does not contain full 5,000-step logger histories, so the training plot shows verified completion and endpoint losses rather than an invented learning curve.
+The Review 2 plots are generated from complete, committed 18,523-step histories by `python scripts/generate_review2_graphs.py`. Older Review 1 plots remain for traceability and only claim what their earlier artifacts support.
 
 
 ## Quick start
@@ -80,7 +96,7 @@ Open the printed local URL. The bundled demonstration is explicitly labeled `FIX
 
 ## Current limitations
 
-- A leading development checkpoint exists, but the missing-state fallback, release threshold, local runtime, and final-test metrics are not yet frozen.
+- Development metrics guide model selection only. A frozen-visual state-adapter follow-up is in progress; the release threshold and final-test metrics remain deliberately unfrozen and sealed.
 - The checked-in evaluation fixture proves software behavior only; it is not model performance.
 - AU-AIR provides paired annotation metadata, not proven zero-latency sensor timestamps.
 - With eight recording roots, evaluation is session-held-out but not broad new-location validation.

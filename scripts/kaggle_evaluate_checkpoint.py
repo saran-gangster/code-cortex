@@ -20,8 +20,10 @@ from aeroguard.evaluation import (
     build_evaluation_report,
     evaluate_calibration,
     evaluate_detections,
+    evaluate_operating_points,
     match_detections,
     normalize_model_prediction,
+    select_best_f1_point,
     write_evaluation_report,
 )
 from aeroguard.models.fcos import build_flight_aware_fcos
@@ -64,9 +66,17 @@ def load_partition_records(manifest: Path, protocol: dict, partition: str) -> li
 
 
 class EvaluationDataset(Dataset):
-    def __init__(self, data_root: Path, records: list[dict], normalizer: dict) -> None:
+    def __init__(
+        self,
+        data_root: Path,
+        records: list[dict],
+        normalizer: dict,
+        *,
+        state_index_offset: int = 0,
+    ) -> None:
         self.data_root = data_root
         self.records = records
+        self.state_index_offset = state_index_offset
         self.means = torch.tensor(normalizer["mean"], dtype=torch.float32)
         self.scales = torch.tensor(normalizer["std"], dtype=torch.float32)
 
@@ -77,7 +87,8 @@ class EvaluationDataset(Dataset):
         record = self.records[index]
         with Image.open(self.data_root / record["image_relative_path"]) as image:
             pixels = pil_to_tensor(image.convert("RGB")).float().div_(255.0)
-        state = (torch.tensor(record["state"], dtype=torch.float32) - self.means) / self.scales
+        state_record = self.records[(index + self.state_index_offset) % len(self.records)]
+        state = (torch.tensor(state_record["state"], dtype=torch.float32) - self.means) / self.scales
         return pixels, state, record
 
 
@@ -89,7 +100,12 @@ def collate(samples):
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--checkpoint", type=Path, required=True)
-    parser.add_argument("--mode", choices=("masked", "paired"), required=True)
+    parser.add_argument("--mode", choices=("masked", "paired", "shuffled"), required=True)
+    parser.add_argument(
+        "--checkpoint-arm",
+        choices=("masked", "paired"),
+        help="Training arm that owns the checkpoint; defaults to mode, or paired for shuffled mode.",
+    )
     parser.add_argument("--model-id", required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--data-root", type=Path, default=Path("data/auair/04_AUAIR_multimodal_uav"))
@@ -112,14 +128,20 @@ def main() -> None:
         raise RuntimeError("evaluation manifest roots do not exactly match development")
 
     checkpoint_sha = sha256_file(args.checkpoint)
-    training_summary_path = args.checkpoint.parent / "run_summary.json"
+    run_root = args.checkpoint.parent.parent if args.checkpoint.parent.name == "checkpoints" else args.checkpoint.parent
+    training_summary_path = run_root / "run_summary.json"
     if not training_summary_path.is_file():
         raise RuntimeError(f"missing checkpoint provenance summary: {training_summary_path}")
     training_summary = json.loads(training_summary_path.read_text(encoding="utf-8"))
-    expected_arm = "E2_paired_film" if args.mode == "paired" else "E1_rgb_masked"
+    checkpoint_arm = args.checkpoint_arm or ("paired" if args.mode == "shuffled" else args.mode)
+    expected_arm = "E2_paired_film" if checkpoint_arm == "paired" else "E1_rgb_masked"
+    relative_checkpoint = str(args.checkpoint.relative_to(run_root)).replace("\\", "/")
+    expected_checkpoint_sha = training_summary.get("checkpoint_sha256s", {}).get(
+        relative_checkpoint,
+        training_summary.get("checkpoint_sha256") if args.checkpoint.name == "final.ckpt" else None,
+    )
     provenance_checks = {
         "experiment_arm": expected_arm,
-        "checkpoint_sha256": checkpoint_sha,
         "protocol_sha256": protocol["protocol_sha256"],
         "normalizer_sha256": normalizer["normalizer_sha256"],
     }
@@ -129,6 +151,11 @@ def main() -> None:
                 f"checkpoint provenance mismatch for {field}: "
                 f"{training_summary.get(field)!r} != {expected!r}"
             )
+    if expected_checkpoint_sha != checkpoint_sha:
+        raise RuntimeError(
+            "checkpoint provenance mismatch: "
+            f"{expected_checkpoint_sha!r} != {checkpoint_sha!r} for {relative_checkpoint}"
+        )
     if training_summary.get("final_test_unsealed") is not False:
         raise RuntimeError("checkpoint summary does not preserve the final-test seal")
     if training_summary.get("development_roots_used") or training_summary.get("final_test_roots_used"):
@@ -145,7 +172,12 @@ def main() -> None:
     model.detector.topk_candidates = max(args.max_detections, model.detector.topk_candidates)
 
     loader = DataLoader(
-        EvaluationDataset(args.data_root, records, normalizer),
+        EvaluationDataset(
+            args.data_root,
+            records,
+            normalizer,
+            state_index_offset=1000 if args.mode == "shuffled" else 0,
+        ),
         batch_size=1,
         shuffle=False,
         num_workers=args.num_workers,
@@ -153,13 +185,15 @@ def main() -> None:
         prefetch_factor=2 if args.num_workers > 0 else None,
         collate_fn=collate,
     )
-    state_mask_value = 1.0 if args.mode == "paired" else 0.0
+    state_mask_value = 0.0 if args.mode == "masked" else 1.0
     evaluation_records: list[dict] = []
     calibration_scores: list[float] = []
     calibration_correctness: list[bool] = []
     model_times_ms: list[float] = []
     samples: list[dict] = []
     dropped_degenerate_predictions = 0
+    evaluation_started = time.perf_counter()
+    progress_path = args.output / "evaluation_progress.json"
 
     with torch.inference_mode():
         for index, (images, state, batch_records) in enumerate(loader):
@@ -212,10 +246,28 @@ def main() -> None:
                         "frame_id": record["frame_id"],
                         "recording_root": record["recording_root"],
                         "prediction_source": "computed",
-                        "input_mode": "paired" if args.mode == "paired" else "masked",
+                        "input_mode": args.mode,
                         "predictions": predictions,
                     }
                 )
+            completed_frames = index + 1
+            if completed_frames % 100 == 0 or completed_frames == len(records):
+                elapsed_seconds = time.perf_counter() - evaluation_started
+                progress = {
+                    "frames_completed": completed_frames,
+                    "frames_total": len(records),
+                    "fraction_complete": completed_frames / len(records),
+                    "elapsed_seconds": elapsed_seconds,
+                    "frames_per_second": completed_frames / elapsed_seconds,
+                    "state_mode": args.mode,
+                    "checkpoint_training_arm": checkpoint_arm,
+                }
+                temporary = progress_path.with_suffix(".json.tmp")
+                temporary.write_text(
+                    json.dumps(progress, indent=2, sort_keys=True, allow_nan=False) + "\n",
+                    encoding="utf-8",
+                )
+                os.replace(temporary, progress_path)
 
     result = evaluate_detections(
         evaluation_records,
@@ -225,6 +277,23 @@ def main() -> None:
         fixed_iou_threshold=0.5,
     )
     metrics = result.as_dict()
+    metrics["evaluated_frame_count"] = len(records)
+    metrics["evaluated_object_count"] = result.pooled.support
+    threshold_values = [round(value / 100, 2) for value in range(5, 96, 5)]
+    operating_points = evaluate_operating_points(
+        evaluation_records,
+        threshold_values,
+        score_floor=args.score_floor,
+        iou_threshold=0.5,
+        max_detections_per_image=args.max_detections,
+    )
+    metrics["operating_point_sweep"] = {
+        "selection_partition": "development",
+        "selection_rule": "maximum_f1_then_detection_accuracy_then_precision_then_threshold",
+        "accuracy_definition": "TP / (TP + FP + FN); not image-classification accuracy",
+        "points": operating_points,
+        "best_f1_point": select_best_f1_point(operating_points),
+    }
     metrics["dropped_degenerate_predictions"] = dropped_degenerate_predictions
     human = result.pooled.per_class.get(1)
     metrics["human_recall_at_fixed_operating_point"] = human.recall if human else None
@@ -248,6 +317,12 @@ def main() -> None:
         checkpoint_id=checkpoint_sha,
         config={
             "state_mode": args.mode,
+            "checkpoint_training_arm": checkpoint_arm,
+            "state_alignment": (
+                "deliberately_1000_frame_shifted"
+                if args.mode == "shuffled"
+                else "paired_annotation" if args.mode == "paired" else "masked_unavailable"
+            ),
             "score_floor": args.score_floor,
             "display_threshold": args.display_threshold,
             "max_detections_per_image": args.max_detections,
@@ -265,6 +340,8 @@ def main() -> None:
             "Thresholds are not frozen for release by this report.",
             "Calibration covers emitted detections only and does not measure missed objects.",
             "Finite zero-area detector outputs are dropped and counted before evaluation.",
+            "Detection accuracy means TP/(TP+FP+FN), not image-classification accuracy.",
+            "The best-F1 threshold is selected only on development data; final test remains sealed.",
             "Random-initialized runs are controls unless the model id explicitly states ImageNet.",
         ],
     )

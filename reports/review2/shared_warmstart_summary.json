@@ -1,0 +1,11 @@
+{
+  "artifact_kind": "shared_finetuning_warmstart",
+  "benchmark_claim": false,
+  "checkpoint_sha256": "82c6ac41a943a60a99513b1e255b5762f4cedf2563284260f14094610643a4e5",
+  "detector_head_origin": "seeded_random_auair_9_class_head",
+  "film_origin": "seeded_zero_initialized_identity",
+  "seed": 17,
+  "torchvision_weights_enum": "ResNet50_Weights.IMAGENET1K_V2",
+  "upstream_url": "https://download.pytorch.org/models/resnet50-11ad3fa6.pth",
+  "weights_origin": "torchvision_resnet50_imagenet1k_v2_backbone"
+}

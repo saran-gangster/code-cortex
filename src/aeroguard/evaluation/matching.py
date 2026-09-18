@@ -34,6 +34,18 @@ class MatchSummary:
         denominator = self.true_positives + self.false_negatives
         return self.true_positives / denominator if denominator else 0.0
 
+    @property
+    def f1(self) -> float:
+        denominator = 2 * self.true_positives + self.false_positives + self.false_negatives
+        return 2 * self.true_positives / denominator if denominator else 0.0
+
+    @property
+    def detection_accuracy(self) -> float:
+        """Return TP / (TP + FP + FN), not image-classification accuracy."""
+
+        denominator = self.true_positives + self.false_positives + self.false_negatives
+        return self.true_positives / denominator if denominator else 0.0
+
 
 def match_detections(
     predictions: list[dict],

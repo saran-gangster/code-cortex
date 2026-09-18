@@ -7,6 +7,7 @@ import hashlib
 import json
 import os
 import random
+import time
 from pathlib import Path
 
 import lightning as L
@@ -17,8 +18,74 @@ from torch.utils.data import DataLoader, Dataset
 from torchvision.transforms.functional import pil_to_tensor
 
 from aeroguard.data.provenance import validate_protocol_bundle
+from aeroguard.data.training_schedule import deterministic_state_mask
 from aeroguard.models.fcos import build_flight_aware_fcos
 from aeroguard.training import AeroGuardDetectorModule
+
+
+class JsonlLossHistory(L.Callback):
+    """Persist every completed optimizer step for full judge-facing loss curves."""
+
+    def __init__(self, path: Path, *, start_step: int) -> None:
+        super().__init__()
+        self.path = path
+        self.start_step = start_step
+        self.started = 0.0
+        self.prior_elapsed_seconds = 0.0
+
+    def on_fit_start(self, trainer, pl_module) -> None:
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        if not self.path.is_file():
+            if self.start_step:
+                raise RuntimeError("resume checkpoint exists without loss_history.jsonl")
+            self.path.write_text("", encoding="utf-8")
+            self.started = time.perf_counter()
+            return
+
+        lines = [line for line in self.path.read_text(encoding="utf-8").splitlines() if line]
+        rows = [json.loads(line) for line in lines]
+        steps = [int(row["step"]) for row in rows]
+        if steps != list(range(1, len(rows) + 1)):
+            raise RuntimeError("loss history must contain a complete ordered 1..N step sequence")
+        if len(rows) < self.start_step:
+            raise RuntimeError("loss history ends before the resume checkpoint")
+        if len(rows) > self.start_step:
+            discarded = self.path.with_name(
+                f"loss_history.discarded-steps-{self.start_step + 1}-{len(rows)}.jsonl"
+            )
+            discarded.write_text("\n".join(lines[self.start_step :]) + "\n", encoding="utf-8")
+            temporary = self.path.with_suffix(".jsonl.reconciled")
+            retained = lines[: self.start_step]
+            temporary.write_text("\n".join(retained) + ("\n" if retained else ""), encoding="utf-8")
+            os.replace(temporary, self.path)
+            rows = rows[: self.start_step]
+        if rows:
+            last = rows[-1]
+            self.prior_elapsed_seconds = float(
+                last.get("cumulative_elapsed_seconds", last["session_elapsed_seconds"])
+            )
+        self.started = time.perf_counter()
+
+    def on_train_batch_end(self, trainer, pl_module, outputs, batch, batch_idx) -> None:
+        metrics = getattr(pl_module, "_aeroguard_last_train_metrics", None)
+        step = getattr(pl_module, "_aeroguard_last_train_step", None)
+        if not isinstance(metrics, dict) or not isinstance(step, int):
+            raise TypeError("training module did not expose step loss metrics")
+        optimizer = trainer.optimizers[0]
+        session_elapsed_seconds = time.perf_counter() - self.started
+        row = {
+            "step": step,
+            "epoch": int(trainer.current_epoch),
+            "batch_index": int(batch_idx),
+            "session_elapsed_seconds": session_elapsed_seconds,
+            "cumulative_elapsed_seconds": self.prior_elapsed_seconds + session_elapsed_seconds,
+            "learning_rates": [float(group["lr"]) for group in optimizer.param_groups],
+            "losses": metrics,
+        }
+        if torch.cuda.is_available():
+            row["process_peak_cuda_memory_bytes"] = int(torch.cuda.max_memory_allocated())
+        with self.path.open("a", encoding="utf-8") as handle:
+            handle.write(json.dumps(row, sort_keys=True, allow_nan=False) + "\n")
 
 
 def sha256_file(path: Path) -> str:
@@ -58,6 +125,8 @@ class DevelopmentScheduleDataset(Dataset):
         steps: int,
         start_step: int,
         state_mask: float,
+        state_dropout_probability: float,
+        mask_seed: int,
         means: list[float],
         scales: list[float],
     ) -> None:
@@ -66,6 +135,8 @@ class DevelopmentScheduleDataset(Dataset):
         self.steps = steps
         self.start_step = start_step
         self.state_mask = state_mask
+        self.state_dropout_probability = state_dropout_probability
+        self.mask_seed = mask_seed
         self.means = torch.tensor(means, dtype=torch.float32)
         self.scales = torch.tensor(scales, dtype=torch.float32)
         if self.means.shape != (8,) or self.scales.shape != (8,):
@@ -79,7 +150,8 @@ class DevelopmentScheduleDataset(Dataset):
         return self.steps
 
     def __getitem__(self, index: int):
-        record = self.records[(self.start_step + index) % len(self.records)]
+        schedule_index = self.start_step + index
+        record = self.records[schedule_index % len(self.records)]
         with Image.open(self.data_root / record["image_relative_path"]) as image:
             pixels = pil_to_tensor(image.convert("RGB")).float().div_(255.0)
         state = torch.tensor(record["state"], dtype=torch.float32)
@@ -95,7 +167,15 @@ class DevelopmentScheduleDataset(Dataset):
             pixels,
             target,
             state,
-            torch.tensor(self.state_mask, dtype=torch.float32),
+            torch.tensor(
+                deterministic_state_mask(
+                    self.state_mask,
+                    self.state_dropout_probability,
+                    seed=self.mask_seed,
+                    schedule_index=schedule_index,
+                ),
+                dtype=torch.float32,
+            ),
         )
 
 
@@ -128,9 +208,20 @@ def main() -> None:
     parser.add_argument("--seed", type=int, default=17)
     parser.add_argument("--num-workers", type=int, default=2)
     parser.add_argument("--precision", choices=("32-true", "16-mixed"), default="32-true")
+    parser.add_argument("--state-dropout-probability", type=float, default=0.0)
+    parser.add_argument("--freeze-visual-detector", action="store_true")
+    parser.add_argument("--backbone-lr", type=float, default=3e-5)
+    parser.add_argument("--head-and-film-lr", type=float, default=3e-4)
+    parser.add_argument("--experiment-arm")
     args = parser.parse_args()
     if args.steps <= 0 or args.checkpoint_steps <= 0 or args.num_workers < 0:
         raise ValueError("steps/checkpoint-steps must be positive and num-workers non-negative")
+    if not 0.0 <= args.state_dropout_probability < 1.0:
+        raise ValueError("state-dropout-probability must be in [0, 1)")
+    if args.mode == "masked" and args.state_dropout_probability:
+        raise ValueError("state dropout is only meaningful in paired mode")
+    if args.backbone_lr <= 0 or args.head_and_film_lr <= 0:
+        raise ValueError("learning rates must be positive")
 
     args.output.mkdir(parents=True, exist_ok=True)
     L.seed_everything(args.seed, workers=True)
@@ -157,6 +248,8 @@ def main() -> None:
         steps=args.steps - start_step,
         start_step=start_step,
         state_mask=state_mask,
+        state_dropout_probability=args.state_dropout_probability,
+        mask_seed=args.seed,
         means=normalizer["mean"],
         scales=normalizer["std"],
     )
@@ -172,7 +265,16 @@ def main() -> None:
 
     detector = build_flight_aware_fcos(pretrained=False, min_size=320, max_size=576)
     detector.load_state_dict(torch.load(args.warmstart, map_location="cpu", weights_only=True))
-    module = AeroGuardDetectorModule(detector)
+    if args.freeze_visual_detector:
+        for parameter in detector.detector.parameters():
+            parameter.requires_grad_(False)
+    module = AeroGuardDetectorModule(
+        detector,
+        backbone_lr=args.backbone_lr,
+        head_and_film_lr=args.head_and_film_lr,
+    )
+    loss_history_path = args.output / "loss_history.jsonl"
+    loss_history_callback = JsonlLossHistory(loss_history_path, start_step=start_step)
     checkpoint_callback = ModelCheckpoint(
         dirpath=args.output / "checkpoints",
         filename="step-{step:06d}",
@@ -188,13 +290,14 @@ def main() -> None:
         max_steps=args.steps,
         max_epochs=1,
         logger=False,
-        callbacks=[checkpoint_callback],
+        callbacks=[loss_history_callback, checkpoint_callback],
         enable_model_summary=False,
         gradient_clip_val=1.0,
         gradient_clip_algorithm="norm",
-        log_every_n_steps=20,
+        log_every_n_steps=1,
         deterministic=True,
     )
+    training_started = time.perf_counter()
     trainer.fit(
         module,
         train_dataloaders=loader,
@@ -206,15 +309,40 @@ def main() -> None:
         )
     final_checkpoint = args.output / "final.ckpt"
     trainer.save_checkpoint(final_checkpoint)
+    session_training_seconds = time.perf_counter() - training_started
+    training_seconds = loss_history_callback.prior_elapsed_seconds + session_training_seconds
     final_loss = trainer.callback_metrics.get("train/loss_step")
+    history_lines = [line for line in loss_history_path.read_text(encoding="utf-8").splitlines() if line]
+    if len(history_lines) != args.steps:
+        raise RuntimeError(
+            f"loss history has {len(history_lines)} rows; expected one row for each of {args.steps} steps"
+        )
+    checkpoint_hashes = {
+        str(path.relative_to(args.output)).replace("\\", "/"): sha256_file(path)
+        for path in sorted(args.output.rglob("*.ckpt"))
+    }
+    unique_training_frames = len(set(schedule))
+    state_mask_schedule = [
+        deterministic_state_mask(
+            state_mask,
+            args.state_dropout_probability,
+            seed=args.seed,
+            schedule_index=index,
+        )
+        for index in range(args.steps)
+    ]
     summary = {
         "artifact_kind": "matched_development_training_not_benchmark",
         "benchmark_claim": False,
-        "experiment_arm": "E2_paired_film" if args.mode == "paired" else "E1_rgb_masked",
+        "experiment_arm": args.experiment_arm
+        or ("E2_paired_film" if args.mode == "paired" else "E1_rgb_masked"),
         "completed_steps": int(trainer.global_step),
         "requested_steps": args.steps,
         "resumed_from_step": start_step,
         "training_record_count": len(records),
+        "unique_training_frames_presented": unique_training_frames,
+        "training_frame_coverage_fraction": unique_training_frames / len(records),
+        "equivalent_training_epochs": args.steps / len(records),
         "training_roots": protocol["selection"]["train"],
         "development_roots_used": sorted(used_roots & set(partitions.development)),
         "final_test_roots_used": sorted(used_roots & set(partitions.final_test)),
@@ -222,12 +350,24 @@ def main() -> None:
         "matched_frame_schedule_sha256": canonical_hash(schedule),
         "state_alignment": "paired_annotation" if args.mode == "paired" else "unavailable",
         "state_mask": state_mask,
+        "state_dropout_probability": args.state_dropout_probability,
+        "effective_state_mask_mean": sum(state_mask_schedule) / len(state_mask_schedule),
+        "state_mask_schedule_sha256": canonical_hash(state_mask_schedule),
+        "visual_detector_frozen": args.freeze_visual_detector,
+        "backbone_lr": args.backbone_lr,
+        "head_and_film_lr": args.head_and_film_lr,
         "normalizer_sha256": normalizer["normalizer_sha256"],
         "protocol_sha256": protocol["protocol_sha256"],
         "initial_weights_origin": args.warmstart_origin,
         "shared_warmstart_sha256": sha256_file(args.warmstart),
         "checkpoint_sha256": sha256_file(final_checkpoint),
+        "checkpoint_sha256s": checkpoint_hashes,
+        "loss_history_rows": len(history_lines),
+        "loss_history_sha256": sha256_file(loss_history_path),
         "final_logged_train_loss": float(final_loss) if final_loss is not None else None,
+        "training_seconds": training_seconds,
+        "latest_session_training_seconds": session_training_seconds,
+        "samples_per_second": args.steps / training_seconds,
         "precision": args.precision,
         "device_name": torch.cuda.get_device_name(0) if torch.cuda.is_available() else "CPU",
         "physical_gpu_id": os.getenv("AEROGUARD_PHYSICAL_GPU", "unrecorded"),

@@ -21,8 +21,16 @@ def test_perfect_detection_has_unit_ap_and_recall():
     assert result.pooled.ap50 == pytest.approx(1.0)
     assert result.pooled.ap50_95 == pytest.approx(1.0)
     assert result.pooled.recall == pytest.approx(1.0)
+    assert result.pooled.precision == pytest.approx(1.0)
+    assert result.pooled.f1 == pytest.approx(1.0)
+    assert result.pooled.detection_accuracy == pytest.approx(1.0)
     assert result.pooled.per_class[1].support == 1
     assert tuple(result.iou_thresholds) == tuple(IOU_THRESHOLDS)
+
+    payload = result.as_dict()["pooled"]
+    assert payload["precision"] == pytest.approx(1.0)
+    assert payload["f1"] == pytest.approx(1.0)
+    assert payload["detection_accuracy"] == pytest.approx(1.0)
 
 
 def test_empty_predictions_have_zero_metrics_and_support_is_target_count():
@@ -37,6 +45,9 @@ def test_duplicate_is_one_true_positive_and_one_false_positive():
     assert result.pooled.true_positives == 1
     assert result.pooled.false_positives == 1
     assert result.pooled.ap50 == pytest.approx(1.0)
+    assert result.pooled.precision == pytest.approx(0.5)
+    assert result.pooled.f1 == pytest.approx(2 / 3)
+    assert result.pooled.detection_accuracy == pytest.approx(0.5)
 
 
 def test_wrong_class_is_not_a_match():
@@ -81,6 +92,19 @@ def test_per_recording_root_aggregation_is_separate_from_pooled():
     assert result.by_recording_root["a"].recall == pytest.approx(1.0)
     assert result.by_recording_root["b"].recall == pytest.approx(0.0)
     assert result.pooled.recall == pytest.approx(0.5)
+
+
+def test_single_recording_root_matches_pooled_values_and_keeps_root_name():
+    result = evaluate_detections([
+        record([prediction()], [target()], root="flight-a", image_id="a1")
+    ])
+    root = result.by_recording_root["flight-a"]
+
+    assert root.name == "flight-a"
+    assert root.support == result.pooled.support
+    assert root.ap50 == result.pooled.ap50
+    assert root.ap50_95 == result.pooled.ap50_95
+    assert root.true_positives == result.pooled.true_positives
 
 
 def test_fixed_operating_point_can_use_higher_score_threshold():

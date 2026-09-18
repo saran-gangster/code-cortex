@@ -1,0 +1,60 @@
+artifact_kind: next_review_full_pass_training
+benchmark_claim: false
+seed: 17
+steps_per_arm: 18523
+training_frame_count: 18523
+unique_training_frames_target: 18523
+equivalent_training_epochs: 1.0
+batch_size_per_gpu: 1
+precision: 32-true
+image_min_size: 320
+image_max_size: 576
+optimizer: AdamW
+backbone_lr: 0.00003
+head_and_film_lr: 0.0003
+weight_decay: 0.0001
+gradient_clip_norm: 1.0
+checkpoint_every_steps: 2000
+loss_history_every_steps: 1
+normalizer_sha256: 11b40c1ce508a4a644a71708f6a6709ae81ed81b4618689b59b2954383a48678
+protocol_sha256: c848194b212301de811fc835eb561bfbc6d4ee60bf9f39fb7497c06b97f7a1cc
+final_test_unsealed: false
+data_split:
+  total_frames: 32823
+  train:
+    frames: 18523
+    proportion: 0.5643
+    recording_roots: 5
+  development:
+    frames: 5734
+    proportion: 0.1747
+    recording_roots: 1
+  sealed_final_test:
+    frames: 8566
+    proportion: 0.2610
+    recording_roots: 2
+arms:
+  E1_rgb_masked:
+    physical_gpu_id: 0
+    state_mask: 0.0
+  E2_paired_film:
+    physical_gpu_id: 1
+    state_mask: 1.0
+warmstart_origin: torchvision_resnet50_imagenet1k_v2_backbone
+evaluation:
+  partition: development
+  score_floor: 0.05
+  threshold_sweep: [0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.50, 0.55, 0.60, 0.65, 0.70, 0.75, 0.80, 0.85, 0.90, 0.95]
+  threshold_selection: maximum_f1
+  accuracy_definition: TP / (TP + FP + FN), not image-classification accuracy
+  robustness_checks:
+    e2_masked_fallback:
+      checkpoint_arm: E2_paired_film
+      state_mask: 0.0
+      purpose: measure the image-only fallback of the selected E2 checkpoint
+    e2_shifted_state:
+      checkpoint_arm: E2_paired_film
+      state_mask: 1.0
+      state_index_offset_frames: 1000
+      purpose: deliberately misalign telemetry to test sensitivity to correct pairing
+  final_test_access: forbidden

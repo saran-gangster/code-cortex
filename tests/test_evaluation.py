@@ -14,6 +14,9 @@ def test_duplicate_prediction_is_false_positive():
     duplicate = {**PREDICTION, "score": 0.8}
     result = match_detections([PREDICTION, duplicate], [TARGET])
     assert (result.true_positives, result.false_positives, result.false_negatives) == (1, 1, 0)
+    assert result.precision == 0.5
+    assert result.f1 == 2 / 3
+    assert result.detection_accuracy == 0.5
 
 
 def test_wrong_class_cannot_match():
