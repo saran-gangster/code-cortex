@@ -33,4 +33,12 @@ class InferenceRuntime:
             raise RuntimeErrorInfo("inference runtime returned an invalid record") from exc
         if record.prediction_source is not PredictionSource.computed:
             raise RuntimeErrorInfo("injected runtime must return computed provenance")
+        if record.frame_id != request.frame_id:
+            raise RuntimeErrorInfo("inference runtime returned a record for a different frame")
+        if record.original_size != request.original_size:
+            raise RuntimeErrorInfo("inference runtime returned a record for a different image size")
+        if record.input_mode is not request.input_mode:
+            raise RuntimeErrorInfo("inference runtime returned a record for a different input mode")
+        if record.metadata_alignment is not request.metadata_alignment:
+            raise RuntimeErrorInfo("inference runtime returned a record for different metadata alignment")
         return record

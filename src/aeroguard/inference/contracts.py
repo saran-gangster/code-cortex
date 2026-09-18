@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import base64
+import binascii
 import math
 from enum import Enum
 from typing import Annotated, Any, Literal
@@ -151,6 +153,42 @@ class InferenceRequest(StrictModel):
     state: list[float] | None = None
     review_requested: bool = False
 
+    @field_validator("frame_id", "run_id")
+    @classmethod
+    def safe_identifier(cls, value: str) -> str:
+        if not isinstance(value, str) or not value.strip() or value != value.strip():
+            raise ValueError("identifiers must be non-empty strings without surrounding whitespace")
+        if any(character in value for character in ("/", "\\", "..")):
+            raise ValueError("identifiers cannot contain path traversal characters")
+        return value
+
+    @field_validator("source_time_ms", mode="before")
+    @classmethod
+    def strict_source_time(cls, value: Any) -> int | None:
+        if value is not None and (isinstance(value, bool) or not isinstance(value, int)):
+            raise ValueError("source_time_ms must be an integer or null")
+        return value
+
+    @field_validator("image_base64")
+    @classmethod
+    def valid_image_base64(cls, value: str | None) -> str | None:
+        if value is None:
+            return value
+        if not isinstance(value, str) or not value:
+            raise ValueError("image_base64 must be a non-empty base64 string")
+        encoded = value
+        if value.startswith("data:"):
+            header, separator, encoded = value.partition(",")
+            if separator != "," or ";base64" not in header.lower() or not header.lower().startswith("data:image/"):
+                raise ValueError("image_base64 must be raw base64 or a base64 image data URL")
+        try:
+            decoded = base64.b64decode(encoded, validate=True)
+        except (ValueError, binascii.Error) as exc:
+            raise ValueError("image_base64 is not valid base64") from exc
+        if not decoded:
+            raise ValueError("image_base64 must not decode to an empty image")
+        return value
+
     @field_validator("state", mode="before")
     @classmethod
     def finite_state(cls, value: list[float] | None) -> list[float] | None:
@@ -161,6 +199,12 @@ class InferenceRequest(StrictModel):
                 raise ValueError("state values must be finite")
         return value
 
+    @model_validator(mode="after")
+    def validate_input_pairing(self) -> InferenceRequest:
+        if self.input_mode in {InputMode.paired_state, InputMode.state_masked} and not self.state:
+            raise ValueError(f"state is required for input_mode={self.input_mode.value}")
+        return self
+
 
 class ReviewRequest(StrictModel):
     run_id: Annotated[str, Field(min_length=1)]
@@ -168,7 +212,96 @@ class ReviewRequest(StrictModel):
     decision: Literal["accept", "reject", "needs_review"]
     comment: Annotated[str, Field(max_length=4000)] = ""
 
+    @field_validator("run_id", "frame_id")
+    @classmethod
+    def safe_identifier(cls, value: str) -> str:
+        if not value.strip() or value != value.strip():
+            raise ValueError("identifiers must be non-empty strings without surrounding whitespace")
+        if any(character in value for character in ("/", "\\", "..")):
+            raise ValueError("identifiers cannot contain path traversal characters")
+        return value
+
 
 class Review(ReviewRequest):
     review_id: Annotated[str, Field(min_length=1)]
     created_at: Annotated[str, Field(min_length=1)]
+
+
+class HealthResponse(StrictModel):
+    status: Literal["ok"]
+    version: str
+    model_ready: bool
+    runtime_mode: Literal["computed", "fixture_replay"]
+
+
+class ReadinessResponse(StrictModel):
+    ready: bool
+    status: Literal["ready", "degraded"]
+    computed_inference_ready: bool
+    replay_ready: bool
+
+
+class CapabilityResponse(StrictModel):
+    api_version: str
+    computed_inference: bool
+    fixture_replay: bool
+    review_persistence: bool
+    supported_prediction_sources: list[PredictionSource]
+    endpoints: dict[str, str]
+
+
+class RunSummary(StrictModel):
+    run_id: str
+    prediction_source: PredictionSource
+    frame_count: int = Field(ge=0)
+
+
+class RunListResponse(StrictModel):
+    runs: list[RunSummary]
+
+
+class ReviewListResponse(StrictModel):
+    reviews: list[Review]
+
+
+class ModelSummary(StrictModel):
+    model_id: str
+    report_id: str | None = None
+    checkpoint_id: str | None = None
+    partition: str | None = None
+    prediction_source: PredictionSource | None = None
+    available_for_inference: bool
+
+
+class ModelListResponse(StrictModel):
+    models: list[ModelSummary]
+
+
+class ModelDetail(ModelSummary):
+    report: dict[str, Any] | None = None
+
+
+class ReportsListResponse(StrictModel):
+    reports: list[EvaluationReportResponse]
+
+
+class EvaluationReportResponse(StrictModel):
+    schema_version: Literal["1.0"]
+    artifact_kind: str
+    benchmark_claim: Literal[False]
+    partition: Literal["synthetic_fixture", "development", "final_test", "external_test"]
+    protocol_sha256: HexSha256
+    final_test_unsealed: bool
+    model_id: str
+    report_id: str
+    checkpoint_id: str
+    config: dict[str, Any]
+    metrics: dict[str, Any]
+    limitations: list[str]
+
+
+class RunReportResponse(StrictModel):
+    run_id: str
+    provenance: PredictionSource
+    review_count: int = Field(ge=0)
+    reviews: list[Review]

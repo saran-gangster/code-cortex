@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import threading
 from copy import deepcopy
 from pathlib import Path
 from typing import Any
@@ -26,6 +27,7 @@ class FixtureReplayStore:
     def __init__(self) -> None:
         self._records: dict[tuple[str, str], InferenceRecord] = {}
         self._runs: dict[str, dict[str, object]] = {}
+        self._lock = threading.RLock()
         self._seed()
 
     def _seed(self) -> None:
@@ -47,15 +49,39 @@ class FixtureReplayStore:
             self.put("fcos-overfit-engineering-gate", computed)
 
     def list_runs(self) -> list[dict[str, object]]:
-        return deepcopy(list(self._runs.values()))
+        with self._lock:
+            ordered = sorted(self._runs, key=lambda key: (key != "fixture-run", key))
+            return deepcopy([self._runs[key] for key in ordered])
 
     def get(self, run_id: str, frame_id: str) -> InferenceRecord | None:
-        record = self._records.get((run_id, frame_id))
-        return deepcopy(record) if record else None
+        with self._lock:
+            record = self._records.get((run_id, frame_id))
+            return deepcopy(record) if record else None
+
+    def list_frames(self, run_id: str) -> list[InferenceRecord]:
+        with self._lock:
+            records = [record for (stored_run, _), record in self._records.items() if stored_run == run_id]
+            return deepcopy(sorted(records, key=lambda record: record.frame_id))
+
+    def list_models(self) -> list[dict[str, object]]:
+        with self._lock:
+            models: dict[str, dict[str, object]] = {}
+            for record in self._records.values():
+                models.setdefault(record.model_id, {
+                    "model_id": record.model_id,
+                    "prediction_source": record.prediction_source,
+                })
+            return deepcopy([models[key] for key in sorted(models)])
 
     def put(self, run_id: str, record: InferenceRecord) -> None:
-        self._records[(run_id, record.frame_id)] = deepcopy(record)
-        self._runs[run_id] = {"run_id": run_id, "prediction_source": record.prediction_source.value, "frame_count": 1}
+        with self._lock:
+            self._records[(run_id, record.frame_id)] = deepcopy(record)
+            frame_count = sum(1 for stored_run, _ in self._records if stored_run == run_id)
+            self._runs[run_id] = {
+                "run_id": run_id,
+                "prediction_source": record.prediction_source.value,
+                "frame_count": frame_count,
+            }
 
 
 class EvaluationReportStore:
@@ -89,6 +115,8 @@ class EvaluationReportStore:
         validator = jsonschema.Draft202012Validator(schema)
         reports: dict[str, dict[str, Any]] = {}
         for path in sorted(self.directory.glob("*.json")):
+            if path.is_symlink() or not path.is_file():
+                continue
             try:
                 report = json.loads(path.read_text(encoding="utf-8"))
                 validator.validate(report)
@@ -96,7 +124,16 @@ class EvaluationReportStore:
                 raise ValueError(f"invalid evaluation report: {path}") from exc
             if not isinstance(report, dict):
                 raise TypeError(f"evaluation report must be an object: {path}")
+            if report["partition"] == "final_test":
+                if report["final_test_unsealed"] is not True:
+                    raise ValueError(f"final-test seal violation: {path}")
+            elif report["final_test_unsealed"] is not False:
+                raise ValueError(f"non-final report cannot unseal final test: {path}")
             report_id = report["model_id"]
+            if not isinstance(report_id, str) or not report_id.strip() or report_id != report_id.strip() or any(
+                character in report_id for character in ("/", "\\", "..")
+            ):
+                raise ValueError(f"unsafe evaluation report id {report_id!r}: {path}")
             if report_id in reports:
                 raise ValueError(f"duplicate evaluation report id {report_id!r}: {path}")
             materialized = deepcopy(report)
@@ -105,7 +142,7 @@ class EvaluationReportStore:
         return reports
 
     def list(self) -> list[dict[str, Any]]:
-        return deepcopy(list(self._reports.values()))
+        return deepcopy([self._reports[key] for key in sorted(self._reports)])
 
     def get(self, report_id: str) -> dict[str, Any] | None:
         report = self._reports.get(report_id)
