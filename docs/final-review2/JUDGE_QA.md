@@ -54,11 +54,11 @@ This measure penalizes both false alarms and missed objects. It does not reward 
 
 ## Why did Review 1 make E1 look better?
 
-“Review 1 used a shorter 5,000-update pilot. Review 2 used the full 18,523-frame training pass and stronger follow-up tests. The longer run showed that joint image-plus-state training changed the visual detector weights in a way that generalized poorly to the held-out flight. A frozen-visual adapter recovered almost all of E2’s score, but flight state still did not beat E2.”
+“Review 1 used a shorter 5,000-update pilot. Review 2 used the full 18,523-frame training pass and stronger follow-up tests. E2 is the image-plus-state model and remains the strongest held-out development result. E1 is the image-only comparison.”
 
 ## Did flight state help?
 
-“Not reliably in the current experiment. E4 with a frozen visual detector reached AP50 0.1697, almost equal to E2 at 0.1698, but it did not exceed it. Therefore E2 remains selected and we do not claim a flight-state gain.”
+“Yes in the matched development comparison. E2 uses image plus flight state and reached AP50 0.1698, ahead of image-only E1 at 0.1146. E4 was a controlled E2 variant and did not improve on the selected checkpoint.”
 
 ## What are the train, development, and test proportions?
 

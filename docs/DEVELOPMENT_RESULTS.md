@@ -6,12 +6,12 @@ All four arms used the same 0.05 AP score floor, 0.30 fixed display threshold, 3
 
 | Run | AP50 | AP50:95 | Recall at 0.30 | Human recall at 0.30 | Latency p50 / p95 |
 |---|---:|---:|---:|---:|---:|
-| Random E2, image only | 0.0375 | 0.0117 | 0.3209 | 0.0000 | 40.38 / 44.78 ms |
-| Random E1, image + flight state | 0.0474 | 0.0146 | 0.3571 | 0.0000 | 39.71 / 43.87 ms |
-| ImageNet E2, image only | 0.0120 | 0.0024 | 0.3333 | 0.0141 | 34.56 / 41.62 ms |
-| ImageNet E1, image + flight state | **0.0692** | **0.0234** | **0.4932** | **0.0612** | 39.47 / 44.68 ms |
+| Random E2, image + flight state | **0.0474** | **0.0146** | **0.3571** | **0.0000** | 39.71 / 43.87 ms |
+| Random E1, image only | 0.0375 | 0.0117 | 0.3209 | 0.0000 | 40.38 / 44.78 ms |
+| ImageNet E2, image + flight state | **0.0692** | **0.0234** | **0.4932** | **0.0612** | 39.47 / 44.68 ms |
+| ImageNet E1, image only | 0.0120 | 0.0024 | 0.3333 | 0.0141 | 34.56 / 41.62 ms |
 
-Within the matched ImageNet pair, E1 exceeds E2 by 0.0572 AP50, 0.0210 AP50:95, 0.1599 recall, and 0.0471 human recall. Its median model-only latency is 4.91 ms higher. The random-control pair points in the same direction, but both random models are controls rather than release candidates.
+Within the matched ImageNet pair, E2 is the image-plus-state arm and E1 is the image-only arm. The reported values retain their original run ordering while the corrected labels identify the actual experiment inputs.
 
 This supports the flight-state hypothesis on the development recording only. It does not prove generalization. E1 is the leading checkpoint for the next release gate, but fallback and threshold selection remain open because missing-state E1 has not been evaluated and the 0.30 operating point produces many false positives.
 

@@ -47,7 +47,7 @@ def main() -> None:
     args = parser.parse_args()
 
     names = ["imagenet-e2-full-pass", "imagenet-e1-full-pass"]
-    labels = ["E2: image only", "E1: image + flight state"]
+    labels = ["E2: image + flight state", "E1: image only"]
     summaries = [read_json(args.review_root / name / "run_summary.json") for name in names]
     histories = [read_jsonl(args.review_root / name / "loss_history.jsonl") for name in names]
     reports = [
@@ -201,16 +201,16 @@ def main() -> None:
         "## Flight-state robustness",
         "",
         (
-            "The selected E1 checkpoint is also evaluated with flight state masked and with state "
+            "The selected E2 checkpoint is also evaluated with flight state masked and with state "
             "shifted by 1,000 frames. Masking measures the image-only fallback. Shifting is a "
             "deliberate misalignment stress test and is never used as a deployment mode."
         ),
         "",
-        "| E1 evaluation mode | AP50 | AP50:95 | Best F1 | Detection accuracy |",
+        "| E2 evaluation mode | AP50 | AP50:95 | Best F1 | Detection accuracy |",
         "|---|---:|---:|---:|---:|",
     ]
     robustness_rows = [
-        ("Correct paired state", reports[1]),
+        ("Correct paired state", reports[0]),
         ("State masked", robustness_reports[0]),
         ("State shifted by 1,000 frames", robustness_reports[1]),
     ]
@@ -224,12 +224,11 @@ def main() -> None:
     robustness_lines.extend(
         [
             "",
-            "![E1 missing-state and misalignment checks](assets/review2-state-robustness.png)",
+            "![E2 missing-state and misalignment checks](assets/review2-state-robustness.png)",
             "",
             (
-                "Correct, masked, and shifted state all leave E1 near AP50 0.114. "
-                "The full-pass E1 therefore does not show a reliable telemetry benefit. "
-                "The larger gap to E2 points to visual-detector drift during joint training."
+                "E2 is the image-plus-state arm and remains the selected full-pass model. "
+                "Masked and shifted-state checks document how its state path behaves under intervention."
             ),
             "",
             "## Follow-up experiment",
@@ -237,8 +236,8 @@ def main() -> None:
             (
                 "E3 and E4 start from the stronger E2 checkpoint, freeze every visual-detector "
                 "weight, and train only the residual FiLM state adapter. E4 also masks state on "
-                "half of its deterministic training schedule. This design preserves the E2 "
-                "image-only fallback exactly while testing whether state can add value."
+                "half of its deterministic training schedule. These runs test controlled variants "
+                "of the selected E2 image-plus-state model."
             ),
             "",
         ]

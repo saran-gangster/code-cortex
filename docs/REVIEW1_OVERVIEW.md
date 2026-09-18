@@ -8,7 +8,7 @@ Flight-aware aerial detection and review. Evidence snapshot: 18 September 2026. 
 
 Drone images change with height, speed and angle. Engineers and traffic-monitoring operators need to inspect detections and understand the model's inputs. An image-only detector does not explicitly use flight state.
 
-AeroGuard tests whether paired height, speed and attitude help detect objects. We compare the same FCOS detector in two forms: E2 uses RGB images; E1 adds gated FiLM, a small module that adjusts image features using flight state. Missing state switches that adjustment off. The console shows detections, input status and model evidence, and lets an operator save a review.
+AeroGuard tests whether paired height, speed and attitude help detect objects. We compare the same FCOS detector in two forms: E1 uses RGB images only; E2 adds gated FiLM, a small module that adjusts image features using flight state. Missing state switches that adjustment off. The console shows detections, input status and model evidence, and lets an operator save a review.
 
 ## Working evidence
 

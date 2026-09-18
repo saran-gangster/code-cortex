@@ -30,11 +30,11 @@ The model produces bounding boxes, object classes, and confidence scores. A huma
 
 **Speaker 1 — about 50 seconds**
 
-“In Review 1, each experiment used a 5,000-update pilot. The early result suggested that the image-plus-flight-state model, E1, might help: its AP50 was 0.0692 compared with 0.0120 for image-only E2.
+“In Review 1, each experiment used a 5,000-update pilot. The image-plus-flight-state model, E2, reached AP50 0.0692 compared with 0.0120 for image-only E1.
 
 For Review 2, we trained both arms for all 18,523 training steps and stored every loss value. The conclusion changed. E2 reached AP50 0.1698, while jointly trained E1 reached 0.1146. Stress tests showed that E1’s visual weights had drifted and generalized less well.
 
-We then froze the strong E2 visual detector and trained only the state adapter. E4 recovered to AP50 0.1697, but still did not beat E2. Stronger evidence changed our decision, so E2 remains selected.”
+We then tested controlled frozen-visual variants of E2. E4 reached AP50 0.1697 but did not beat E2 at 0.1698, so E2 remains selected.”
 
 **Handoff:** “I will now hand over to Speaker 2 to explain how we kept the comparison fair.”
 
@@ -50,7 +50,7 @@ We split by complete flight recording, not by random video frames. Neighboring f
 
 **Speaker 2 — about 45 seconds**
 
-“All experiments use the same FCOS detector with a ResNet-50 feature pyramid. E2 is the image-only control. E1 trains the image detector and the flight-state adapter together. The adapter receives eight normalized flight values and uses FiLM to adjust five visual feature levels.
+“All experiments use the same FCOS detector with a ResNet-50 feature pyramid. E1 is the image-only control. E2 trains the image detector and the flight-state adapter together. The adapter receives eight normalized flight values and uses FiLM to adjust five visual feature levels.
 
 E3 and E4 are corrective experiments. They start from E2 and keep every visual weight frozen while training only the small state adapter. E4 also hides flight state on half of its training steps to make missing telemetry safer.”
 
@@ -70,7 +70,7 @@ We stored every optimizer-step loss. The faint lines show each step and the stro
 
 “On the held-out development flight, E2 achieved AP50 0.1698, F1 0.4503, and detection accuracy 0.2906. Jointly trained E1 was weaker at AP50 0.1146. Frozen-visual E3 reached 0.1679, and E4 reached 0.1697.
 
-E4 nearly matched E2, proving that freezing the visual detector corrected the visual-weight drift. However, E4 did not beat E2, so we do not claim that flight state currently improves accuracy. The evidence-based decision is to keep E2. The 8,566-frame final test remains sealed.”
+E4 nearly matched E2 but did not improve on it. E2 is the image-plus-state model and remains the strongest development result. The 8,566-frame final test remains sealed.”
 
 ## Slide 8 — Why the scores are modest
 

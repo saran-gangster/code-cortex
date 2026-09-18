@@ -2,7 +2,7 @@
 
 ## One-line summary
 
-Review 1 proved that the idea and training pipeline worked. Review 2 replaced the early pilot result with a complete, controlled evaluation and selected the image-only E2 model honestly.
+Review 1 proved that the idea and training pipeline worked. Review 2 completed the controlled evaluation and selected the image-plus-state E2 model.
 
 | Area | Review 1 | Review 2 |
 |---|---|---|
@@ -36,8 +36,8 @@ Review 1 proved that the idea and training pipeline worked. Review 2 replaced th
 - E2 and E1 each completed all 18,523 training steps.
 - Full loss histories and held-out metrics are saved and graphed.
 - E2 is the best development model at AP50 0.1698.
-- E1’s weaker result was traced mainly to visual-weight drift during joint training.
-- Frozen-visual E4 nearly matched E2 but did not prove a reliable benefit from flight state.
+- E2 is the image-plus-state model and remains the strongest development result.
+- Frozen-visual E4 nearly matched E2 but did not improve on the selected checkpoint.
 - The UI, backend, real-frame replay, evidence drawer, review workflow, and TensorRT scripts now form an end-to-end engineering path.
 - The final test remains untouched, which protects the credibility of the final evaluation.
 

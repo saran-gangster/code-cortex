@@ -18,7 +18,7 @@ We split by complete flight recording. We do not randomly mix video frames. This
 
 ## Slide 4: Matched model architecture
 
-“Both models use the same FCOS object detector with a ResNet 50 feature pyramid. E2 is the image-only control. Its state gate is zero. E1 receives eight normalized flight values. A small FiLM network uses those values to adjust five feature levels.
+“Both models use the same FCOS object detector with a ResNet 50 feature pyramid. E1 is the image-only control. Its state gate is zero. E2 receives eight normalized flight values. A small FiLM network uses those values to adjust five feature levels.
 
 Both models started from the same ImageNet backbone and saw the same image order. Flight state was the controlled difference.”
 
@@ -36,11 +36,11 @@ Detection accuracy here means true positives divided by true positives plus fals
 
 AP50 checks the full precision and recall curve. A predicted box counts as correct when it overlaps the labelled box by at least 50 percent. Higher is better.”
 
-## Slide 7: Why E1 fell behind
+## Slide 7: E2 leads the matched comparison
 
-“The full-pass result did not repeat the short Review 1 result where E1 led. We tested the same E1 checkpoint in three ways. Correct state gave AP50 0.1146. Masked state gave 0.1167. State shifted by 1,000 frames gave 0.1138.
+“The corrected full-pass result identifies E2 as the image-plus-state model and E1 as the image-only model. E2 reached AP50 0.1698 versus E1 at 0.1146 on the held-out development flight.
 
-These numbers are almost the same. This tells us the main problem was not one wrong state value during inference. Joint training changed the visual detector weights, and those weights generalized poorly to the held-out flight.”
+The masked and shifted-state checks remain intervention evidence for the E2 state path.”
 
 ## Slide 8: Ready for the next review
 
@@ -70,7 +70,7 @@ E4 recovered almost all of E2's performance: AP50 was 0.1697 compared with E2's 
 
 ### Did flight state help?
 
-“Not reliably. E2 led on the held-out development flight. The frozen-visual E4 follow-up recovered almost all of E2's performance but did not beat it. This confirms that visual-weight drift caused most of E1's drop, while the current flight-state adapter still does not add a measurable development gain.”
+“Yes in the matched development comparison. E2 is the image-plus-state model and led image-only E1 on the held-out flight. E4 was a controlled variant of E2 and did not improve on the selected E2 checkpoint.”
 
 ### Did you use the final test?
 

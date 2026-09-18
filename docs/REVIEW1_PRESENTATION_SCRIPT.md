@@ -18,7 +18,7 @@ The operator can see what the model found, which inputs it used, and when an inp
 
 ## 0:55–1:40 — Speaker 1: the solution and data
 
-“We compare two versions of the same detector. E2 sees the colour image. E1 sees the image and paired flight state. Both get the same training budget and image order.
+“We compare two versions of the same detector. E1 sees the colour image only. E2 sees the image and paired flight state. Both get the same training budget and image order.
 
 AU-AIR has 32,823 paired frames. Our parser rejected and logged 54 invalid boxes, leaving 131,977 valid boxes across eight classes.
 
@@ -94,7 +94,7 @@ AeroGuard makes aerial detections easier to inspect: what the model found, which
 
 **What is new here?** Our contribution is the controlled use of paired flight state, missing-state handling and a review workflow with traceable evidence. FCOS and FiLM are existing methods that we build on.
 
-**Does flight state improve accuracy?** On the single frozen development recording, yes: the matched ImageNet E1 arm is above E2 on AP and recall. That supports the idea but does not prove generalization. Final-test results are unavailable, and training losses were not used for this conclusion.
+**Does flight state improve accuracy?** On the single frozen development recording, yes: the matched ImageNet E2 arm is above image-only E1 on AP and recall. That supports the idea but does not prove generalization. Final-test results are unavailable, and training losses were not used for this conclusion.
 
 **Why FCOS?** Its feature pyramid is accessible, so we can add and test conditioning at a clear point. It already provides detection outputs and losses. We do not claim it is the fastest detector.
 

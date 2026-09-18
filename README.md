@@ -11,7 +11,7 @@ AeroGuard combines a TorchVision FCOS detector with gated FiLM conditioning so t
 - A responsive React review console that can start from bundled fixtures and connect to the API.
 - A documented [ONNX/TensorRT edge deployment stack](deployment/tensorrt/README.md) with export, engine-build, validation, and inference scripts.
 - Reproducible Kaggle scripts for protocol construction, matched training, evaluation, and artifact capture.
-- A dual-T4 Lightning gate that ran matched E2 masked-state and E1 paired-state arms from one hashed initialization and image schedule.
+- A dual-T4 Lightning gate that ran matched E1 image-only and E2 paired-state arms from one hashed initialization and image schedule.
 - A deterministic evaluator for AP50, AP50:95, per-class support, per-root results, fixed-point recall, calibration, and VisDrone ignore regions.
 - Judge-ready [Review 1 materials](docs/REVIEW1_OVERVIEW.md), [Review 2 evidence](docs/REVIEW2_EVIDENCE.md), [frozen-visual adapter follow-up](docs/REVIEW2_ADAPTER_FOLLOWUP.md), [final Review 2 deck](docs/final-review2/AeroGuard_Review2_Final_Deck.pptx), [team presentation script](docs/final-review2/REVIEW2_FINAL_PRESENTATION_SCRIPT.md), [Review 1 to Review 2 comparison](docs/final-review2/REVIEW1_TO_REVIEW2.md), [judge Q&A](docs/final-review2/JUDGE_QA.md), [system architecture](docs/assets/aeroguard-review1-architecture.png), and [E2/E1 model architecture](docs/assets/aeroguard-model-architecture.png).
 
@@ -22,11 +22,11 @@ Training and benchmark values appear only after a run writes machine-generated r
 - AU-AIR manifest: 32,823 frames, 131,977 valid boxes, 54 rejected nonpositive boxes.
 - Random-init FCOS overfit gate: loss 2.87 to 1.28 over 24 updates on one real frame.
 - Matched Lightning gate: 40 updates per arm, concurrently on physical T4 GPUs 0 and 1, with the same warmstart and eight-frame schedule hashes.
-- Masked E2 kept FiLM projections at exactly zero; paired E1 moved their L1 norm from 0 to 120.735.
+- Image-only E1 kept FiLM projections at exactly zero; paired-state E2 moved their L1 norm from 0 to 120.735.
 - Matched random-control and ImageNet-backbone development-training pairs each completed 5,000 updates per arm on physical T4 GPUs 0 and 1. Their saved reports remain training evidence, not held-out accuracy.
-- On the frozen development root, the matched ImageNet E1 flight-state arm reached AP50 0.0692 and AP50:95 0.0234 versus E2's 0.0120 and 0.0024. This supports E1 on development only; the final test remains sealed.
+- On the frozen development root, the matched ImageNet E2 flight-state arm reached AP50 0.0692 and AP50:95 0.0234 versus image-only E1 at 0.0120 and 0.0024. This supports E2 on development only; the final test remains sealed.
 - The Review 2 pair completed one full pass over all 18,523 training frames per arm. Every optimizer-step loss is stored and hashed, both arms use the same frame order and ImageNet warmstart, and physical GPUs 0 and 1 ran concurrently.
-- On the same held-out development flight after the full pass, E2 reached AP50 0.1698, best F1 0.4503, and detection accuracy 0.2906. Jointly trained E1 reached AP50 0.1146, best F1 0.2515, and detection accuracy 0.1438. E1 with correct, masked, and shifted state stayed near AP50 0.114, pointing to visual-weight drift rather than a single bad telemetry value.
+- On the same held-out development flight after the full pass, image-plus-state E2 reached AP50 0.1698, best F1 0.4503, and detection accuracy 0.2906. Image-only E1 reached AP50 0.1146, best F1 0.2515, and detection accuracy 0.1438.
 - The corrective E3/E4 runs froze and byte-verified every E2 visual tensor while training only the FiLM adapter for 18,523 steps. E4 with 50% state dropout nearly matched E2 at AP50 0.1697, F1 0.4493, and detection accuracy 0.2897, but did not beat it. E2 therefore remains the development-selected model.
 
 The smoke and 40-step runs are implementation gates. The separate [development results](docs/DEVELOPMENT_RESULTS.md) are real held-out development evidence, not final-test or safety evidence.

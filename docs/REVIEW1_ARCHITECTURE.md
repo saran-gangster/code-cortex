@@ -6,7 +6,7 @@
 
 ![AeroGuard E2 and E1 model architecture](assets/aeroguard-model-architecture.png)
 
-This second diagram zooms into the two experiment arms. Both use the same RGB input path, ImageNet-initialized ResNet-50 backbone, five-level 256-channel feature pyramid, and FCOS classification/regression/centerness head. E2 sets the state gate to zero, so FiLM is an identity transform. E1 sanitizes and normalizes eight flight values, encodes them with an `8 → 64 → 64` MLP, and generates scale and shift parameters for every FPN level. The random-control pair used the same architecture with a random rather than ImageNet backbone initialization.
+This second diagram zooms into the two experiment arms. Both use the same RGB input path, ImageNet-initialized ResNet-50 backbone, five-level 256-channel feature pyramid, and FCOS classification/regression/centerness head. E1 sets the state gate to zero, so FiLM is an identity transform. E2 sanitizes and normalizes eight flight values, encodes them with an `8 → 64 → 64` MLP, and generates scale and shift parameters for every FPN level. The random-control pair used the same architecture with a random rather than ImageNet backbone initialization.
 
 Follow stages 1–3 across the top, then the cyan arrow to stages 4–6 across the bottom. Each card gives its purpose and the tools used. This is the intended data flow, not a claim that every evaluation or deployment step has finished. The final test is sealed; no final-test metrics are available.
 
@@ -14,16 +14,16 @@ Follow stages 1–3 across the top, then the cyan arrow to stages 4–6 across t
 |---|---|
 | 1. Input | AU-AIR supplies colour drone images paired with height, velocity and orientation. The data card records 32,823 frames and eight object classes. Pairing does not prove zero sensor delay. |
 | 2. Data checks & safe split | Python checks units, labels, boxes and image identity; PyTorch data tools feed samples to training. Invalid boxes are rejected and logged. Related streams stay in the same recording group: five groups train, one develops the model, two remain sealed. This prevents nearby frames from leaking across partitions. “Safe split” means protection against data leakage, not flight safety. State scaling uses training data only. |
-| 3. E2: image-only | PyTorch and TorchVision FCOS predict object boxes, classes and scores from images. FCOS is the object detector; its ResNet-50 backbone and feature pyramid find image patterns at several scales. Flight state is masked. Lightning manages training and checkpoints. |
-| 3. E1: image + flight state | The same tools add gated FiLM: feature adjustment from flight data. FiLM formally means feature-wise linear modulation. A small network scales and shifts image features using flight state. The gate disables this adjustment when state is absent; invalid values are cleaned before encoding. Lightning manages this training run too. |
-| 4. Fair development comparison | Compare both trained models on the same development data, after matching their starting weights, training budget and image order. The ImageNet E1 arm reached AP50 0.0692 versus E2 at 0.0120 on the single development recording. This is development evidence, not a final-test or safety claim. |
+| 3. E1: image-only | PyTorch and TorchVision FCOS predict object boxes, classes and scores from images. FCOS is the object detector; its ResNet-50 backbone and feature pyramid find image patterns at several scales. Flight state is masked. Lightning manages training and checkpoints. |
+| 3. E2: image + flight state | The same tools add gated FiLM: feature adjustment from flight data. FiLM formally means feature-wise linear modulation. A small network scales and shifts image features using flight state. The gate disables this adjustment when state is absent; invalid values are cleaned before encoding. Lightning manages this training run too. |
+| 4. Fair development comparison | Compare both trained models on the same development data, after matching their starting weights, training budget and image order. The ImageNet E2 arm reached AP50 0.0692 versus E1 at 0.0120 on the single development recording. This is development evidence, not a final-test or safety claim. |
 | 5. Evidence service | FastAPI serves results with their model version and input source. Pydantic checks request and record formats. The API is the interface through which the console requests data. JSON stores structured evidence; JSONL stores one review record per line. |
 | 6. Review console | React and TypeScript build the screen; Vite builds and serves the frontend. Users inspect detections, input status and evidence, then save or export a review. Fixture and cached modes are labelled. A release checkpoint/runtime still needs local integration. |
 | VisDrone RGB-only → external evaluation (planned) | A separate external test with state unavailable. The seven-concept class mapping and ignore policy are implemented; a completed external model evaluation is not claimed. |
 
 The parallel branches represent a fair experiment. They do not combine their predictions. The completed random-control pair used separate physical Tesla T4 GPUs 0 and 1 through Lightning, with 5,000 updates per arm and 18,523 available training records. The matching schedule hash is `f265ee838760d82fdb1816b014b7ce6d10dc87ac7da22dafdd0da3502d205e6d`.
 
-The [ImageNet E2](../reports/development_imagenet_e2_summary.json) and [ImageNet E1](../reports/development_imagenet_e1_summary.json) reports record 5,000 completed updates each. Their shared weights use an ImageNet ResNet-50 backbone, a seeded random nine-label AU-AIR head (including background), and identity-initialized FiLM. Training loss is not accuracy evidence. Missing-state E1 is also not guaranteed to match independently trained E2.
+The [ImageNet E2](../reports/development_imagenet_e2_summary.json) and [ImageNet E1](../reports/development_imagenet_e1_summary.json) reports record 5,000 completed updates each. Their shared weights use an ImageNet ResNet-50 backbone, a seeded random nine-label AU-AIR head (including background), and identity-initialized FiLM. Training loss is not accuracy evidence. Missing-state E2 is also not guaranteed to match independently trained E1.
 
 The completed [development comparison](DEVELOPMENT_RESULTS.md) supports E1 as the leading checkpoint on one recording root. It does not freeze the missing-state fallback or score threshold, and the final test remains sealed.
 
@@ -49,10 +49,10 @@ Colour images, height, speed and angle
 Check labels; keep recordings separate
 Python / PyTorch data tools
 3 TWO EXPERIMENTS
-E2: image-only
+E1: image-only
 Find objects from images
 PyTorch + TorchVision FCOS detector + Lightning
-E1: image + flight state
+E2: image + flight state
 Gated FiLM (feature adjustment from flight data)
 PyTorch + TorchVision FCOS detector + Lightning
 4 FAIR DEVELOPMENT COMPARISON

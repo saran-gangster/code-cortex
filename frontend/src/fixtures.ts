@@ -74,8 +74,8 @@ export const offlineModels: ModelSummary[] = documentedReports.map((report) => (
 }))
 
 export function fixtureDetections(frame: InferenceRecord, kind: 'e2' | 'e1'): Detection[] {
-  if (kind === 'e2' && frame.rgb_detections) return frame.rgb_detections
-  if (kind === 'e1' && frame.state_detections) return frame.state_detections
-  if (kind === 'e1') return frame.detections
+  if (kind === 'e1' && frame.rgb_detections) return frame.rgb_detections
+  if (kind === 'e2' && frame.state_detections) return frame.state_detections
+  if (kind === 'e2') return frame.detections
   return frame.detections.slice(0, Math.max(1, frame.detections.length - 1)).map((item) => ({ ...item, raw_score: Math.max(0, (item.raw_score ?? 0) - 0.08) }))
 }

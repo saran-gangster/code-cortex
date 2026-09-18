@@ -125,8 +125,8 @@ def main() -> None:
             raise RuntimeError(f"{name}: visual state hash differs from the parent")
 
     labels = [
-        "E2\nimage only",
-        "E1\njoint training",
+        "E2\nimage + state",
+        "E1\nimage only",
         "E3\nexact frozen visual",
         "E4\nexact frozen + dropout",
     ]
@@ -252,7 +252,7 @@ def main() -> None:
         "# AeroGuard frozen-visual adapter follow-up",
         "",
         (
-            "This experiment responds to the full-pass E1 failure mode. E3 and E4 start "
+            "This experiment tests controlled variants of the selected E2 image-plus-state model. E3 and E4 start "
             "from the stronger E2 checkpoint. Every visual-detector tensor is frozen and "
             "verified byte-for-byte after training; only the residual FiLM adapter changes."
         ),

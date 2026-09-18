@@ -115,7 +115,7 @@ def _validate_history(run: Path, rows: list[dict]) -> dict:
 def generate_loss_graph(output: Path, run_paths: list[Path]) -> None:
     histories = [read_jsonl(path / "loss_history.jsonl") for path in run_paths]
     summaries = [_validate_history(path, rows) for path, rows in zip(run_paths, histories, strict=True)]
-    labels = ["E2 image only", "E1 image + flight state"]
+    labels = ["E2 image + flight state", "E1 image only"]
     colors = [CYAN, AMBER]
     window = 200
 
@@ -164,7 +164,7 @@ def generate_loss_graph(output: Path, run_paths: list[Path]) -> None:
 
 
 def generate_component_graph(output: Path, run_paths: list[Path]) -> None:
-    labels = ["E2 image only", "E1 image + flight state"]
+    labels = ["E2 image + flight state", "E1 image only"]
     component_specs = [
         ("classification", "Classification", CYAN),
         ("bbox_regression", "Box regression", AMBER),
@@ -194,7 +194,7 @@ def generate_development_graph(output: Path, report_paths: list[Path]) -> None:
     for report in reports:
         if report["partition"] != "development" or report["final_test_unsealed"] is not False:
             raise RuntimeError("reports must contain sealed development-only evidence")
-    labels = ["E2 image only", "E1 image + state"]
+    labels = ["E2 image + state", "E1 image only"]
     pooled = [report["metrics"]["pooled"] for report in reports]
     best = [report["metrics"]["operating_point_sweep"]["best_f1_point"] for report in reports]
 
@@ -267,7 +267,7 @@ def generate_development_graph(output: Path, report_paths: list[Path]) -> None:
 
 
 def generate_threshold_graph(output: Path, report_paths: list[Path]) -> None:
-    labels = ["E2 image only", "E1 image + flight state"]
+    labels = ["E2 image + flight state", "E1 image only"]
     colors = [CYAN, AMBER]
     figure, axes = plt.subplots(1, 2, figsize=(16, 7.8), facecolor=BG, sharey=True)
     figure.suptitle("Choosing the confidence threshold on development data", color=TEXT, fontsize=22, fontweight="bold", y=0.98)
@@ -306,7 +306,7 @@ def generate_threshold_graph(output: Path, report_paths: list[Path]) -> None:
 def generate_per_class_graph(output: Path, report_paths: list[Path]) -> None:
     reports = [read_json(path) for path in report_paths]
     per_class = [report["metrics"]["pooled"]["per_class"] for report in reports]
-    labels = ["E2 image only", "E1 image + state"]
+    labels = ["E2 image + state", "E1 image only"]
     colors = [CYAN, AMBER]
     x = np.arange(len(CLASS_NAMES))
     width = 0.36
@@ -346,7 +346,7 @@ def generate_per_class_graph(output: Path, report_paths: list[Path]) -> None:
 
 def generate_robustness_graph(output: Path, report_paths: list[Path]) -> None:
     reports = [read_json(path) for path in report_paths]
-    labels = ["E2\nimage only", "E1\npaired state", "E1\nstate masked", "E1\nstate shifted"]
+    labels = ["E2\npaired state", "E1\nimage only", "E2\nstate masked", "E2\nstate shifted"]
     colors = [CYAN, AMBER, PURPLE, RED]
     pooled = [report["metrics"]["pooled"] for report in reports]
     best = [report["metrics"]["operating_point_sweep"]["best_f1_point"] for report in reports]
