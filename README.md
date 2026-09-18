@@ -12,7 +12,7 @@ AeroGuard combines a TorchVision FCOS detector with gated FiLM conditioning so t
 - Reproducible Kaggle scripts for protocol construction, matched training, evaluation, and artifact capture.
 - A dual-T4 Lightning gate that ran matched E1 masked-state and E2 paired-state arms from one hashed initialization and image schedule.
 - A deterministic evaluator for AP50, AP50:95, per-class support, per-root results, fixed-point recall, calibration, and VisDrone ignore regions.
-- A judge-ready [Review 1 overview](docs/REVIEW1_OVERVIEW.md), [team presentation script](docs/REVIEW1_PRESENTATION_SCRIPT.md), and [simple architecture diagram](docs/REVIEW1_ARCHITECTURE.md).
+- A judge-ready [Review 1 overview](docs/REVIEW1_OVERVIEW.md), [team presentation script](docs/REVIEW1_PRESENTATION_SCRIPT.md), [system architecture](docs/assets/aeroguard-review1-architecture.png), and [E1/E2 model architecture](docs/assets/aeroguard-model-architecture.png).
 
 Training and benchmark values appear only after a run writes machine-generated result artifacts. Missing values remain unavailable; the UI never substitutes invented metrics.
 

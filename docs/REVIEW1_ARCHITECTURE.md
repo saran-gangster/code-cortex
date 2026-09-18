@@ -2,6 +2,12 @@
 
 ![AeroGuard Review Architecture](assets/aeroguard-review1-architecture.png)
 
+## E1 and E2 model architecture
+
+![AeroGuard E1 and E2 model architecture](assets/aeroguard-model-architecture.png)
+
+This second diagram zooms into the two experiment arms. Both use the same RGB input path, ImageNet-initialized ResNet-50 backbone, five-level 256-channel feature pyramid, and FCOS classification/regression/centerness head. E1 sets the state gate to zero, so FiLM is an identity transform. E2 sanitizes and normalizes eight flight values, encodes them with an `8 → 64 → 64` MLP, and generates scale and shift parameters for every FPN level. The random-control pair used the same architecture with a random rather than ImageNet backbone initialization.
+
 Follow stages 1–3 across the top, then the cyan arrow to stages 4–6 across the bottom. Each card gives its purpose and the tools used. This is the intended data flow, not a claim that every evaluation or deployment step has finished. The final test is sealed; no final-test metrics are available.
 
 | Box | What it means |
