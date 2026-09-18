@@ -1,0 +1,493 @@
+{
+  "dataset_id": "AU-AIR",
+  "display_threshold": 0.45,
+  "frames": [
+    {
+      "frame_id": "frame_20190905091750_x_0000129",
+      "frame_index": 129,
+      "ground_truth": [
+        {
+          "box_xyxy": [
+            991.0,
+            472.0,
+            1176.0,
+            533.0
+          ],
+          "class_name": "Car"
+        },
+        {
+          "box_xyxy": [
+            1482.0,
+            418.0,
+            1581.0,
+            494.0
+          ],
+          "class_name": "Truck"
+        }
+      ],
+      "image_filename": "frame_20190905091750_x_0000129.jpg",
+      "original_size": {
+        "height": 1080,
+        "width": 1920
+      },
+      "rgb_detections": [
+        {
+          "box_xyxy": [
+            990.090576171875,
+            463.9183044433594,
+            1173.53662109375,
+            548.1591186523438
+          ],
+          "calibrated_score": null,
+          "class_name": "Car",
+          "raw_score": 0.4960465729236603,
+          "track_id": null
+        },
+        {
+          "box_xyxy": [
+            370.9114990234375,
+            19.55898094177246,
+            621.6962890625,
+            274.5755920410156
+          ],
+          "calibrated_score": null,
+          "class_name": "Human",
+          "raw_score": 0.4584713578224182,
+          "track_id": null
+        }
+      ],
+      "source_time_iso_no_timezone": "2019-09-05T09:18:15.600000",
+      "source_time_ms": 25800,
+      "state": [
+        3.483,
+        0.2447969764471054,
+        -1.512471079826355,
+        -0.0558168888092041,
+        -0.05254993215203285,
+        0.07869164645671844,
+        0.10251193695994044,
+        0.9947317742892912
+      ],
+      "state_detections": [
+        {
+          "box_xyxy": [
+            989.453369140625,
+            462.3546142578125,
+            1175.77099609375,
+            549.2506713867188
+          ],
+          "calibrated_score": null,
+          "class_name": "Car",
+          "raw_score": 0.5444372892379761,
+          "track_id": null
+        }
+      ]
+    },
+    {
+      "frame_id": "frame_20190905091750_x_0000130",
+      "frame_index": 130,
+      "ground_truth": [
+        {
+          "box_xyxy": [
+            1051.0,
+            457.0,
+            1232.0,
+            539.0
+          ],
+          "class_name": "Car"
+        },
+        {
+          "box_xyxy": [
+            1205.0,
+            412.0,
+            1257.0,
+            437.0
+          ],
+          "class_name": "Car"
+        },
+        {
+          "box_xyxy": [
+            1464.0,
+            407.0,
+            1575.0,
+            503.0
+          ],
+          "class_name": "Car"
+        },
+        {
+          "box_xyxy": [
+            857.0,
+            412.0,
+            872.0,
+            425.0
+          ],
+          "class_name": "Car"
+        },
+        {
+          "box_xyxy": [
+            832.0,
+            412.0,
+            856.0,
+            438.0
+          ],
+          "class_name": "Car"
+        },
+        {
+          "box_xyxy": [
+            1026.0,
+            416.0,
+            1050.0,
+            439.0
+          ],
+          "class_name": "Car"
+        }
+      ],
+      "image_filename": "frame_20190905091750_x_0000130.jpg",
+      "original_size": {
+        "height": 1080,
+        "width": 1920
+      },
+      "rgb_detections": [
+        {
+          "box_xyxy": [
+            1057.3848876953125,
+            462.1213684082031,
+            1235.2760009765625,
+            544.8362426757812
+          ],
+          "calibrated_score": null,
+          "class_name": "Car",
+          "raw_score": 0.4755525290966034,
+          "track_id": null
+        },
+        {
+          "box_xyxy": [
+            368.67041015625,
+            17.456905364990234,
+            623.1307983398438,
+            276.2484436035156
+          ],
+          "calibrated_score": null,
+          "class_name": "Human",
+          "raw_score": 0.4644468426704407,
+          "track_id": null
+        }
+      ],
+      "source_time_iso_no_timezone": "2019-09-05T09:18:15.800000",
+      "source_time_ms": 26000,
+      "state": [
+        3.5020000000000002,
+        0.15674468874931335,
+        -1.2789987325668335,
+        -0.0166766494512558,
+        0.20927459001541138,
+        0.08226896077394485,
+        0.10034654269518098,
+        0.9949525472951583
+      ],
+      "state_detections": [
+        {
+          "box_xyxy": [
+            1056.14111328125,
+            460.68646240234375,
+            1237.57958984375,
+            545.9038696289062
+          ],
+          "calibrated_score": null,
+          "class_name": "Car",
+          "raw_score": 0.5185109972953796,
+          "track_id": null
+        }
+      ]
+    },
+    {
+      "frame_id": "frame_20190905091750_x_0000131",
+      "frame_index": 131,
+      "ground_truth": [
+        {
+          "box_xyxy": [
+            1118.0,
+            455.0,
+            1288.0,
+            534.0
+          ],
+          "class_name": "Car"
+        },
+        {
+          "box_xyxy": [
+            1455.0,
+            403.0,
+            1572.0,
+            491.0
+          ],
+          "class_name": "Van"
+        }
+      ],
+      "image_filename": "frame_20190905091750_x_0000131.jpg",
+      "original_size": {
+        "height": 1080,
+        "width": 1920
+      },
+      "rgb_detections": [
+        {
+          "box_xyxy": [
+            1119.4619140625,
+            457.3921813964844,
+            1286.4300537109375,
+            540.851318359375
+          ],
+          "calibrated_score": null,
+          "class_name": "Car",
+          "raw_score": 0.4762437343597412,
+          "track_id": null
+        },
+        {
+          "box_xyxy": [
+            1121.7259521484375,
+            454.40423583984375,
+            1284.3826904296875,
+            538.689453125
+          ],
+          "calibrated_score": null,
+          "class_name": "Van",
+          "raw_score": 0.4527767300605774,
+          "track_id": null
+        }
+      ],
+      "source_time_iso_no_timezone": "2019-09-05T09:18:16",
+      "source_time_ms": 26200,
+      "state": [
+        3.543,
+        0.11478018760681152,
+        -0.575717568397522,
+        -0.0009973421692848206,
+        0.1554795801639557,
+        0.12231480330228806,
+        0.1031709001690017,
+        0.9946636443332579
+      ],
+      "state_detections": [
+        {
+          "box_xyxy": [
+            1118.212158203125,
+            456.0833435058594,
+            1288.4228515625,
+            541.5215454101562
+          ],
+          "calibrated_score": null,
+          "class_name": "Car",
+          "raw_score": 0.5023223757743835,
+          "track_id": null
+        }
+      ]
+    },
+    {
+      "frame_id": "frame_20190905091750_x_0000132",
+      "frame_index": 132,
+      "ground_truth": [
+        {
+          "box_xyxy": [
+            1433.0,
+            415.0,
+            1557.0,
+            485.0
+          ],
+          "class_name": "Van"
+        },
+        {
+          "box_xyxy": [
+            1175.0,
+            447.0,
+            1335.0,
+            527.0
+          ],
+          "class_name": "Car"
+        },
+        {
+          "box_xyxy": [
+            836.0,
+            396.0,
+            880.0,
+            438.0
+          ],
+          "class_name": "Car"
+        }
+      ],
+      "image_filename": "frame_20190905091750_x_0000132.jpg",
+      "original_size": {
+        "height": 1080,
+        "width": 1920
+      },
+      "rgb_detections": [
+        {
+          "box_xyxy": [
+            1172.5562744140625,
+            447.35125732421875,
+            1332.2752685546875,
+            527.4395141601562
+          ],
+          "calibrated_score": null,
+          "class_name": "Van",
+          "raw_score": 0.4728926420211792,
+          "track_id": null
+        },
+        {
+          "box_xyxy": [
+            1172.5562744140625,
+            447.35125732421875,
+            1332.2752685546875,
+            527.4395141601562
+          ],
+          "calibrated_score": null,
+          "class_name": "Car",
+          "raw_score": 0.45371586084365845,
+          "track_id": null
+        }
+      ],
+      "source_time_iso_no_timezone": "2019-09-05T09:18:16.200000",
+      "source_time_ms": 26400,
+      "state": [
+        3.515,
+        -0.1539311707019806,
+        -0.42847421765327454,
+        0.05131988227367401,
+        0.020195670425891876,
+        0.27430564165115356,
+        0.10842558270838451,
+        0.9941045684505968
+      ],
+      "state_detections": [
+        {
+          "box_xyxy": [
+            1172.041259765625,
+            446.8406982421875,
+            1334.431640625,
+            527.7720336914062
+          ],
+          "calibrated_score": null,
+          "class_name": "Van",
+          "raw_score": 0.46020808815956116,
+          "track_id": null
+        }
+      ]
+    },
+    {
+      "frame_id": "frame_20190905091750_x_0000133",
+      "frame_index": 133,
+      "ground_truth": [
+        {
+          "box_xyxy": [
+            1210.0,
+            437.0,
+            1369.0,
+            537.0
+          ],
+          "class_name": "Car"
+        },
+        {
+          "box_xyxy": [
+            1437.0,
+            392.0,
+            1520.0,
+            481.0
+          ],
+          "class_name": "Car"
+        }
+      ],
+      "image_filename": "frame_20190905091750_x_0000133.jpg",
+      "original_size": {
+        "height": 1080,
+        "width": 1920
+      },
+      "rgb_detections": [
+        {
+          "box_xyxy": [
+            1230.1927490234375,
+            445.21063232421875,
+            1389.367431640625,
+            525.5322875976562
+          ],
+          "calibrated_score": null,
+          "class_name": "Van",
+          "raw_score": 0.46641284227371216,
+          "track_id": null
+        },
+        {
+          "box_xyxy": [
+            1230.1927490234375,
+            445.21063232421875,
+            1389.367431640625,
+            525.5322875976562
+          ],
+          "calibrated_score": null,
+          "class_name": "Car",
+          "raw_score": 0.45898792147636414,
+          "track_id": null
+        }
+      ],
+      "source_time_iso_no_timezone": "2019-09-05T09:18:16.400000",
+      "source_time_ms": 26600,
+      "state": [
+        3.486,
+        -0.7237444519996643,
+        -0.4247189462184906,
+        0.05657827854156494,
+        -0.05347497761249542,
+        0.32771825790405273,
+        0.10642102622614015,
+        0.9943211579650587
+      ],
+      "state_detections": []
+    },
+    {
+      "frame_id": "frame_20190905091750_x_0000134",
+      "frame_index": 134,
+      "ground_truth": [
+        {
+          "box_xyxy": [
+            1408.0,
+            409.0,
+            1525.0,
+            480.0
+          ],
+          "class_name": "Car"
+        },
+        {
+          "box_xyxy": [
+            1279.0,
+            447.0,
+            1420.0,
+            520.0
+          ],
+          "class_name": "Car"
+        }
+      ],
+      "image_filename": "frame_20190905091750_x_0000134.jpg",
+      "original_size": {
+        "height": 1080,
+        "width": 1920
+      },
+      "rgb_detections": [],
+      "source_time_iso_no_timezone": "2019-09-05T09:18:16.600000",
+      "source_time_ms": 26800,
+      "state": [
+        3.448,
+        -1.2180895805358887,
+        -0.5751694440841675,
+        0.02436789870262146,
+        -0.05559651181101799,
+        0.2481437623500824,
+        0.1023270818166278,
+        0.9947508071506618
+      ],
+      "state_detections": []
+    }
+  ],
+  "partition": "development",
+  "prediction_source": "computed",
+  "provenance": "Real AU-AIR development images with stored GPU-computed E1 and E4 predictions",
+  "recording_root": "20190905091750",
+  "rgb_model_id": "imagenet-full-pass-e1-rgb-masked",
+  "schema_version": "1.0",
+  "state_model_id": "imagenet-e4-exact-frozen-visual-film-dropout50"
+}

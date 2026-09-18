@@ -1,0 +1,246 @@
+[
+  {
+    "artifact_kind": "auair_development_evaluation_not_final_test",
+    "benchmark_claim": false,
+    "checkpoint_id": "7cea7f2cd4c6eef1c26e0fdc2df98df9267b8c23b6dc02d38c194661509bd5e2",
+    "config": {
+      "checkpoint_training_arm": "masked",
+      "device": "Tesla T4",
+      "display_threshold": 0.3,
+      "initial_weights_origin": "torchvision_resnet50_imagenet1k_v2_backbone",
+      "max_detections_per_image": 300,
+      "normalizer_sha256": "11b40c1ce508a4a644a71708f6a6709ae81ed81b4618689b59b2954383a48678",
+      "physical_gpu_id": "0",
+      "score_floor": 0.05,
+      "shared_warmstart_sha256": "82c6ac41a943a60a99513b1e255b5762f4cedf2563284260f14094610643a4e5",
+      "state_alignment": "masked_unavailable",
+      "state_mode": "masked",
+      "torch_version": "2.10.0+cu128",
+      "training_schedule_sha256": "de8379eb59a77124950ea9d6f24512a296b70d87881ae03c6b1d6aab3d860255",
+      "evidence_source": "reports/evaluations/review2-imagenet-e1-full-pass.json"
+    },
+    "final_test_unsealed": false,
+    "limitations": [
+      "Development-root evidence only; final-test roots remain sealed.",
+      "Thresholds are not frozen for release by this report.",
+      "Calibration covers emitted detections only and does not measure missed objects.",
+      "Finite zero-area detector outputs are dropped and counted before evaluation.",
+      "Detection accuracy means TP/(TP+FP+FN), not image-classification accuracy.",
+      "The best-F1 threshold is selected only on development data; final test remains sealed.",
+      "Random-initialized runs are controls unless the model id explicitly states ImageNet.",
+      "Documented snapshot of the committed report; not a live API response."
+    ],
+    "metrics": {
+      "evaluated_frame_count": 5734,
+      "pooled": {
+        "ap50": 0.1697852101126862
+      },
+      "latency": {
+        "p95_ms": 43.91592245001448
+      },
+      "operating_point_sweep": {
+        "best_f1_point": {
+          "detection_accuracy": 0.29061174515719973,
+          "f1": 0.45034728104353716,
+          "false_negatives": 10227,
+          "false_positives": 5996,
+          "iou_threshold": 0.5,
+          "precision": 0.5257079576016453,
+          "recall": 0.3938837195519469,
+          "score_threshold": 0.45,
+          "true_positives": 6646
+        },
+        "selection_partition": "development"
+      }
+    },
+    "model_id": "imagenet-full-pass-e1-rgb-masked",
+    "partition": "development",
+    "protocol_sha256": "c848194b212301de811fc835eb561bfbc6d4ee60bf9f39fb7497c06b97f7a1cc",
+    "schema_version": "1.0",
+    "report_id": "review2-imagenet-e1-full-pass",
+    "documentedFallback": true
+  },
+  {
+    "artifact_kind": "auair_development_evaluation_not_final_test",
+    "benchmark_claim": false,
+    "checkpoint_id": "4a7b05db34ae7f06d5126a4ecb1262bffefb61bf457f291f311d998e140dbd9f",
+    "config": {
+      "checkpoint_training_arm": "paired",
+      "device": "Tesla T4",
+      "display_threshold": 0.3,
+      "initial_weights_origin": "torchvision_resnet50_imagenet1k_v2_backbone",
+      "max_detections_per_image": 300,
+      "normalizer_sha256": "11b40c1ce508a4a644a71708f6a6709ae81ed81b4618689b59b2954383a48678",
+      "physical_gpu_id": "1",
+      "score_floor": 0.05,
+      "shared_warmstart_sha256": "82c6ac41a943a60a99513b1e255b5762f4cedf2563284260f14094610643a4e5",
+      "state_alignment": "paired_annotation",
+      "state_mode": "paired",
+      "torch_version": "2.10.0+cu128",
+      "training_schedule_sha256": "de8379eb59a77124950ea9d6f24512a296b70d87881ae03c6b1d6aab3d860255",
+      "evidence_source": "reports/evaluations/review2-imagenet-e2-full-pass.json"
+    },
+    "final_test_unsealed": false,
+    "limitations": [
+      "Development-root evidence only; final-test roots remain sealed.",
+      "Thresholds are not frozen for release by this report.",
+      "Calibration covers emitted detections only and does not measure missed objects.",
+      "Finite zero-area detector outputs are dropped and counted before evaluation.",
+      "Detection accuracy means TP/(TP+FP+FN), not image-classification accuracy.",
+      "The best-F1 threshold is selected only on development data; final test remains sealed.",
+      "Random-initialized runs are controls unless the model id explicitly states ImageNet.",
+      "Documented snapshot of the committed report; not a live API response."
+    ],
+    "metrics": {
+      "evaluated_frame_count": 5734,
+      "pooled": {
+        "ap50": 0.11455784404639657
+      },
+      "latency": {
+        "p95_ms": 44.56293604998789
+      },
+      "operating_point_sweep": {
+        "best_f1_point": {
+          "detection_accuracy": 0.1438398447834906,
+          "f1": 0.2515034695451041,
+          "false_negatives": 11980,
+          "false_positives": 17144,
+          "iou_threshold": 0.5,
+          "precision": 0.22203566728683577,
+          "recall": 0.28998992473182006,
+          "score_threshold": 0.45,
+          "true_positives": 4893
+        },
+        "selection_partition": "development"
+      }
+    },
+    "model_id": "imagenet-full-pass-e2-paired-film",
+    "partition": "development",
+    "protocol_sha256": "c848194b212301de811fc835eb561bfbc6d4ee60bf9f39fb7497c06b97f7a1cc",
+    "schema_version": "1.0",
+    "report_id": "review2-imagenet-e2-full-pass",
+    "documentedFallback": true
+  },
+  {
+    "artifact_kind": "auair_development_evaluation_not_final_test",
+    "benchmark_claim": false,
+    "checkpoint_id": "c3eb54ba790cd7e22a093da1c8cb9689b0d15e79ea2ec9a674a2752f9b648fef",
+    "config": {
+      "checkpoint_training_arm": "paired",
+      "device": "Tesla T4",
+      "display_threshold": 0.3,
+      "initial_weights_origin": "review2_e1_full_pass_checkpoint",
+      "max_detections_per_image": 300,
+      "normalizer_sha256": "11b40c1ce508a4a644a71708f6a6709ae81ed81b4618689b59b2954383a48678",
+      "physical_gpu_id": "0",
+      "score_floor": 0.05,
+      "shared_warmstart_sha256": "a015b7eb4c45163ab3b5d2312cb47937a0f3975603307c2f57f0542322776389",
+      "state_alignment": "paired_annotation",
+      "state_mode": "paired",
+      "torch_version": "2.10.0+cu128",
+      "training_schedule_sha256": "de8379eb59a77124950ea9d6f24512a296b70d87881ae03c6b1d6aab3d860255",
+      "evidence_source": "reports/evaluations/review2-imagenet-e3-exact-frozen-visual-film.json"
+    },
+    "final_test_unsealed": false,
+    "limitations": [
+      "Development-root evidence only; final-test roots remain sealed.",
+      "Thresholds are not frozen for release by this report.",
+      "Calibration covers emitted detections only and does not measure missed objects.",
+      "Finite zero-area detector outputs are dropped and counted before evaluation.",
+      "Detection accuracy means TP/(TP+FP+FN), not image-classification accuracy.",
+      "The best-F1 threshold is selected only on development data; final test remains sealed.",
+      "Random-initialized runs are controls unless the model id explicitly states ImageNet.",
+      "Documented snapshot of the committed report; not a live API response."
+    ],
+    "metrics": {
+      "evaluated_frame_count": 5734,
+      "pooled": {
+        "ap50": 0.16793182100925783
+      },
+      "latency": {
+        "p95_ms": 53.47854109968465
+      },
+      "operating_point_sweep": {
+        "best_f1_point": {
+          "detection_accuracy": 0.2858238931263258,
+          "f1": 0.44457704457704456,
+          "false_negatives": 10540,
+          "false_positives": 5284,
+          "iou_threshold": 0.5,
+          "precision": 0.5451493500903848,
+          "recall": 0.37533337284418894,
+          "score_threshold": 0.45,
+          "true_positives": 6333
+        },
+        "selection_partition": "development"
+      }
+    },
+    "model_id": "imagenet-e3-exact-frozen-visual-film",
+    "partition": "development",
+    "protocol_sha256": "c848194b212301de811fc835eb561bfbc6d4ee60bf9f39fb7497c06b97f7a1cc",
+    "schema_version": "1.0",
+    "report_id": "review2-imagenet-e3-exact-frozen-visual-film",
+    "documentedFallback": true
+  },
+  {
+    "artifact_kind": "auair_development_evaluation_not_final_test",
+    "benchmark_claim": false,
+    "checkpoint_id": "0583fe7ccdc3772e16bbef2a662abf91c88cc1420eca8047500d5115c8d6e611",
+    "config": {
+      "checkpoint_training_arm": "paired",
+      "device": "Tesla T4",
+      "display_threshold": 0.3,
+      "initial_weights_origin": "review2_e1_full_pass_checkpoint",
+      "max_detections_per_image": 300,
+      "normalizer_sha256": "11b40c1ce508a4a644a71708f6a6709ae81ed81b4618689b59b2954383a48678",
+      "physical_gpu_id": "1",
+      "score_floor": 0.05,
+      "shared_warmstart_sha256": "a015b7eb4c45163ab3b5d2312cb47937a0f3975603307c2f57f0542322776389",
+      "state_alignment": "paired_annotation",
+      "state_mode": "paired",
+      "torch_version": "2.10.0+cu128",
+      "training_schedule_sha256": "de8379eb59a77124950ea9d6f24512a296b70d87881ae03c6b1d6aab3d860255",
+      "evidence_source": "reports/evaluations/review2-imagenet-e4-exact-frozen-visual-film-dropout50.json"
+    },
+    "final_test_unsealed": false,
+    "limitations": [
+      "Development-root evidence only; final-test roots remain sealed.",
+      "Thresholds are not frozen for release by this report.",
+      "Calibration covers emitted detections only and does not measure missed objects.",
+      "Finite zero-area detector outputs are dropped and counted before evaluation.",
+      "Detection accuracy means TP/(TP+FP+FN), not image-classification accuracy.",
+      "The best-F1 threshold is selected only on development data; final test remains sealed.",
+      "Random-initialized runs are controls unless the model id explicitly states ImageNet.",
+      "Documented snapshot of the committed report; not a live API response."
+    ],
+    "metrics": {
+      "evaluated_frame_count": 5734,
+      "pooled": {
+        "ap50": 0.1696876534152756
+      },
+      "latency": {
+        "p95_ms": 54.62195254931429
+      },
+      "operating_point_sweep": {
+        "best_f1_point": {
+          "detection_accuracy": 0.28970877255672683,
+          "f1": 0.4492623121147053,
+          "false_negatives": 10387,
+          "false_positives": 5515,
+          "iou_threshold": 0.5,
+          "precision": 0.5404549620864928,
+          "recall": 0.38440111420612816,
+          "score_threshold": 0.45,
+          "true_positives": 6486
+        },
+        "selection_partition": "development"
+      }
+    },
+    "model_id": "imagenet-e4-exact-frozen-visual-film-dropout50",
+    "partition": "development",
+    "protocol_sha256": "c848194b212301de811fc835eb561bfbc6d4ee60bf9f39fb7497c06b97f7a1cc",
+    "schema_version": "1.0",
+    "report_id": "review2-imagenet-e4-exact-frozen-visual-film-dropout50",
+    "documentedFallback": true
+  }
+]

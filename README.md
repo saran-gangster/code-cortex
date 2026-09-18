@@ -9,6 +9,7 @@ AeroGuard combines a TorchVision FCOS detector with gated FiLM conditioning so t
 - Leakage-safe AU-AIR parsing, state conversion, grouped protocol, and FiLM components with tests.
 - A strict [FastAPI backend](docs/BACKEND_API.md) for health, capability discovery, model reports, inference/replay, and idempotent human review.
 - A responsive React review console that can start from bundled fixtures and connect to the API.
+- A documented [ONNX/TensorRT edge deployment stack](deployment/tensorrt/README.md) with export, engine-build, validation, and inference scripts.
 - Reproducible Kaggle scripts for protocol construction, matched training, evaluation, and artifact capture.
 - A dual-T4 Lightning gate that ran matched E1 masked-state and E2 paired-state arms from one hashed initialization and image schedule.
 - A deterministic evaluator for AP50, AP50:95, per-class support, per-root results, fixed-point recall, calibration, and VisDrone ignore regions.
@@ -96,6 +97,7 @@ Open the printed local URL. The bundled demonstration is explicitly labeled `FIX
 - `src/aeroguard/evaluation`: protocol-aware metrics and reports.
 - `src/aeroguard/api`, `src/aeroguard/inference`: service and runtime contract.
 - `frontend`: operator review console.
+- `deployment/tensorrt`: reproducible ONNX/TensorRT edge-inference contract and tooling.
 - `configs`: resolved experiment settings.
 - `docs`: architecture, model/data cards, Review 1 materials, and measured development evidence.
 
@@ -107,3 +109,4 @@ Open the printed local URL. The bundled demonstration is explicitly labeled `FIX
 - With eight recording roots, evaluation is session-held-out but not broad new-location validation.
 - Supplied AU-AIR frames do not validate genuinely empty-scene behavior.
 - This prototype is for supervised offline perception review, not certified autonomous control.
+- TensorRT scripts are implemented and CPU-tested; no `.engine` is claimed until a checkpoint is exported and validated on the target NVIDIA device.

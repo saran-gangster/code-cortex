@@ -1,4 +1,4 @@
-export type PredictionSource = 'computed' | 'cached' | 'fixture'
+export type PredictionSource = 'computed' | 'cached' | 'fixture' | 'annotation'
 export type InputMode = 'paired_state' | 'state_masked' | 'separate_rgb_fallback'
 export type MetadataAlignment =
   | 'paired_annotation'
@@ -10,7 +10,7 @@ export type MetadataAlignment =
 export type Detection = {
   class_name: 'Human' | 'Car' | 'Truck' | 'Van' | 'Motorbike' | 'Bicycle' | 'Bus' | 'Trailer'
   box_xyxy: [number, number, number, number]
-  raw_score: number
+  raw_score: number | null
   calibrated_score: number | null
   track_id: string | null
 }
@@ -36,6 +36,12 @@ export type InferenceRecord = {
   }
   image_url?: string
   image_data_url?: string
+  state?: number[]
+  rgb_detections?: Detection[]
+  state_detections?: Detection[]
+  rgb_model_id?: string
+  state_model_id?: string
+  ground_truth?: Array<{ class_name: string; box_xyxy: number[] }>
 }
 
 export type HealthResponse = {

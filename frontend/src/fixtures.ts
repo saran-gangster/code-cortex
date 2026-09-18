@@ -1,6 +1,8 @@
 import type { Detection, EvaluationReport, InferenceRecord, ModelSummary, RunSummary } from './types'
+import developmentReports from './development-reports.json'
+import developmentSequence from '../public/assets/auair-demo/sequence.json'
 
-export const OFFLINE_RUN_ID = 'offline-demo-run'
+export const OFFLINE_RUN_ID = 'auair-development-replay'
 const ZERO = '0'.repeat(64)
 
 const boxes: Array<[Detection['class_name'], [number, number, number, number], number]> = [
@@ -13,7 +15,7 @@ function detection([class_name, box_xyxy, raw_score]: typeof boxes[number]): Det
   return { class_name, box_xyxy, raw_score, calibrated_score: null, track_id: null }
 }
 
-export const offlineFrames: InferenceRecord[] = Array.from({ length: 6 }, (_, index) => ({
+export const syntheticFrames: InferenceRecord[] = Array.from({ length: 6 }, (_, index) => ({
   schema_version: '1.0',
   frame_id: `fixture-frame-0${180 + index}`,
   model_id: 'aeroguard-offline-fixture-e2',
@@ -32,47 +34,34 @@ export const offlineFrames: InferenceRecord[] = Array.from({ length: 6 }, (_, in
   latency: { preprocess_ms: null, model_ms: null, postprocess_ms: null, end_to_end_ms: null },
 }))
 
+export const offlineFrames: InferenceRecord[] = developmentSequence.frames.map((frame) => ({
+  schema_version: '1.0', frame_id: frame.frame_id,
+  model_id: developmentSequence.state_model_id,
+  checkpoint_sha256: ZERO, protocol_sha256: ZERO,
+  prediction_source: 'cached', source_time_ms: frame.source_time_ms,
+  original_size: frame.original_size, input_mode: 'paired_state', metadata_alignment: 'paired_annotation',
+  detections: frame.state_detections as Detection[], rgb_detections: frame.rgb_detections as Detection[],
+  state_detections: frame.state_detections as Detection[], rgb_model_id: developmentSequence.rgb_model_id,
+  state_model_id: developmentSequence.state_model_id, state: frame.state, ground_truth: frame.ground_truth,
+  quality_flags: [], latency: { preprocess_ms: null, model_ms: null, postprocess_ms: null, end_to_end_ms: null },
+  image_url: `/assets/auair-demo/${frame.image_filename}`,
+}))
+
 export const offlineRun: RunSummary = {
   run_id: OFFLINE_RUN_ID,
-  prediction_source: 'fixture',
+  prediction_source: 'cached',
   frame_count: offlineFrames.length,
   offline: true,
 }
 
-function documentedReport(modelId: string, checkpointId: string, ap50: number, recall: number, detectionAccuracy: number, latency: number): EvaluationReport {
-  return {
-    schema_version: '1.0',
-    artifact_kind: 'development_evaluation',
-    benchmark_claim: false,
-    partition: 'development',
-    protocol_sha256: ZERO,
-    final_test_unsealed: false,
-    model_id: modelId,
-    report_id: modelId,
-    checkpoint_id: checkpointId,
-    config: { evidence_scope: 'Review 2 documented snapshot' },
-    metrics: {
-      evaluated_frame_count: 5734,
-      pooled: { ap50 },
-      latency: { p95_ms: latency },
-      operating_point_sweep: {
-        best_f1_point: { recall, detection_accuracy: detectionAccuracy },
-        selection_partition: 'development',
-      },
-    },
-    limitations: [
-      'Development-root evidence only; final-test roots remain sealed.',
-      'Detection accuracy means TP/(TP+FP+FN), not image-classification accuracy.',
-      'This offline value is a documented snapshot; connect the API for repository-discovered reports.',
-    ],
-    documentedFallback: true,
-  }
-}
+// Compact snapshots extracted from the committed development evaluation reports.
+export const documentedReports = developmentReports as EvaluationReport[]
 
-export const documentedReports: EvaluationReport[] = [
-  documentedReport('imagenet-full-pass-e1-rgb-masked', '7cea7f2cd4c6…', 0.1697852101126862, 0.3938837195519469, 0.29061174515719973, 43.9159),
-  documentedReport('imagenet-full-pass-e2-paired-film', '4a7b05db34ae…', 0.11455784404639657, 0.28998992473182006, 0.1438398447834906, 44.5629),
-]
+export function mergeDocumentedReports(apiReports: EvaluationReport[]): EvaluationReport[] {
+  return [...apiReports, ...documentedReports.filter((snapshot) =>
+    !apiReports.some((report) => report.model_id === snapshot.model_id && report.partition === snapshot.partition),
+  )]
+}
 
 export const offlineModels: ModelSummary[] = documentedReports.map((report) => ({
   model_id: report.model_id,
@@ -85,6 +74,8 @@ export const offlineModels: ModelSummary[] = documentedReports.map((report) => (
 }))
 
 export function fixtureDetections(frame: InferenceRecord, kind: 'e1' | 'e2'): Detection[] {
+  if (kind === 'e1' && frame.rgb_detections) return frame.rgb_detections
+  if (kind === 'e2' && frame.state_detections) return frame.state_detections
   if (kind === 'e2') return frame.detections
-  return frame.detections.slice(0, Math.max(1, frame.detections.length - 1)).map((item) => ({ ...item, raw_score: Math.max(0, item.raw_score - 0.08) }))
+  return frame.detections.slice(0, Math.max(1, frame.detections.length - 1)).map((item) => ({ ...item, raw_score: Math.max(0, (item.raw_score ?? 0) - 0.08) }))
 }

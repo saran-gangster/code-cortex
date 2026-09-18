@@ -156,6 +156,11 @@ function parseFrame(value: unknown): InferenceRecord {
     },
     image_url: optionalString(item.image_url) ?? undefined,
     image_data_url: optionalString(item.image_data_url) ?? undefined,
+    rgb_detections: Array.isArray(item.rgb_detections) ? item.rgb_detections.map(parseDetection) : undefined,
+    state_detections: Array.isArray(item.state_detections) ? item.state_detections.map(parseDetection) : undefined,
+    rgb_model_id: optionalString(item.rgb_model_id) ?? undefined,
+    state_model_id: optionalString(item.state_model_id) ?? undefined,
+    state: Array.isArray(item.state) && item.state.every((value) => typeof value === 'number' && Number.isFinite(value)) ? item.state : undefined,
   }
 }
 
