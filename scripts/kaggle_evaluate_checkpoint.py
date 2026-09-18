@@ -106,6 +106,10 @@ def main() -> None:
         choices=("masked", "paired"),
         help="Training arm that owns the checkpoint; defaults to mode, or paired for shuffled mode.",
     )
+    parser.add_argument(
+        "--expected-experiment-arm",
+        help="Exact training-summary experiment arm for follow-up checkpoints.",
+    )
     parser.add_argument("--model-id", required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--data-root", type=Path, default=Path("data/auair/04_AUAIR_multimodal_uav"))
@@ -134,7 +138,9 @@ def main() -> None:
         raise RuntimeError(f"missing checkpoint provenance summary: {training_summary_path}")
     training_summary = json.loads(training_summary_path.read_text(encoding="utf-8"))
     checkpoint_arm = args.checkpoint_arm or ("paired" if args.mode == "shuffled" else args.mode)
-    expected_arm = "E2_paired_film" if checkpoint_arm == "paired" else "E1_rgb_masked"
+    expected_arm = args.expected_experiment_arm or (
+        "E2_paired_film" if checkpoint_arm == "paired" else "E1_rgb_masked"
+    )
     relative_checkpoint = str(args.checkpoint.relative_to(run_root)).replace("\\", "/")
     expected_checkpoint_sha = training_summary.get("checkpoint_sha256s", {}).get(
         relative_checkpoint,

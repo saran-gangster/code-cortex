@@ -20,15 +20,40 @@ class AeroGuardDetectorModule(L.LightningModule):
         backbone_lr: float = 3e-5,
         head_and_film_lr: float = 3e-4,
         weight_decay: float = 1e-4,
+        freeze_visual_detector: bool = False,
     ) -> None:
         super().__init__()
         self.detector = detector
         self.backbone_lr = backbone_lr
         self.head_and_film_lr = head_and_film_lr
         self.weight_decay = weight_decay
+        self.freeze_visual_detector = freeze_visual_detector
+        if freeze_visual_detector and any(
+            parameter.requires_grad for parameter in detector.detector.parameters()
+        ):
+            raise ValueError(
+                "freeze_visual_detector requires every visual-detector parameter "
+                "to have requires_grad=False"
+            )
         self.save_hyperparameters(ignore=("detector",))
 
+    def _freeze_visual_running_statistics(self) -> None:
+        for module in self.detector.detector.modules():
+            if isinstance(module, torch.nn.modules.batchnorm._BatchNorm):
+                module.eval()
+
+    def train(self, mode: bool = True):
+        """Keep frozen visual BatchNorm buffers fixed while training the adapter."""
+        super().train(mode)
+        if mode and self.freeze_visual_detector:
+            self._freeze_visual_running_statistics()
+        return self
+
     def training_step(self, batch: dict[str, Any], batch_index: int) -> torch.Tensor:
+        if self.freeze_visual_detector:
+            # Lightning can re-apply training mode between setup and the first batch.
+            # Enforce the invariant immediately before every visual forward pass.
+            self._freeze_visual_running_statistics()
         losses = self.detector(
             batch["images"],
             batch["state"],

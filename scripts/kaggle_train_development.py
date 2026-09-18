@@ -272,6 +272,7 @@ def main() -> None:
         detector,
         backbone_lr=args.backbone_lr,
         head_and_film_lr=args.head_and_film_lr,
+        freeze_visual_detector=args.freeze_visual_detector,
     )
     loss_history_path = args.output / "loss_history.jsonl"
     loss_history_callback = JsonlLossHistory(loss_history_path, start_step=start_step)
@@ -354,6 +355,7 @@ def main() -> None:
         "effective_state_mask_mean": sum(state_mask_schedule) / len(state_mask_schedule),
         "state_mask_schedule_sha256": canonical_hash(state_mask_schedule),
         "visual_detector_frozen": args.freeze_visual_detector,
+        "visual_running_statistics_frozen": args.freeze_visual_detector,
         "backbone_lr": args.backbone_lr,
         "head_and_film_lr": args.head_and_film_lr,
         "normalizer_sha256": normalizer["normalizer_sha256"],
