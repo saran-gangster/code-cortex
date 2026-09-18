@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Create the disclosed shared ImageNet-backbone initialization for fine-tuning."""
 
 from __future__ import annotations

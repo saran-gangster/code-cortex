@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Create one immutable random initialization shared by matched smoke arms."""
 
 import argparse

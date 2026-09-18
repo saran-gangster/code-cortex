@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Evaluate one trained AeroGuard checkpoint on the frozen development root."""
 
 from __future__ import annotations

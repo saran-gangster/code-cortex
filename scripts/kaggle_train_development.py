@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Train one matched AeroGuard development arm on frozen AU-AIR train roots."""
 
 from __future__ import annotations

@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Build the frozen AU-AIR manifest, grouped protocol, and train-only normalizer."""
 
 from __future__ import annotations

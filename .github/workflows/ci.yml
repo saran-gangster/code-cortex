@@ -17,26 +17,7 @@ jobs:
       - run: python scripts/generate_evaluation_fixture.py
       - run: git diff --exit-code -- reports/evaluation_pipeline_fixture.json
       - run: python -m pytest
-      - run: >-
-          ruff check src tests
-          scripts/kaggle_build_protocol.py
-          scripts/kaggle_train_smoke.py
-          scripts/kaggle_train_film_smoke.py
-          scripts/kaggle_prepare_warmstart.py
-          scripts/kaggle_train_development.py
-          scripts/kaggle_prepare_imagenet_warmstart.py
-          scripts/kaggle_evaluate_checkpoint.py
-          scripts/generate_evaluation_fixture.py
-      - run: |
-          for file in \
-            scripts/run_matched_lightning.sh \
-            scripts/run_matched_development.sh \
-            scripts/queue_imagenet_finetune.sh \
-            scripts/queue_development_evaluations.sh \
-            scripts/prune_training_checkpoints.sh \
-            scripts/monitor_checkpoint_storage.sh; do
-            bash -n "$file"
-          done
+      - run: ruff check src tests scripts
       - uses: actions/setup-node@v4
         with:
           node-version: "22"

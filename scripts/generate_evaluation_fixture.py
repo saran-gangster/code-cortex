@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Generate non-benchmark evidence that the evaluation pipeline is executable."""
 
 from __future__ import annotations
