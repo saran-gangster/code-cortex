@@ -1,0 +1,32 @@
+{
+  "artifact_kind": "matched_development_training_not_benchmark",
+  "benchmark_claim": false,
+  "checkpoint_sha256": "e49cbf3a2ee9d83ab12a891f558205b45218149731c3fbfa57089de6f8966a35",
+  "completed_steps": 5000,
+  "development_roots_used": [],
+  "device_name": "Tesla T4",
+  "experiment_arm": "E2_paired_film",
+  "final_logged_train_loss": 1.2117297649383545,
+  "final_test_roots_used": [],
+  "final_test_unsealed": false,
+  "initial_weights_origin": "torchvision_resnet50_imagenet1k_v2_backbone",
+  "lightning_version": "2.6.6",
+  "matched_frame_schedule_sha256": "f265ee838760d82fdb1816b014b7ce6d10dc87ac7da22dafdd0da3502d205e6d",
+  "normalizer_sha256": "11b40c1ce508a4a644a71708f6a6709ae81ed81b4618689b59b2954383a48678",
+  "physical_gpu_id": "1",
+  "precision": "32-true",
+  "protocol_sha256": "c848194b212301de811fc835eb561bfbc6d4ee60bf9f39fb7497c06b97f7a1cc",
+  "requested_steps": 5000,
+  "shared_warmstart_sha256": "82c6ac41a943a60a99513b1e255b5762f4cedf2563284260f14094610643a4e5",
+  "state_alignment": "paired_annotation",
+  "state_mask": 1.0,
+  "torch_version": "2.10.0+cu128",
+  "training_record_count": 18523,
+  "training_roots": [
+    "20190829091111",
+    "20190905103112",
+    "20190905111947",
+    "20190905112522",
+    "20190905142119"
+  ]
+}

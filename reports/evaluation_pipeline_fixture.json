@@ -1,0 +1,173 @@
+{
+  "artifact_kind": "synthetic_evaluation_pipeline_fixture_not_benchmark",
+  "benchmark_claim": false,
+  "checkpoint_id": "none-synthetic-fixture",
+  "config": {
+    "fixed_score_threshold": 0.5,
+    "iou_thresholds": "0.50:0.05:0.95",
+    "max_detections_per_image": 100,
+    "score_floor": 0.05
+  },
+  "final_test_unsealed": false,
+  "limitations": [
+    "Synthetic boxes exercise software behavior only; they are not model results.",
+    "No development, final-test, or VisDrone image was evaluated by this artifact.",
+    "Calibration covers emitted detections only and does not measure missed objects."
+  ],
+  "metrics": {
+    "by_recording_root": {
+      "synthetic-a": {
+        "ap50": 1.0,
+        "ap50_95": 1.0,
+        "false_negatives": 0,
+        "false_positives": 0,
+        "name": "synthetic-a",
+        "per_class": {
+          "1": {
+            "ap50": 1.0,
+            "ap50_95": 1.0,
+            "false_negatives": 0,
+            "false_positives": 0,
+            "label": 1,
+            "recall": 1.0,
+            "support": 1,
+            "true_positives": 1
+          }
+        },
+        "recall": 1.0,
+        "support": 1,
+        "true_positives": 1
+      },
+      "synthetic-b": {
+        "ap50": 1.0,
+        "ap50_95": 1.0,
+        "false_negatives": 0,
+        "false_positives": 0,
+        "name": "synthetic-b",
+        "per_class": {
+          "2": {
+            "ap50": 1.0,
+            "ap50_95": 1.0,
+            "false_negatives": 0,
+            "false_positives": 0,
+            "label": 2,
+            "recall": 1.0,
+            "support": 1,
+            "true_positives": 1
+          }
+        },
+        "recall": 1.0,
+        "support": 1,
+        "true_positives": 1
+      }
+    },
+    "calibration_fixture": {
+      "bins": [
+        {
+          "absolute_gap": null,
+          "count": 0,
+          "empirical_accuracy": null,
+          "lower": 0.0,
+          "mean_confidence": null,
+          "upper": 0.2
+        },
+        {
+          "absolute_gap": null,
+          "count": 0,
+          "empirical_accuracy": null,
+          "lower": 0.2,
+          "mean_confidence": null,
+          "upper": 0.4
+        },
+        {
+          "absolute_gap": 0.4,
+          "count": 1,
+          "empirical_accuracy": 0.0,
+          "lower": 0.4,
+          "mean_confidence": 0.4,
+          "upper": 0.6
+        },
+        {
+          "absolute_gap": null,
+          "count": 0,
+          "empirical_accuracy": null,
+          "lower": 0.6,
+          "mean_confidence": null,
+          "upper": 0.8
+        },
+        {
+          "absolute_gap": 0.1499999999999999,
+          "count": 2,
+          "empirical_accuracy": 1.0,
+          "lower": 0.8,
+          "mean_confidence": 0.8500000000000001,
+          "upper": 1.0
+        }
+      ],
+      "brier_score": 0.07,
+      "expected_calibration_error": 0.23333333333333328,
+      "sample_count": 3,
+      "scope": "emitted_detections_only"
+    },
+    "fixed_operating_point": {
+      "iou_threshold": 0.5,
+      "score_threshold": 0.5
+    },
+    "iou_thresholds": [
+      0.5,
+      0.55,
+      0.6000000000000001,
+      0.6500000000000001,
+      0.7000000000000002,
+      0.7500000000000002,
+      0.8000000000000003,
+      0.8500000000000003,
+      0.9000000000000004,
+      0.9500000000000004
+    ],
+    "max_detections_per_image": 100,
+    "pooled": {
+      "ap50": 1.0,
+      "ap50_95": 1.0,
+      "false_negatives": 0,
+      "false_positives": 0,
+      "name": "pooled",
+      "per_class": {
+        "1": {
+          "ap50": 1.0,
+          "ap50_95": 1.0,
+          "false_negatives": 0,
+          "false_positives": 0,
+          "label": 1,
+          "recall": 1.0,
+          "support": 1,
+          "true_positives": 1
+        },
+        "2": {
+          "ap50": 1.0,
+          "ap50_95": 1.0,
+          "false_negatives": 0,
+          "false_positives": 0,
+          "label": 2,
+          "recall": 1.0,
+          "support": 1,
+          "true_positives": 1
+        }
+      },
+      "recall": 1.0,
+      "support": 2,
+      "true_positives": 2
+    },
+    "score_floor": 0.05,
+    "visdrone_ignore_policy_fixture": {
+      "false_negatives": 0,
+      "false_positives": 0,
+      "ignored_predictions": 1,
+      "true_positives": 1
+    }
+  },
+  "model_id": "synthetic-evaluator-fixture",
+  "partition": "synthetic_fixture",
+  "protocol_sha256": "c848194b212301de811fc835eb561bfbc6d4ee60bf9f39fb7497c06b97f7a1cc",
+  "schema_version": "1.0"
+}

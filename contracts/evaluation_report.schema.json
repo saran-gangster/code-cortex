@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aeroguard.local/contracts/evaluation_report.schema.json",
+  "title": "AeroGuard engineering evaluation report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_kind",
+    "benchmark_claim",
+    "partition",
+    "protocol_sha256",
+    "final_test_unsealed",
+    "model_id",
+    "checkpoint_id",
+    "config",
+    "metrics",
+    "limitations"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "artifact_kind": {"type": "string", "minLength": 1},
+    "benchmark_claim": {"const": false},
+    "partition": {
+      "enum": ["synthetic_fixture", "development", "final_test", "external_test"]
+    },
+    "protocol_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "final_test_unsealed": {"type": "boolean"},
+    "model_id": {"type": "string", "minLength": 1},
+    "checkpoint_id": {"type": "string", "minLength": 1},
+    "config": {"type": "object"},
+    "metrics": {"type": "object"},
+    "limitations": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1}
+    }
+  }
+}

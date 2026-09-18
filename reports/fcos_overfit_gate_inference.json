@@ -1,0 +1,26 @@
+{
+  "checkpoint_sha256": "29dc9c526a88e8c067b8bce41e142b14273c9a7da3a4dea4ec481172302c713e",
+  "detections": [],
+  "frame_id": "frame_20190829091111_x_0000156",
+  "input_mode": "separate_rgb_fallback",
+  "latency": {
+    "end_to_end_ms": 25.290496000025087,
+    "model_ms": 25.290496000025087,
+    "postprocess_ms": null,
+    "preprocess_ms": null
+  },
+  "metadata_alignment": "paired_annotation",
+  "model_id": "fcos-r50-fpn-random-init-smoke",
+  "original_size": {
+    "height": 1080,
+    "width": 1920
+  },
+  "prediction_source": "computed",
+  "protocol_sha256": "c848194b212301de811fc835eb561bfbc6d4ee60bf9f39fb7497c06b97f7a1cc",
+  "quality_flags": [
+    "CALIBRATION_UNAVAILABLE",
+    "REVIEW_REQUESTED"
+  ],
+  "schema_version": "1.0",
+  "source_time_ms": null
+}

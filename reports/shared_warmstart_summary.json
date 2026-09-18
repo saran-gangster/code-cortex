@@ -1,0 +1,6 @@
+{
+  "artifact_kind": "shared_random_initialization",
+  "seed": 17,
+  "sha256": "0159d44f909133612a9330d109196459abe5a0c46e9e845f85e90619f88736cc",
+  "weights_origin": "random_no_pretrained_weights"
+}

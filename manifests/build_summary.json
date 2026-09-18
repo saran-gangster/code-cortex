@@ -1,0 +1,19 @@
+{
+  "manifest_sha256": "44fd3dfe2efad1afe587b0ddd96cee068d9c1d633806e924098dc4c09977fcc0",
+  "normalizer_sha256": "11b40c1ce508a4a644a71708f6a6709ae81ed81b4618689b59b2954383a48678",
+  "protocol_sha256": "c848194b212301de811fc835eb561bfbc6d4ee60bf9f39fb7497c06b97f7a1cc",
+  "recording_roots": [
+    "20190829091111",
+    "20190905091750",
+    "20190905103112",
+    "20190905111947",
+    "20190905112522",
+    "20190905142119",
+    "20190905143505",
+    "20190906150731"
+  ],
+  "records": 32823,
+  "rejected_boxes": 54,
+  "smoke_frame_count": 32,
+  "valid_boxes": 131977
+}

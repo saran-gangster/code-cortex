@@ -1,0 +1,332 @@
+{
+  "artifact_kind": "auair_development_evaluation_not_final_test",
+  "benchmark_claim": false,
+  "checkpoint_id": "b70204defcf4cdf4e49af7e3ece4dd7585decdff80b904e53616f9b05daf6358",
+  "config": {
+    "device": "Tesla T4",
+    "display_threshold": 0.3,
+    "initial_weights_origin": "torchvision_resnet50_imagenet1k_v2_backbone",
+    "max_detections_per_image": 300,
+    "normalizer_sha256": "11b40c1ce508a4a644a71708f6a6709ae81ed81b4618689b59b2954383a48678",
+    "physical_gpu_id": "0",
+    "score_floor": 0.05,
+    "shared_warmstart_sha256": "82c6ac41a943a60a99513b1e255b5762f4cedf2563284260f14094610643a4e5",
+    "state_mode": "masked",
+    "torch_version": "2.10.0+cu128",
+    "training_schedule_sha256": "f265ee838760d82fdb1816b014b7ce6d10dc87ac7da22dafdd0da3502d205e6d"
+  },
+  "final_test_unsealed": false,
+  "limitations": [
+    "Development-root evidence only; final-test roots remain sealed.",
+    "Thresholds are not frozen for release by this report.",
+    "Calibration covers emitted detections only and does not measure missed objects.",
+    "Finite zero-area detector outputs are dropped and counted before evaluation.",
+    "Random-initialized runs are controls unless the model id explicitly states ImageNet."
+  ],
+  "metrics": {
+    "by_recording_root": {
+      "20190905091750": {
+        "ap50": 0.012048592087017897,
+        "ap50_95": 0.0024237503421083557,
+        "false_negatives": 11249,
+        "false_positives": 88757,
+        "name": "20190905091750",
+        "per_class": {
+          "1": {
+            "ap50": 0.0005586732014776546,
+            "ap50_95": 0.0001241959970054023,
+            "false_negatives": 419,
+            "false_positives": 1831,
+            "label": 1,
+            "recall": 0.01411764705882353,
+            "support": 425,
+            "true_positives": 6
+          },
+          "2": {
+            "ap50": 0.04478797671260924,
+            "ap50_95": 0.009004663029327,
+            "false_negatives": 7942,
+            "false_positives": 50444,
+            "label": 2,
+            "recall": 0.35671472541713917,
+            "support": 12346,
+            "true_positives": 4404
+          },
+          "3": {
+            "ap50": 0.026719514117027696,
+            "ap50_95": 0.0053312646082450624,
+            "false_negatives": 1220,
+            "false_positives": 14179,
+            "label": 3,
+            "recall": 0.3444384739387426,
+            "support": 1861,
+            "true_positives": 641
+          },
+          "4": {
+            "ap50": 0.020561398133520946,
+            "ap50_95": 0.004261066690396329,
+            "false_negatives": 1262,
+            "false_positives": 16947,
+            "label": 4,
+            "recall": 0.3019911504424779,
+            "support": 1808,
+            "true_positives": 546
+          },
+          "5": {
+            "ap50": 3.454396099019573e-06,
+            "ap50_95": 6.908792198039147e-07,
+            "false_negatives": 22,
+            "false_positives": 195,
+            "label": 5,
+            "recall": 0.0,
+            "support": 22,
+            "true_positives": 0
+          },
+          "6": {
+            "ap50": 5.465437344997044e-06,
+            "ap50_95": 2.048184964789957e-06,
+            "false_negatives": 25,
+            "false_positives": 39,
+            "label": 6,
+            "recall": 0.0,
+            "support": 25,
+            "true_positives": 0
+          },
+          "7": {
+            "ap50": 0.0012616771104266046,
+            "ap50_95": 0.00021635974023820754,
+            "false_negatives": 108,
+            "false_positives": 982,
+            "label": 7,
+            "recall": 0.01818181818181818,
+            "support": 110,
+            "true_positives": 2
+          },
+          "8": {
+            "ap50": 0.0024905775876370023,
+            "ap50_95": 0.0004497136074702457,
+            "false_negatives": 251,
+            "false_positives": 4140,
+            "label": 8,
+            "recall": 0.09057971014492754,
+            "support": 276,
+            "true_positives": 25
+          }
+        },
+        "recall": 0.33331357790552957,
+        "support": 16873,
+        "true_positives": 5624
+      }
+    },
+    "calibration": {
+      "bins": [
+        {
+          "absolute_gap": null,
+          "count": 0,
+          "empirical_accuracy": null,
+          "lower": 0.0,
+          "mean_confidence": null,
+          "upper": 0.1
+        },
+        {
+          "absolute_gap": null,
+          "count": 0,
+          "empirical_accuracy": null,
+          "lower": 0.1,
+          "mean_confidence": null,
+          "upper": 0.2
+        },
+        {
+          "absolute_gap": null,
+          "count": 0,
+          "empirical_accuracy": null,
+          "lower": 0.2,
+          "mean_confidence": null,
+          "upper": 0.3
+        },
+        {
+          "absolute_gap": 0.2923934167592166,
+          "count": 59312,
+          "empirical_accuracy": 0.047545184785540866,
+          "lower": 0.3,
+          "mean_confidence": 0.33993860154475747,
+          "upper": 0.4
+        },
+        {
+          "absolute_gap": 0.34746898683145655,
+          "count": 21718,
+          "empirical_accuracy": 0.09572704668938208,
+          "lower": 0.4,
+          "mean_confidence": 0.44319603352083864,
+          "upper": 0.5
+        },
+        {
+          "absolute_gap": 0.47631022702885695,
+          "count": 9059,
+          "empirical_accuracy": 0.06523898885086654,
+          "lower": 0.5,
+          "mean_confidence": 0.5415492158797235,
+          "upper": 0.6
+        },
+        {
+          "absolute_gap": 0.5971559718458451,
+          "count": 3164,
+          "empirical_accuracy": 0.041719342604298354,
+          "lower": 0.6,
+          "mean_confidence": 0.6388753144501434,
+          "upper": 0.7
+        },
+        {
+          "absolute_gap": 0.7394205287764573,
+          "count": 582,
+          "empirical_accuracy": 0.001718213058419244,
+          "lower": 0.7,
+          "mean_confidence": 0.7411387418348765,
+          "upper": 0.8
+        },
+        {
+          "absolute_gap": 0.8462014438468458,
+          "count": 273,
+          "empirical_accuracy": 0.0,
+          "lower": 0.8,
+          "mean_confidence": 0.8462014438468458,
+          "upper": 0.9
+        },
+        {
+          "absolute_gap": 0.941630523283403,
+          "count": 273,
+          "empirical_accuracy": 0.003663003663003663,
+          "lower": 0.9,
+          "mean_confidence": 0.9452935269464067,
+          "upper": 1.0
+        }
+      ],
+      "brier_score": 0.1790816906842644,
+      "expected_calibration_error": 0.33917299570016585,
+      "sample_count": 94381,
+      "scope": "emitted_detections_only"
+    },
+    "dropped_degenerate_predictions": 3810,
+    "fixed_operating_point": {
+      "iou_threshold": 0.5,
+      "score_threshold": 0.3
+    },
+    "human_recall_at_fixed_operating_point": 0.01411764705882353,
+    "iou_thresholds": [
+      0.5,
+      0.55,
+      0.6000000000000001,
+      0.6500000000000001,
+      0.7000000000000002,
+      0.7500000000000002,
+      0.8000000000000003,
+      0.8500000000000003,
+      0.9000000000000004,
+      0.9500000000000004
+    ],
+    "latency": {
+      "p50_ms": 34.55516849999185,
+      "p95_ms": 41.62004685013016,
+      "sample_count": 5714,
+      "scope": "model_only_batch_1_after_20_frame_warmup"
+    },
+    "max_detections_per_image": 300,
+    "pooled": {
+      "ap50": 0.012048592087017897,
+      "ap50_95": 0.0024237503421083557,
+      "false_negatives": 11249,
+      "false_positives": 88757,
+      "name": "pooled",
+      "per_class": {
+        "1": {
+          "ap50": 0.0005586732014776546,
+          "ap50_95": 0.0001241959970054023,
+          "false_negatives": 419,
+          "false_positives": 1831,
+          "label": 1,
+          "recall": 0.01411764705882353,
+          "support": 425,
+          "true_positives": 6
+        },
+        "2": {
+          "ap50": 0.04478797671260924,
+          "ap50_95": 0.009004663029327,
+          "false_negatives": 7942,
+          "false_positives": 50444,
+          "label": 2,
+          "recall": 0.35671472541713917,
+          "support": 12346,
+          "true_positives": 4404
+        },
+        "3": {
+          "ap50": 0.026719514117027696,
+          "ap50_95": 0.0053312646082450624,
+          "false_negatives": 1220,
+          "false_positives": 14179,
+          "label": 3,
+          "recall": 0.3444384739387426,
+          "support": 1861,
+          "true_positives": 641
+        },
+        "4": {
+          "ap50": 0.020561398133520946,
+          "ap50_95": 0.004261066690396329,
+          "false_negatives": 1262,
+          "false_positives": 16947,
+          "label": 4,
+          "recall": 0.3019911504424779,
+          "support": 1808,
+          "true_positives": 546
+        },
+        "5": {
+          "ap50": 3.454396099019573e-06,
+          "ap50_95": 6.908792198039147e-07,
+          "false_negatives": 22,
+          "false_positives": 195,
+          "label": 5,
+          "recall": 0.0,
+          "support": 22,
+          "true_positives": 0
+        },
+        "6": {
+          "ap50": 5.465437344997044e-06,
+          "ap50_95": 2.048184964789957e-06,
+          "false_negatives": 25,
+          "false_positives": 39,
+          "label": 6,
+          "recall": 0.0,
+          "support": 25,
+          "true_positives": 0
+        },
+        "7": {
+          "ap50": 0.0012616771104266046,
+          "ap50_95": 0.00021635974023820754,
+          "false_negatives": 108,
+          "false_positives": 982,
+          "label": 7,
+          "recall": 0.01818181818181818,
+          "support": 110,
+          "true_positives": 2
+        },
+        "8": {
+          "ap50": 0.0024905775876370023,
+          "ap50_95": 0.0004497136074702457,
+          "false_negatives": 251,
+          "false_positives": 4140,
+          "label": 8,
+          "recall": 0.09057971014492754,
+          "support": 276,
+          "true_positives": 25
+        }
+      },
+      "recall": 0.33331357790552957,
+      "support": 16873,
+      "true_positives": 5624
+    },
+    "score_floor": 0.05
+  },
+  "model_id": "imagenet-finetune-e1-rgb-masked",
+  "partition": "development",
+  "protocol_sha256": "c848194b212301de811fc835eb561bfbc6d4ee60bf9f39fb7497c06b97f7a1cc",
+  "schema_version": "1.0"
+}

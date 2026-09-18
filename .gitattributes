@@ -1,0 +1,3 @@
+IMPLEMENTATION_PLAN.md whitespace=-trailing-space
+implementation_read.md whitespace=-trailing-space
+reports/*_lightning.log whitespace=-trailing-space

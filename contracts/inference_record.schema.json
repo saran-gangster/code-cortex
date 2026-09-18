@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AeroGuard inference record v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "frame_id", "model_id", "checkpoint_sha256",
+    "protocol_sha256", "prediction_source", "source_time_ms", "original_size",
+    "input_mode", "metadata_alignment", "detections", "quality_flags", "latency"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "frame_id": {"type": "string", "minLength": 1},
+    "model_id": {"type": "string", "minLength": 1},
+    "checkpoint_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "protocol_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "prediction_source": {"enum": ["computed", "cached", "fixture"]},
+    "source_time_ms": {"type": ["integer", "null"]},
+    "original_size": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["width", "height"],
+      "properties": {
+        "width": {"type": "integer", "minimum": 1},
+        "height": {"type": "integer", "minimum": 1}
+      }
+    },
+    "input_mode": {"enum": ["paired_state", "state_masked", "separate_rgb_fallback"]},
+    "metadata_alignment": {
+      "enum": ["paired_annotation", "independently_timestamped", "unavailable", "injected_delay", "injected_permutation"]
+    },
+    "detections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["class_name", "box_xyxy", "raw_score", "calibrated_score"],
+        "properties": {
+          "class_name": {"enum": ["Human", "Car", "Truck", "Van", "Motorbike", "Bicycle", "Bus", "Trailer"]},
+          "box_xyxy": {"type": "array", "items": {"type": "number", "minimum": 0}, "minItems": 4, "maxItems": 4},
+          "raw_score": {"type": "number", "minimum": 0, "maximum": 1},
+          "calibrated_score": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
+          "track_id": {"type": ["string", "null"]}
+        }
+      }
+    },
+    "quality_flags": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"enum": ["STATE_MISSING", "STATE_INVALID", "INJECTED_DELAY", "INJECTED_PERMUTATION", "REVIEW_REQUESTED", "FRAME_GAP", "CALIBRATION_UNAVAILABLE"]}
+    },
+    "latency": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["preprocess_ms", "model_ms", "postprocess_ms", "end_to_end_ms"],
+      "properties": {
+        "preprocess_ms": {"type": ["number", "null"], "minimum": 0},
+        "model_ms": {"type": ["number", "null"], "minimum": 0},
+        "postprocess_ms": {"type": ["number", "null"], "minimum": 0},
+        "end_to_end_ms": {"type": ["number", "null"], "minimum": 0}
+      }
+    }
+  }
+}

@@ -1,0 +1,330 @@
+{
+  "artifact_kind": "auair_development_evaluation_not_final_test",
+  "benchmark_claim": false,
+  "checkpoint_id": "e49cbf3a2ee9d83ab12a891f558205b45218149731c3fbfa57089de6f8966a35",
+  "config": {
+    "device": "Tesla T4",
+    "display_threshold": 0.3,
+    "initial_weights_origin": "torchvision_resnet50_imagenet1k_v2_backbone",
+    "max_detections_per_image": 300,
+    "normalizer_sha256": "11b40c1ce508a4a644a71708f6a6709ae81ed81b4618689b59b2954383a48678",
+    "physical_gpu_id": "1",
+    "score_floor": 0.05,
+    "shared_warmstart_sha256": "82c6ac41a943a60a99513b1e255b5762f4cedf2563284260f14094610643a4e5",
+    "state_mode": "paired",
+    "torch_version": "2.10.0+cu128",
+    "training_schedule_sha256": "f265ee838760d82fdb1816b014b7ce6d10dc87ac7da22dafdd0da3502d205e6d"
+  },
+  "final_test_unsealed": false,
+  "limitations": [
+    "Development-root evidence only; final-test roots remain sealed.",
+    "Thresholds are not frozen for release by this report.",
+    "Calibration covers emitted detections only and does not measure missed objects.",
+    "Random-initialized runs are controls unless the model id explicitly states ImageNet."
+  ],
+  "metrics": {
+    "by_recording_root": {
+      "20190905091750": {
+        "ap50": 0.06921864822674809,
+        "ap50_95": 0.0234422657429824,
+        "false_negatives": 8551,
+        "false_positives": 51968,
+        "name": "20190905091750",
+        "per_class": {
+          "1": {
+            "ap50": 0.001864571167535272,
+            "ap50_95": 0.0003789262596620144,
+            "false_negatives": 399,
+            "false_positives": 2711,
+            "label": 1,
+            "recall": 0.0611764705882353,
+            "support": 425,
+            "true_positives": 26
+          },
+          "2": {
+            "ap50": 0.18237686303738976,
+            "ap50_95": 0.05432979287729552,
+            "false_negatives": 6517,
+            "false_positives": 25002,
+            "label": 2,
+            "recall": 0.4721367244451644,
+            "support": 12346,
+            "true_positives": 5829
+          },
+          "3": {
+            "ap50": 0.24123743399266365,
+            "ap50_95": 0.08781514312313063,
+            "false_negatives": 660,
+            "false_positives": 8650,
+            "label": 3,
+            "recall": 0.645351961311123,
+            "support": 1861,
+            "true_positives": 1201
+          },
+          "4": {
+            "ap50": 0.0866108268917542,
+            "ap50_95": 0.030669110924507838,
+            "false_negatives": 655,
+            "false_positives": 11953,
+            "label": 4,
+            "recall": 0.6377212389380531,
+            "support": 1808,
+            "true_positives": 1153
+          },
+          "5": {
+            "ap50": 0.00042227900710059015,
+            "ap50_95": 0.0001230286465000344,
+            "false_negatives": 22,
+            "false_positives": 632,
+            "label": 5,
+            "recall": 0.0,
+            "support": 22,
+            "true_positives": 0
+          },
+          "6": {
+            "ap50": 0.00011044871286561215,
+            "ap50_95": 2.9790966289208114e-05,
+            "false_negatives": 25,
+            "false_positives": 65,
+            "label": 6,
+            "recall": 0.0,
+            "support": 25,
+            "true_positives": 0
+          },
+          "7": {
+            "ap50": 0.013251524523227023,
+            "ap50_95": 0.005041478480031042,
+            "false_negatives": 90,
+            "false_positives": 754,
+            "label": 7,
+            "recall": 0.18181818181818182,
+            "support": 110,
+            "true_positives": 20
+          },
+          "8": {
+            "ap50": 0.02787523848144855,
+            "ap50_95": 0.009150854666442918,
+            "false_negatives": 183,
+            "false_positives": 2201,
+            "label": 8,
+            "recall": 0.33695652173913043,
+            "support": 276,
+            "true_positives": 93
+          }
+        },
+        "recall": 0.49321401054939845,
+        "support": 16873,
+        "true_positives": 8322
+      }
+    },
+    "calibration": {
+      "bins": [
+        {
+          "absolute_gap": null,
+          "count": 0,
+          "empirical_accuracy": null,
+          "lower": 0.0,
+          "mean_confidence": null,
+          "upper": 0.1
+        },
+        {
+          "absolute_gap": null,
+          "count": 0,
+          "empirical_accuracy": null,
+          "lower": 0.1,
+          "mean_confidence": null,
+          "upper": 0.2
+        },
+        {
+          "absolute_gap": null,
+          "count": 0,
+          "empirical_accuracy": null,
+          "lower": 0.2,
+          "mean_confidence": null,
+          "upper": 0.3
+        },
+        {
+          "absolute_gap": 0.2817360873249811,
+          "count": 36900,
+          "empirical_accuracy": 0.05761517615176152,
+          "lower": 0.3,
+          "mean_confidence": 0.33935126347674266,
+          "upper": 0.4
+        },
+        {
+          "absolute_gap": 0.24571846878501996,
+          "count": 11652,
+          "empirical_accuracy": 0.19636113971850327,
+          "lower": 0.4,
+          "mean_confidence": 0.44207960850352324,
+          "upper": 0.5
+        },
+        {
+          "absolute_gap": 0.15633117184992273,
+          "count": 6357,
+          "empirical_accuracy": 0.38870536416548684,
+          "lower": 0.5,
+          "mean_confidence": 0.5450365360154096,
+          "upper": 0.6
+        },
+        {
+          "absolute_gap": 0.14685523236199144,
+          "count": 2852,
+          "empirical_accuracy": 0.49228611500701264,
+          "lower": 0.6,
+          "mean_confidence": 0.6391413473690041,
+          "upper": 0.7
+        },
+        {
+          "absolute_gap": 0.6934900595407886,
+          "count": 549,
+          "empirical_accuracy": 0.051001821493624776,
+          "lower": 0.7,
+          "mean_confidence": 0.7444918810344133,
+          "upper": 0.8
+        },
+        {
+          "absolute_gap": 0.8571479025028519,
+          "count": 708,
+          "empirical_accuracy": 0.002824858757062147,
+          "lower": 0.8,
+          "mean_confidence": 0.8599727612599141,
+          "upper": 0.9
+        },
+        {
+          "absolute_gap": 0.9392207806121627,
+          "count": 1272,
+          "empirical_accuracy": 0.0023584905660377358,
+          "lower": 0.9,
+          "mean_confidence": 0.9415792711782005,
+          "upper": 1.0
+        }
+      ],
+      "brier_score": 0.1958107271534661,
+      "expected_calibration_error": 0.27955012760523795,
+      "sample_count": 60290,
+      "scope": "emitted_detections_only"
+    },
+    "fixed_operating_point": {
+      "iou_threshold": 0.5,
+      "score_threshold": 0.3
+    },
+    "human_recall_at_fixed_operating_point": 0.0611764705882353,
+    "iou_thresholds": [
+      0.5,
+      0.55,
+      0.6000000000000001,
+      0.6500000000000001,
+      0.7000000000000002,
+      0.7500000000000002,
+      0.8000000000000003,
+      0.8500000000000003,
+      0.9000000000000004,
+      0.9500000000000004
+    ],
+    "latency": {
+      "p50_ms": 39.467971000249236,
+      "p95_ms": 44.67905224996684,
+      "sample_count": 5714,
+      "scope": "model_only_batch_1_after_20_frame_warmup"
+    },
+    "max_detections_per_image": 300,
+    "pooled": {
+      "ap50": 0.06921864822674809,
+      "ap50_95": 0.0234422657429824,
+      "false_negatives": 8551,
+      "false_positives": 51968,
+      "name": "pooled",
+      "per_class": {
+        "1": {
+          "ap50": 0.001864571167535272,
+          "ap50_95": 0.0003789262596620144,
+          "false_negatives": 399,
+          "false_positives": 2711,
+          "label": 1,
+          "recall": 0.0611764705882353,
+          "support": 425,
+          "true_positives": 26
+        },
+        "2": {
+          "ap50": 0.18237686303738976,
+          "ap50_95": 0.05432979287729552,
+          "false_negatives": 6517,
+          "false_positives": 25002,
+          "label": 2,
+          "recall": 0.4721367244451644,
+          "support": 12346,
+          "true_positives": 5829
+        },
+        "3": {
+          "ap50": 0.24123743399266365,
+          "ap50_95": 0.08781514312313063,
+          "false_negatives": 660,
+          "false_positives": 8650,
+          "label": 3,
+          "recall": 0.645351961311123,
+          "support": 1861,
+          "true_positives": 1201
+        },
+        "4": {
+          "ap50": 0.0866108268917542,
+          "ap50_95": 0.030669110924507838,
+          "false_negatives": 655,
+          "false_positives": 11953,
+          "label": 4,
+          "recall": 0.6377212389380531,
+          "support": 1808,
+          "true_positives": 1153
+        },
+        "5": {
+          "ap50": 0.00042227900710059015,
+          "ap50_95": 0.0001230286465000344,
+          "false_negatives": 22,
+          "false_positives": 632,
+          "label": 5,
+          "recall": 0.0,
+          "support": 22,
+          "true_positives": 0
+        },
+        "6": {
+          "ap50": 0.00011044871286561215,
+          "ap50_95": 2.9790966289208114e-05,
+          "false_negatives": 25,
+          "false_positives": 65,
+          "label": 6,
+          "recall": 0.0,
+          "support": 25,
+          "true_positives": 0
+        },
+        "7": {
+          "ap50": 0.013251524523227023,
+          "ap50_95": 0.005041478480031042,
+          "false_negatives": 90,
+          "false_positives": 754,
+          "label": 7,
+          "recall": 0.18181818181818182,
+          "support": 110,
+          "true_positives": 20
+        },
+        "8": {
+          "ap50": 0.02787523848144855,
+          "ap50_95": 0.009150854666442918,
+          "false_negatives": 183,
+          "false_positives": 2201,
+          "label": 8,
+          "recall": 0.33695652173913043,
+          "support": 276,
+          "true_positives": 93
+        }
+      },
+      "recall": 0.49321401054939845,
+      "support": 16873,
+      "true_positives": 8322
+    },
+    "score_floor": 0.05
+  },
+  "model_id": "imagenet-finetune-e2-paired-film",
+  "partition": "development",
+  "protocol_sha256": "c848194b212301de811fc835eb561bfbc6d4ee60bf9f39fb7497c06b97f7a1cc",
+  "schema_version": "1.0"
+}

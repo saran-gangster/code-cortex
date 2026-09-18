@@ -1,0 +1,32 @@
+{
+  "artifact_kind": "matched_development_training_not_benchmark",
+  "benchmark_claim": false,
+  "checkpoint_sha256": "8f2ca616703f568d5be966f0c87fd2dc1398986d58867072ec43322a33a86025",
+  "completed_steps": 5000,
+  "development_roots_used": [],
+  "device_name": "Tesla T4",
+  "experiment_arm": "E1_rgb_masked",
+  "final_logged_train_loss": 1.6349632740020752,
+  "final_test_roots_used": [],
+  "final_test_unsealed": false,
+  "initial_weights_origin": "random_no_pretrained_weights",
+  "lightning_version": "2.6.6",
+  "matched_frame_schedule_sha256": "f265ee838760d82fdb1816b014b7ce6d10dc87ac7da22dafdd0da3502d205e6d",
+  "normalizer_sha256": "11b40c1ce508a4a644a71708f6a6709ae81ed81b4618689b59b2954383a48678",
+  "physical_gpu_id": "0",
+  "precision": "32-true",
+  "protocol_sha256": "c848194b212301de811fc835eb561bfbc6d4ee60bf9f39fb7497c06b97f7a1cc",
+  "requested_steps": 5000,
+  "shared_warmstart_sha256": "0159d44f909133612a9330d109196459abe5a0c46e9e845f85e90619f88736cc",
+  "state_alignment": "unavailable",
+  "state_mask": 0.0,
+  "torch_version": "2.10.0+cu128",
+  "training_record_count": 18523,
+  "training_roots": [
+    "20190829091111",
+    "20190905103112",
+    "20190905111947",
+    "20190905112522",
+    "20190905142119"
+  ]
+}

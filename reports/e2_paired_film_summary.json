@@ -1,0 +1,30 @@
+{
+  "artifact_kind": "matched_lightning_engineering_gate_not_benchmark",
+  "benchmark_claim": false,
+  "checkpoint_sha256": "1ca80a53272668c18624d40efd18449f8795610ececeeceb30859f87f022b131",
+  "completed_steps": 40,
+  "device_name": "Tesla T4",
+  "experiment_arm": "E2_paired_film",
+  "film_projection_l1_after": 120.73500663042068,
+  "film_projection_l1_before": 0.0,
+  "final_logged_train_loss": 2.0052144527435303,
+  "frame_ids": [
+    "frame_20190829091111_x_0000156",
+    "frame_20190829091111_x_0001030",
+    "frame_20190829091111_x_0001837",
+    "frame_20190829091111_x_0002475",
+    "frame_20190829091111_x_0003211",
+    "frame_20190905103112_x_0000468",
+    "frame_20190905103112_x_0001059",
+    "frame_20190905103112_x_0001654"
+  ],
+  "lightning_version": "2.6.6",
+  "matched_frame_schedule_sha256": "990b2886347f477c5d26fb4c205be631e4a3264e803943ee58719c3844be5db1",
+  "physical_gpu_id": "1",
+  "precision": "32-true",
+  "protocol_sha256": "c848194b212301de811fc835eb561bfbc6d4ee60bf9f39fb7497c06b97f7a1cc",
+  "shared_warmstart_sha256": "0159d44f909133612a9330d109196459abe5a0c46e9e845f85e90619f88736cc",
+  "state_alignment": "paired_annotation",
+  "state_mask": 1.0,
+  "torch_version": "2.10.0+cu128"
+}

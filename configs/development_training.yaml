@@ -1,0 +1,38 @@
+artifact_kind: resolved_matched_development_training
+benchmark_claim: false
+seed: 17
+steps_per_arm: 5000
+batch_size_per_gpu: 1
+precision: 32-true
+image_min_size: 320
+image_max_size: 576
+optimizer: AdamW
+backbone_lr: 0.00003
+head_and_film_lr: 0.0003
+weight_decay: 0.0001
+gradient_clip_norm: 1.0
+normalizer_sha256: 11b40c1ce508a4a644a71708f6a6709ae81ed81b4618689b59b2954383a48678
+protocol_sha256: c848194b212301de811fc835eb561bfbc6d4ee60bf9f39fb7497c06b97f7a1cc
+final_test_unsealed: false
+arms:
+  E1_rgb_masked:
+    physical_gpu_id: 0
+    state_mask: 0.0
+  E2_paired_film:
+    physical_gpu_id: 1
+    state_mask: 1.0
+runs:
+  random_control:
+    status: complete
+    warmstart_origin: random_no_pretrained_weights
+    shared_warmstart_sha256: 0159d44f909133612a9330d109196459abe5a0c46e9e845f85e90619f88736cc
+  imagenet_finetune:
+    status: complete
+    warmstart_origin: torchvision_resnet50_imagenet1k_v2_backbone
+    shared_warmstart_sha256: 82c6ac41a943a60a99513b1e255b5762f4cedf2563284260f14094610643a4e5
+evaluation:
+  partition: development
+  score_floor: 0.05
+  display_threshold: 0.30
+  max_detections_per_image: 300
+  final_test_access: forbidden

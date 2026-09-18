@@ -1,0 +1,158 @@
+{
+  "class_map": {
+    "background_model_label": 0,
+    "source_categories_in_index_order": [
+      "Human",
+      "Car",
+      "Truck",
+      "Van",
+      "Motorbike",
+      "Bicycle",
+      "Bus",
+      "Trailer"
+    ],
+    "source_to_model_offset": 1
+  },
+  "dataset": "AU-AIR",
+  "final_test_unsealed": false,
+  "protocol_sha256": "c848194b212301de811fc835eb561bfbc6d4ee60bf9f39fb7497c06b97f7a1cc",
+  "recording_root_pattern": "^frame_(\\d{14})_(x|xx)_(\\d+)\\.jpg$",
+  "root_census": {
+    "20190829091111": {
+      "frames": 2592,
+      "instances_by_model_label": {
+        "1": 2084,
+        "2": 4032,
+        "3": 7,
+        "4": 141,
+        "5": 1,
+        "6": 22,
+        "7": 0,
+        "8": 10
+      }
+    },
+    "20190905091750": {
+      "frames": 5734,
+      "instances_by_model_label": {
+        "1": 425,
+        "2": 12346,
+        "3": 1861,
+        "4": 1808,
+        "5": 22,
+        "6": 25,
+        "7": 110,
+        "8": 276
+      }
+    },
+    "20190905103112": {
+      "frames": 6840,
+      "instances_by_model_label": {
+        "1": 201,
+        "2": 18882,
+        "3": 2509,
+        "4": 1921,
+        "5": 27,
+        "6": 37,
+        "7": 152,
+        "8": 513
+      }
+    },
+    "20190905111947": {
+      "frames": 771,
+      "instances_by_model_label": {
+        "1": 21,
+        "2": 2522,
+        "3": 483,
+        "4": 215,
+        "5": 0,
+        "6": 1,
+        "7": 5,
+        "8": 48
+      }
+    },
+    "20190905112522": {
+      "frames": 5358,
+      "instances_by_model_label": {
+        "1": 170,
+        "2": 14337,
+        "3": 1481,
+        "4": 1217,
+        "5": 30,
+        "6": 23,
+        "7": 235,
+        "8": 255
+      }
+    },
+    "20190905142119": {
+      "frames": 2962,
+      "instances_by_model_label": {
+        "1": 478,
+        "2": 14046,
+        "3": 992,
+        "4": 1305,
+        "5": 34,
+        "6": 301,
+        "7": 31,
+        "8": 336
+      }
+    },
+    "20190905143505": {
+      "frames": 1580,
+      "instances_by_model_label": {
+        "1": 266,
+        "2": 6740,
+        "3": 259,
+        "4": 574,
+        "5": 4,
+        "6": 94,
+        "7": 61,
+        "8": 150
+      }
+    },
+    "20190906150731": {
+      "frames": 6986,
+      "instances_by_model_label": {
+        "1": 1507,
+        "2": 29676,
+        "3": 1948,
+        "4": 2811,
+        "5": 200,
+        "6": 625,
+        "7": 135,
+        "8": 949
+      }
+    }
+  },
+  "schema_version": "1.0",
+  "seed": 17,
+  "selection": {
+    "development": [
+      "20190905091750"
+    ],
+    "final_test": [
+      "20190905143505",
+      "20190906150731"
+    ],
+    "train": [
+      "20190829091111",
+      "20190905103112",
+      "20190905111947",
+      "20190905112522",
+      "20190905142119"
+    ]
+  },
+  "selection_candidate_index_after_seeded_shuffle": 0,
+  "selection_constraints": {
+    "all_classes_present_in_train": true,
+    "group_counts": {
+      "development": 1,
+      "final_test": 2,
+      "train": 5
+    },
+    "minimum_development_classes": 4,
+    "minimum_development_frames": 600,
+    "minimum_final_test_frames": 3000,
+    "model_scores_used": false
+  },
+  "split_unit": "recording_root"
+}

@@ -1,0 +1,21 @@
+{
+  "artifact_kind": "engineering_smoke_not_benchmark",
+  "benchmark_claim": false,
+  "checkpoint_path": "runs/fcos_overfit_gate/smoke_checkpoint.pt",
+  "checkpoint_sha256": "29dc9c526a88e8c067b8bce41e142b14273c9a7da3a4dea4ec481172302c713e",
+  "completed_steps": 24,
+  "device": "cuda:0",
+  "device_name": "Tesla T4",
+  "first_loss": 2.8707244396209717,
+  "inference_model_ms": 25.290496000025087,
+  "initial_weights_origin": "random_no_pretrained_weights",
+  "last_loss": 1.2813771963119507,
+  "minimum_loss": 1.2813771963119507,
+  "precision": "32-true",
+  "prediction_count_at_score_0_05": 0,
+  "protocol_sha256": "c848194b212301de811fc835eb561bfbc6d4ee60bf9f39fb7497c06b97f7a1cc",
+  "sampled_frames": 1,
+  "torch_version": "2.10.0+cu128",
+  "torchvision_version": "0.25.0+cu128",
+  "training_seconds": 3.7026967890001288
+}
