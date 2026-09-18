@@ -22,36 +22,36 @@ def test_frozen_protocol_has_no_group_overlap_and_is_still_sealed():
 
 
 def test_dual_gpu_engineering_arms_are_actually_matched():
-    e1 = json.loads((ROOT / "reports" / "e1_rgb_masked_summary.json").read_text())
-    e2 = json.loads((ROOT / "reports" / "e2_paired_film_summary.json").read_text())
-    assert e1["shared_warmstart_sha256"] == e2["shared_warmstart_sha256"]
-    assert e1["matched_frame_schedule_sha256"] == e2["matched_frame_schedule_sha256"]
-    assert e1["frame_ids"] == e2["frame_ids"]
-    assert {e1["physical_gpu_id"], e2["physical_gpu_id"]} == {"0", "1"}
-    assert e1["state_mask"] == 0.0 and e1["film_projection_l1_after"] == 0.0
-    assert e2["state_mask"] == 1.0 and e2["film_projection_l1_after"] > 0.0
-    assert not e1["benchmark_claim"] and not e2["benchmark_claim"]
+    e2 = json.loads((ROOT / "reports" / "e2_rgb_masked_summary.json").read_text())
+    e1 = json.loads((ROOT / "reports" / "e1_paired_film_summary.json").read_text())
+    assert e2["shared_warmstart_sha256"] == e1["shared_warmstart_sha256"]
+    assert e2["matched_frame_schedule_sha256"] == e1["matched_frame_schedule_sha256"]
+    assert e2["frame_ids"] == e1["frame_ids"]
+    assert {e2["physical_gpu_id"], e1["physical_gpu_id"]} == {"0", "1"}
+    assert e2["state_mask"] == 0.0 and e2["film_projection_l1_after"] == 0.0
+    assert e1["state_mask"] == 1.0 and e1["film_projection_l1_after"] > 0.0
+    assert not e2["benchmark_claim"] and not e1["benchmark_claim"]
 
 
 def test_random_development_controls_are_matched_and_train_only():
     protocol = json.loads((ROOT / "manifests" / "protocol.json").read_text())
     normalizer = json.loads((ROOT / "manifests" / "state_normalizer.json").read_text())
-    e1 = json.loads((ROOT / "reports" / "development_random_e1_summary.json").read_text())
     e2 = json.loads((ROOT / "reports" / "development_random_e2_summary.json").read_text())
+    e1 = json.loads((ROOT / "reports" / "development_random_e1_summary.json").read_text())
 
-    assert e1["completed_steps"] == e2["completed_steps"] == 5000
-    assert e1["training_record_count"] == e2["training_record_count"] == 18523
-    assert e1["training_roots"] == e2["training_roots"] == protocol["selection"]["train"]
-    assert e1["development_roots_used"] == e2["development_roots_used"] == []
-    assert e1["final_test_roots_used"] == e2["final_test_roots_used"] == []
-    assert e1["final_test_unsealed"] is e2["final_test_unsealed"] is False
-    assert e1["shared_warmstart_sha256"] == e2["shared_warmstart_sha256"]
-    assert e1["matched_frame_schedule_sha256"] == e2["matched_frame_schedule_sha256"]
-    assert e1["normalizer_sha256"] == e2["normalizer_sha256"] == normalizer["normalizer_sha256"]
-    assert e1["initial_weights_origin"] == e2["initial_weights_origin"] == "random_no_pretrained_weights"
-    assert {e1["physical_gpu_id"], e2["physical_gpu_id"]} == {"0", "1"}
-    assert e1["state_mask"] == 0.0 and e2["state_mask"] == 1.0
-    assert not e1["benchmark_claim"] and not e2["benchmark_claim"]
+    assert e2["completed_steps"] == e1["completed_steps"] == 5000
+    assert e2["training_record_count"] == e1["training_record_count"] == 18523
+    assert e2["training_roots"] == e1["training_roots"] == protocol["selection"]["train"]
+    assert e2["development_roots_used"] == e1["development_roots_used"] == []
+    assert e2["final_test_roots_used"] == e1["final_test_roots_used"] == []
+    assert e2["final_test_unsealed"] is e1["final_test_unsealed"] is False
+    assert e2["shared_warmstart_sha256"] == e1["shared_warmstart_sha256"]
+    assert e2["matched_frame_schedule_sha256"] == e1["matched_frame_schedule_sha256"]
+    assert e2["normalizer_sha256"] == e1["normalizer_sha256"] == normalizer["normalizer_sha256"]
+    assert e2["initial_weights_origin"] == e1["initial_weights_origin"] == "random_no_pretrained_weights"
+    assert {e2["physical_gpu_id"], e1["physical_gpu_id"]} == {"0", "1"}
+    assert e2["state_mask"] == 0.0 and e1["state_mask"] == 1.0
+    assert not e2["benchmark_claim"] and not e1["benchmark_claim"]
 
 
 def test_disclosed_imagenet_warmstart_is_nonbenchmark_and_hashed():
@@ -67,19 +67,19 @@ def test_imagenet_development_finetuning_is_matched_train_only_and_complete():
     protocol = json.loads((ROOT / "manifests" / "protocol.json").read_text())
     normalizer = json.loads((ROOT / "manifests" / "state_normalizer.json").read_text())
     warmstart = json.loads((ROOT / "reports" / "shared_imagenet_warmstart_summary.json").read_text())
-    e1 = json.loads((ROOT / "reports" / "development_imagenet_e1_summary.json").read_text())
     e2 = json.loads((ROOT / "reports" / "development_imagenet_e2_summary.json").read_text())
+    e1 = json.loads((ROOT / "reports" / "development_imagenet_e1_summary.json").read_text())
 
-    assert e1["completed_steps"] == e2["completed_steps"] == 5000
-    assert e1["training_record_count"] == e2["training_record_count"] == 18523
-    assert e1["training_roots"] == e2["training_roots"] == protocol["selection"]["train"]
-    assert e1["development_roots_used"] == e2["development_roots_used"] == []
-    assert e1["final_test_roots_used"] == e2["final_test_roots_used"] == []
-    assert e1["final_test_unsealed"] is e2["final_test_unsealed"] is False
-    assert e1["shared_warmstart_sha256"] == e2["shared_warmstart_sha256"] == warmstart["checkpoint_sha256"]
-    assert e1["matched_frame_schedule_sha256"] == e2["matched_frame_schedule_sha256"]
-    assert e1["normalizer_sha256"] == e2["normalizer_sha256"] == normalizer["normalizer_sha256"]
-    assert e1["initial_weights_origin"] == e2["initial_weights_origin"] == warmstart["weights_origin"]
-    assert {e1["physical_gpu_id"], e2["physical_gpu_id"]} == {"0", "1"}
-    assert e1["state_mask"] == 0.0 and e2["state_mask"] == 1.0
-    assert not e1["benchmark_claim"] and not e2["benchmark_claim"]
+    assert e2["completed_steps"] == e1["completed_steps"] == 5000
+    assert e2["training_record_count"] == e1["training_record_count"] == 18523
+    assert e2["training_roots"] == e1["training_roots"] == protocol["selection"]["train"]
+    assert e2["development_roots_used"] == e1["development_roots_used"] == []
+    assert e2["final_test_roots_used"] == e1["final_test_roots_used"] == []
+    assert e2["final_test_unsealed"] is e1["final_test_unsealed"] is False
+    assert e2["shared_warmstart_sha256"] == e1["shared_warmstart_sha256"] == warmstart["checkpoint_sha256"]
+    assert e2["matched_frame_schedule_sha256"] == e1["matched_frame_schedule_sha256"]
+    assert e2["normalizer_sha256"] == e1["normalizer_sha256"] == normalizer["normalizer_sha256"]
+    assert e2["initial_weights_origin"] == e1["initial_weights_origin"] == warmstart["weights_origin"]
+    assert {e2["physical_gpu_id"], e1["physical_gpu_id"]} == {"0", "1"}
+    assert e2["state_mask"] == 0.0 and e1["state_mask"] == 1.0
+    assert not e2["benchmark_claim"] and not e1["benchmark_claim"]

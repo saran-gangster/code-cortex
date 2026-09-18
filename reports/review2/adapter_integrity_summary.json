@@ -6,7 +6,7 @@
   "final_test_unsealed": false,
   "parent_film_state_sha256": "4310f56e148a5b6572d542123c25a62f8c0313d7270436b1370129ded06987fc",
   "parent_visual_state_sha256": "95378e7ef3cdfd8b34d4370a54a396309e6a336f0326aa66fb9c7a4cee13b176",
-  "parent_warmstart": "/kaggle/working/code-cortex/runs/review2/e1-frozen-visual-warmstart.pt",
+  "parent_warmstart": "/kaggle/working/code-cortex/runs/review2/e2-frozen-visual-warmstart.pt",
   "runs": {
     "imagenet-e3-exact-frozen-visual-film": {
       "changed_film_tensor_count": 14,

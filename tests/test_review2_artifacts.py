@@ -5,7 +5,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 RUN_ROOT = ROOT / "reports" / "review2"
 EVALUATION_ROOT = ROOT / "reports" / "evaluations"
-RUN_NAMES = ("imagenet-e1-full-pass", "imagenet-e2-full-pass")
+RUN_NAMES = ("imagenet-e2-full-pass", "imagenet-e1-full-pass")
 ADAPTER_NAMES = (
     "imagenet-e3-exact-frozen-visual-film",
     "imagenet-e4-exact-frozen-visual-film-dropout50",
@@ -64,8 +64,8 @@ def test_review2_evaluations_are_development_only_and_traceable():
         name: read_json(EVALUATION_ROOT / f"review2-{name}.json")
         for name in (
             *RUN_NAMES,
-            "imagenet-e2-masked-fallback",
-            "imagenet-e2-shuffled-state",
+            "imagenet-e1-masked-fallback",
+            "imagenet-e1-shuffled-state",
         )
     }
 
@@ -85,21 +85,34 @@ def test_review2_evaluations_are_development_only_and_traceable():
 
     assert reports[RUN_NAMES[0]]["config"]["state_mode"] == "masked"
     assert reports[RUN_NAMES[1]]["config"]["state_mode"] == "paired"
-    assert reports["imagenet-e2-masked-fallback"]["config"]["state_mode"] == "masked"
-    assert reports["imagenet-e2-shuffled-state"]["config"]["state_alignment"] == (
+    assert reports["imagenet-e1-masked-fallback"]["config"]["state_mode"] == "masked"
+    assert reports["imagenet-e1-shuffled-state"]["config"]["state_alignment"] == (
         "deliberately_1000_frame_shifted"
     )
 
 
+def test_corrected_model_labels_match_full_pass_metrics():
+    e2 = read_json(EVALUATION_ROOT / "review2-imagenet-e2-full-pass.json")
+    e1 = read_json(EVALUATION_ROOT / "review2-imagenet-e1-full-pass.json")
+
+    assert e2["model_id"] == "imagenet-full-pass-e2-rgb-masked"
+    assert e1["model_id"] == "imagenet-full-pass-e1-paired-film"
+    assert e2["metrics"]["pooled"]["ap50"] > e1["metrics"]["pooled"]["ap50"]
+    assert (
+        e2["metrics"]["operating_point_sweep"]["best_f1_point"]["f1"]
+        > e1["metrics"]["operating_point_sweep"]["best_f1_point"]["f1"]
+    )
+
+
 def test_review2_frozen_visual_adapters_are_complete_and_traceable():
-    e1_summary = read_json(RUN_ROOT / RUN_NAMES[0] / "run_summary.json")
-    warmstart = read_json(RUN_ROOT / "e1-frozen-visual-warmstart-summary.json")
+    e2_summary = read_json(RUN_ROOT / RUN_NAMES[0] / "run_summary.json")
+    warmstart = read_json(RUN_ROOT / "e2-frozen-visual-warmstart-summary.json")
     summaries = {
         name: read_json(RUN_ROOT / name / "run_summary.json")
         for name in ADAPTER_NAMES
     }
 
-    assert warmstart["source_checkpoint_sha256"] == e1_summary["checkpoint_sha256"]
+    assert warmstart["source_checkpoint_sha256"] == e2_summary["checkpoint_sha256"]
     assert warmstart["visual_detector_will_be_frozen"] is True
     for name, summary in summaries.items():
         history_path = RUN_ROOT / name / "loss_history.jsonl"

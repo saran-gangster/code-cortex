@@ -46,8 +46,8 @@ def main() -> None:
     parser.add_argument("--output", type=Path, default=root / "docs" / "REVIEW2_EVIDENCE.md")
     args = parser.parse_args()
 
-    names = ["imagenet-e1-full-pass", "imagenet-e2-full-pass"]
-    labels = ["E1: image only", "E2: image + flight state"]
+    names = ["imagenet-e2-full-pass", "imagenet-e1-full-pass"]
+    labels = ["E2: image only", "E1: image + flight state"]
     summaries = [read_json(args.review_root / name / "run_summary.json") for name in names]
     histories = [read_jsonl(args.review_root / name / "loss_history.jsonl") for name in names]
     reports = [
@@ -56,7 +56,7 @@ def main() -> None:
     ]
     robustness_reports = [
         read_json(args.evaluation_root / f"review2-{name}.json")
-        for name in ("imagenet-e2-masked-fallback", "imagenet-e2-shuffled-state")
+        for name in ("imagenet-e1-masked-fallback", "imagenet-e1-shuffled-state")
     ]
 
     for name, summary, history, report in zip(names, summaries, histories, reports, strict=True):
@@ -88,7 +88,7 @@ def main() -> None:
     ):
         raise RuntimeError("robustness reports are not sealed development evidence")
     if any(report["checkpoint_id"] != summaries[1]["checkpoint_sha256"] for report in robustness_reports):
-        raise RuntimeError("robustness reports do not use the selected E2 checkpoint")
+        raise RuntimeError("robustness reports do not use the selected E1 checkpoint")
 
     lines = [
         "# AeroGuard next-review evidence",
@@ -136,7 +136,7 @@ def main() -> None:
                 "200-step moving average to make the trend readable; no points are hidden from the artifact."
             ),
             "",
-            "![Complete E1 and E2 training loss](assets/review2-full-training-loss.png)",
+            "![Complete E2 and E1 training loss](assets/review2-full-training-loss.png)",
             "",
             "![Classification, box regression, and centerness loss](assets/review2-loss-components.png)",
             "",
@@ -201,12 +201,12 @@ def main() -> None:
         "## Flight-state robustness",
         "",
         (
-            "The selected E2 checkpoint is also evaluated with flight state masked and with state "
+            "The selected E1 checkpoint is also evaluated with flight state masked and with state "
             "shifted by 1,000 frames. Masking measures the image-only fallback. Shifting is a "
             "deliberate misalignment stress test and is never used as a deployment mode."
         ),
         "",
-        "| E2 evaluation mode | AP50 | AP50:95 | Best F1 | Detection accuracy |",
+        "| E1 evaluation mode | AP50 | AP50:95 | Best F1 | Detection accuracy |",
         "|---|---:|---:|---:|---:|",
     ]
     robustness_rows = [
@@ -224,20 +224,20 @@ def main() -> None:
     robustness_lines.extend(
         [
             "",
-            "![E2 missing-state and misalignment checks](assets/review2-state-robustness.png)",
+            "![E1 missing-state and misalignment checks](assets/review2-state-robustness.png)",
             "",
             (
-                "Correct, masked, and shifted state all leave E2 near AP50 0.114. "
-                "The full-pass E2 therefore does not show a reliable telemetry benefit. "
-                "The larger gap to E1 points to visual-detector drift during joint training."
+                "Correct, masked, and shifted state all leave E1 near AP50 0.114. "
+                "The full-pass E1 therefore does not show a reliable telemetry benefit. "
+                "The larger gap to E2 points to visual-detector drift during joint training."
             ),
             "",
             "## Follow-up experiment",
             "",
             (
-                "E3 and E4 start from the stronger E1 checkpoint, freeze every visual-detector "
+                "E3 and E4 start from the stronger E2 checkpoint, freeze every visual-detector "
                 "weight, and train only the residual FiLM state adapter. E4 also masks state on "
-                "half of its deterministic training schedule. This design preserves the E1 "
+                "half of its deterministic training schedule. This design preserves the E2 "
                 "image-only fallback exactly while testing whether state can add value."
             ),
             "",

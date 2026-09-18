@@ -17,20 +17,20 @@ The FiLM output projections initialize to zero, so the untrained transform is ex
 ## Current evidence
 
 - Random-init FCOS one-frame overfit gate reduced loss from 2.87 to 1.28 over 24 updates.
-- Lightning E1 and E2 each completed 40 updates concurrently on separate Tesla T4 GPUs.
+- Lightning E2 and E1 each completed 40 updates concurrently on separate Tesla T4 GPUs.
 - Both arms used shared warmstart hash `0159…36cc` and schedule hash `990b…5db1`.
-- E1's zero state gate left the FiLM projection norm at zero.
-- E2's paired state produced finite gradients and changed the projection L1 norm from zero to 120.735.
+- E2's zero state gate left the FiLM projection norm at zero.
+- E1's paired state produced finite gradients and changed the projection L1 norm from zero to 120.735.
 - The matched random-control and ImageNet-backbone pairs each completed 5,000 updates per arm on separate T4 GPUs; the saved summaries prove training provenance, not held-out accuracy.
 
-The training results prove wiring and trainability only. The separate development reports show E2 above E1 on one frozen recording root, but do not establish broad generalization or final-test performance.
+The training results prove wiring and trainability only. The separate development reports show E1 above E2 on one frozen recording root, but do not establish broad generalization or final-test performance.
 
 ## Development evidence
 
-- ImageNet E1 image-only: AP50 `0.0120`, AP50:95 `0.0024`, fixed-point recall `0.3333`.
-- ImageNet E2 image + flight state: AP50 `0.0692`, AP50:95 `0.0234`, fixed-point recall `0.4932`.
-- Both used the same 5,000-step schedule and frozen development partition. E2 is the leading candidate, not a released model.
-- The 0.30 display threshold and missing-state E2 path still need selection work. See [development results](DEVELOPMENT_RESULTS.md).
+- ImageNet E2 image-only: AP50 `0.0120`, AP50:95 `0.0024`, fixed-point recall `0.3333`.
+- ImageNet E1 image + flight state: AP50 `0.0692`, AP50:95 `0.0234`, fixed-point recall `0.4932`.
+- Both used the same 5,000-step schedule and frozen development partition. E1 is the leading candidate, not a released model.
+- The 0.30 display threshold and missing-state E1 path still need selection work. See [development results](DEVELOPMENT_RESULTS.md).
 
 ## Intended use
 

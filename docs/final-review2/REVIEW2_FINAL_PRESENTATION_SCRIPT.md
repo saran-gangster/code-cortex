@@ -30,11 +30,11 @@ The model produces bounding boxes, object classes, and confidence scores. A huma
 
 **Speaker 1 — about 50 seconds**
 
-“In Review 1, each experiment used a 5,000-update pilot. The early result suggested that the image-plus-flight-state model, E2, might help: its AP50 was 0.0692 compared with 0.0120 for image-only E1.
+“In Review 1, each experiment used a 5,000-update pilot. The early result suggested that the image-plus-flight-state model, E1, might help: its AP50 was 0.0692 compared with 0.0120 for image-only E2.
 
-For Review 2, we trained both arms for all 18,523 training steps and stored every loss value. The conclusion changed. E1 reached AP50 0.1698, while jointly trained E2 reached 0.1146. Stress tests showed that E2’s visual weights had drifted and generalized less well.
+For Review 2, we trained both arms for all 18,523 training steps and stored every loss value. The conclusion changed. E2 reached AP50 0.1698, while jointly trained E1 reached 0.1146. Stress tests showed that E1’s visual weights had drifted and generalized less well.
 
-We then froze the strong E1 visual detector and trained only the state adapter. E4 recovered to AP50 0.1697, but still did not beat E1. Stronger evidence changed our decision, so E1 remains selected.”
+We then froze the strong E2 visual detector and trained only the state adapter. E4 recovered to AP50 0.1697, but still did not beat E2. Stronger evidence changed our decision, so E2 remains selected.”
 
 **Handoff:** “I will now hand over to Speaker 2 to explain how we kept the comparison fair.”
 
@@ -50,15 +50,15 @@ We split by complete flight recording, not by random video frames. Neighboring f
 
 **Speaker 2 — about 45 seconds**
 
-“All experiments use the same FCOS detector with a ResNet-50 feature pyramid. E1 is the image-only control. E2 trains the image detector and the flight-state adapter together. The adapter receives eight normalized flight values and uses FiLM to adjust five visual feature levels.
+“All experiments use the same FCOS detector with a ResNet-50 feature pyramid. E2 is the image-only control. E1 trains the image detector and the flight-state adapter together. The adapter receives eight normalized flight values and uses FiLM to adjust five visual feature levels.
 
-E3 and E4 are corrective experiments. They start from E1 and keep every visual weight frozen while training only the small state adapter. E4 also hides flight state on half of its training steps to make missing telemetry safer.”
+E3 and E4 are corrective experiments. They start from E2 and keep every visual weight frozen while training only the small state adapter. E4 also hides flight state on half of its training steps to make missing telemetry safer.”
 
 ## Slide 6 — Complete training evidence
 
 **Speaker 2 — about 45 seconds**
 
-“Each full-pass arm completed 18,523 optimizer steps, which covers the full training split once. E1 and E2 ran in parallel on the two Kaggle T4 GPUs using PyTorch Lightning.
+“Each full-pass arm completed 18,523 optimizer steps, which covers the full training split once. E2 and E1 ran in parallel on the two Kaggle T4 GPUs using PyTorch Lightning.
 
 We stored every optimizer-step loss. The faint lines show each step and the strong lines show a 200-step moving average. Both curves fall and then stabilize, so optimization made progress. We still judge model quality on the held-out development flight, not from training loss alone.”
 
@@ -68,9 +68,9 @@ We stored every optimizer-step loss. The faint lines show each step and the stro
 
 **Speaker 3 — about 55 seconds**
 
-“On the held-out development flight, E1 achieved AP50 0.1698, F1 0.4503, and detection accuracy 0.2906. Jointly trained E2 was weaker at AP50 0.1146. Frozen-visual E3 reached 0.1679, and E4 reached 0.1697.
+“On the held-out development flight, E2 achieved AP50 0.1698, F1 0.4503, and detection accuracy 0.2906. Jointly trained E1 was weaker at AP50 0.1146. Frozen-visual E3 reached 0.1679, and E4 reached 0.1697.
 
-E4 nearly matched E1, proving that freezing the visual detector corrected the visual-weight drift. However, E4 did not beat E1, so we do not claim that flight state currently improves accuracy. The evidence-based decision is to keep E1. The 8,566-frame final test remains sealed.”
+E4 nearly matched E2, proving that freezing the visual detector corrected the visual-weight drift. However, E4 did not beat E2, so we do not claim that flight state currently improves accuracy. The evidence-based decision is to keep E2. The 8,566-frame final test remains sealed.”
 
 ## Slide 8 — Why the scores are modest
 
@@ -78,7 +78,7 @@ E4 nearly matched E1, proving that freezing the visual detector corrected the vi
 
 “The scores are low, and we are reporting that directly. This is strict object detection on a different complete flight. The evaluation penalizes both false alarms and missed objects; it does not count millions of background pixels as easy correct answers.
 
-At E1’s selected development threshold, there were 6,646 correct detections, 5,996 false alarms, and 10,227 missed objects. This gives 52.57 percent precision, 39.39 percent recall, 45.03 percent F1, and 29.06 percent detection accuracy.
+At E2’s selected development threshold, there were 6,646 correct detections, 5,996 false alarms, and 10,227 missed objects. This gives 52.57 percent precision, 39.39 percent recall, 45.03 percent F1, and 29.06 percent detection accuracy.
 
 Many aerial targets occupy only a few pixels, the classes are imbalanced, and Review 2 used one full training pass. AP50 0.1698 is the area under a precision–recall curve at 50 percent box overlap. It is not 16.98 percent classification accuracy. These results are not deployment-ready, but they are honest evidence that tells us exactly what to improve.”
 
@@ -88,7 +88,7 @@ Many aerial targets occupy only a few pixels, the classes are imbalanced, and Re
 
 **Speaker 4 — about 50 seconds, followed by the demo**
 
-“The FastAPI backend exposes health, reports, replay frames, inference contracts, and human-review records. The React console replays six real AU-AIR development frames with stored GPU-computed E1 and E4 predictions. It supports autoplay, frame seeking, comparison views, evidence inspection, and review export.
+“The FastAPI backend exposes health, reports, replay frames, inference contracts, and human-review records. The React console replays six real AU-AIR development frames with stored GPU-computed E2 and E4 predictions. It supports autoplay, frame seeking, comparison views, evidence inspection, and review export.
 
 For edge deployment, the repository includes ONNX export, TensorRT engine build, output validation, and inference scripts. We do not claim that the TensorRT engine is complete until a frozen checkpoint is exported and benchmarked on the target NVIDIA edge device.”
 
@@ -96,7 +96,7 @@ For edge deployment, the repository includes ONNX export, TensorRT engine build,
 
 1. Open **Live review** and point to the label `AU-AIR development replay · cached`.
 2. Let frames 129–134 advance automatically, then pause on one frame.
-3. Switch between **E1**, **E4**, and **Split** to compare stored predictions.
+3. Switch between **E2**, **E4**, and **Split** to compare stored predictions.
 4. Select another frame on the timeline to prove that frame data changes.
 5. Open the **Evidence** drawer and show provenance, frame metadata, quality flags, and the review form.
 6. Open **Results & evidence** if time permits and point to the full-pass metrics.
@@ -107,7 +107,7 @@ Say clearly: “This judge demo is a cached replay of real AU-AIR frames and sto
 
 **Speaker 4 — about 35 seconds**
 
-“Review 2 ends with three clear decisions. First, keep E1 because it is the strongest development model. Second, keep the final test sealed until the model, threshold, preprocessing, and deployment contract are frozen. Third, improve the detector before making scaling or safety claims.
+“Review 2 ends with three clear decisions. First, keep E2 because it is the strongest development model. Second, keep the final test sealed until the model, threshold, preprocessing, and deployment contract are frozen. Third, improve the detector before making scaling or safety claims.
 
 Our next steps are longer training, class-balanced sampling, small-object augmentation, validation across more complete flights, and threshold calibration. After that, we will open the final test once and build and benchmark TensorRT on the target edge device.”
 
@@ -122,7 +122,7 @@ Keep this slide available during Q&A. Use the answers in `JUDGE_QA.md` and do no
 If time is cut to five minutes:
 
 - Present slides 1–4 normally.
-- On slide 5, explain only E1, E2, and frozen-visual E4.
+- On slide 5, explain only E2, E1, and frozen-visual E4.
 - On slide 6, say only that all 18,523 steps were stored and both loss trends decreased.
 - Present slides 7–10 normally but skip the live demo.
 - Keep slide 11 for questions.

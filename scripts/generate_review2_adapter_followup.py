@@ -86,12 +86,12 @@ def main() -> None:
     adapter_reports = [
         read_json(evaluation_root / f"review2-{name}.json") for name in adapter_names
     ]
-    base_names = ("imagenet-e1-full-pass", "imagenet-e2-full-pass")
+    base_names = ("imagenet-e2-full-pass", "imagenet-e1-full-pass")
     base_reports = [
         read_json(evaluation_root / f"review2-{name}.json") for name in base_names
     ]
     base_summary = read_json(review_root / base_names[0] / "run_summary.json")
-    warmstart = read_json(review_root / "e1-frozen-visual-warmstart-summary.json")
+    warmstart = read_json(review_root / "e2-frozen-visual-warmstart-summary.json")
     integrity = read_json(review_root / "adapter_integrity_summary.json")
 
     for name, summary, history, report in zip(
@@ -109,9 +109,9 @@ def main() -> None:
         if report["partition"] != "development" or report["final_test_unsealed"]:
             raise RuntimeError(f"{name}: report is not sealed development evidence")
     if not integrity["all_visual_tensors_exactly_equal"]:
-        raise RuntimeError("adapter visual tensors differ from the E1 parent")
+        raise RuntimeError("adapter visual tensors differ from the E2 parent")
     if warmstart["source_checkpoint_sha256"] != base_summary["checkpoint_sha256"]:
-        raise RuntimeError("adapter warmstart does not trace back to the E1 checkpoint")
+        raise RuntimeError("adapter warmstart does not trace back to the E2 checkpoint")
     for name in adapter_names:
         integrity_run = integrity["runs"][name]
         if not integrity_run["visual_tensors_exactly_equal"]:
@@ -125,8 +125,8 @@ def main() -> None:
             raise RuntimeError(f"{name}: visual state hash differs from the parent")
 
     labels = [
-        "E1\nimage only",
-        "E2\njoint training",
+        "E2\nimage only",
+        "E1\njoint training",
         "E3\nexact frozen visual",
         "E4\nexact frozen + dropout",
     ]
@@ -146,7 +146,7 @@ def main() -> None:
     figure.text(
         0.5,
         0.925,
-        "E3 and E4 preserve every E1 visual tensor exactly and train only the FiLM adapter",
+        "E3 and E4 preserve every E2 visual tensor exactly and train only the FiLM adapter",
         ha="center",
         color=MUTED,
         fontsize=11,
@@ -252,8 +252,8 @@ def main() -> None:
         "# AeroGuard frozen-visual adapter follow-up",
         "",
         (
-            "This experiment responds to the full-pass E2 failure mode. E3 and E4 start "
-            "from the stronger E1 checkpoint. Every visual-detector tensor is frozen and "
+            "This experiment responds to the full-pass E1 failure mode. E3 and E4 start "
+            "from the stronger E2 checkpoint. Every visual-detector tensor is frozen and "
             "verified byte-for-byte after training; only the residual FiLM adapter changes."
         ),
         "",

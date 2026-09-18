@@ -17,7 +17,7 @@
       "state_mode": "masked",
       "torch_version": "2.10.0+cu128",
       "training_schedule_sha256": "de8379eb59a77124950ea9d6f24512a296b70d87881ae03c6b1d6aab3d860255",
-      "evidence_source": "reports/evaluations/review2-imagenet-e1-full-pass.json"
+      "evidence_source": "reports/evaluations/review2-imagenet-e2-full-pass.json"
     },
     "final_test_unsealed": false,
     "limitations": [
@@ -53,11 +53,11 @@
         "selection_partition": "development"
       }
     },
-    "model_id": "imagenet-full-pass-e1-rgb-masked",
+    "model_id": "imagenet-full-pass-e2-rgb-masked",
     "partition": "development",
     "protocol_sha256": "c848194b212301de811fc835eb561bfbc6d4ee60bf9f39fb7497c06b97f7a1cc",
     "schema_version": "1.0",
-    "report_id": "review2-imagenet-e1-full-pass",
+    "report_id": "review2-imagenet-e2-full-pass",
     "documentedFallback": true
   },
   {
@@ -78,7 +78,7 @@
       "state_mode": "paired",
       "torch_version": "2.10.0+cu128",
       "training_schedule_sha256": "de8379eb59a77124950ea9d6f24512a296b70d87881ae03c6b1d6aab3d860255",
-      "evidence_source": "reports/evaluations/review2-imagenet-e2-full-pass.json"
+      "evidence_source": "reports/evaluations/review2-imagenet-e1-full-pass.json"
     },
     "final_test_unsealed": false,
     "limitations": [
@@ -114,11 +114,11 @@
         "selection_partition": "development"
       }
     },
-    "model_id": "imagenet-full-pass-e2-paired-film",
+    "model_id": "imagenet-full-pass-e1-paired-film",
     "partition": "development",
     "protocol_sha256": "c848194b212301de811fc835eb561bfbc6d4ee60bf9f39fb7497c06b97f7a1cc",
     "schema_version": "1.0",
-    "report_id": "review2-imagenet-e2-full-pass",
+    "report_id": "review2-imagenet-e1-full-pass",
     "documentedFallback": true
   },
   {
@@ -129,7 +129,7 @@
       "checkpoint_training_arm": "paired",
       "device": "Tesla T4",
       "display_threshold": 0.3,
-      "initial_weights_origin": "review2_e1_full_pass_checkpoint",
+      "initial_weights_origin": "review2_e2_full_pass_checkpoint",
       "max_detections_per_image": 300,
       "normalizer_sha256": "11b40c1ce508a4a644a71708f6a6709ae81ed81b4618689b59b2954383a48678",
       "physical_gpu_id": "0",
@@ -190,7 +190,7 @@
       "checkpoint_training_arm": "paired",
       "device": "Tesla T4",
       "display_threshold": 0.3,
-      "initial_weights_origin": "review2_e1_full_pass_checkpoint",
+      "initial_weights_origin": "review2_e2_full_pass_checkpoint",
       "max_detections_per_image": 300,
       "normalizer_sha256": "11b40c1ce508a4a644a71708f6a6709ae81ed81b4618689b59b2954383a48678",
       "physical_gpu_id": "1",

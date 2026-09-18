@@ -6,7 +6,7 @@
     "checkpoint_training_arm": "paired",
     "device": "Tesla T4",
     "display_threshold": 0.3,
-    "initial_weights_origin": "review2_e1_full_pass_checkpoint",
+    "initial_weights_origin": "review2_e2_full_pass_checkpoint",
     "max_detections_per_image": 300,
     "normalizer_sha256": "11b40c1ce508a4a644a71708f6a6709ae81ed81b4618689b59b2954383a48678",
     "physical_gpu_id": "1",

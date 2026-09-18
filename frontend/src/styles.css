@@ -115,7 +115,7 @@ textarea { padding: 9px 10px; resize: vertical; font-size: 12px; line-height: 1.
 select:focus, textarea:focus { border-color: var(--lime); }
 .feed-layout { display: grid; grid-template-columns: minmax(0, 1fr) 295px; gap: 14px; }
 .feeds { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; min-width: 0; }
-.view-e1 .feeds, .view-e2 .feeds { grid-template-columns: minmax(0, 1fr); }
+.view-e2 .feeds, .view-e1 .feeds { grid-template-columns: minmax(0, 1fr); }
 .feed-card { min-width: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 9px; background: #111b22; }
 .feed-card > header, .feed-card > footer { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 11px 13px; }
 .feed-card > header { min-height: 62px; border-bottom: 1px solid var(--line); background: var(--panel-2); }

@@ -115,7 +115,7 @@ def _validate_history(run: Path, rows: list[dict]) -> dict:
 def generate_loss_graph(output: Path, run_paths: list[Path]) -> None:
     histories = [read_jsonl(path / "loss_history.jsonl") for path in run_paths]
     summaries = [_validate_history(path, rows) for path, rows in zip(run_paths, histories, strict=True)]
-    labels = ["E1 image only", "E2 image + flight state"]
+    labels = ["E2 image only", "E1 image + flight state"]
     colors = [CYAN, AMBER]
     window = 200
 
@@ -164,7 +164,7 @@ def generate_loss_graph(output: Path, run_paths: list[Path]) -> None:
 
 
 def generate_component_graph(output: Path, run_paths: list[Path]) -> None:
-    labels = ["E1 image only", "E2 image + flight state"]
+    labels = ["E2 image only", "E1 image + flight state"]
     component_specs = [
         ("classification", "Classification", CYAN),
         ("bbox_regression", "Box regression", AMBER),
@@ -194,7 +194,7 @@ def generate_development_graph(output: Path, report_paths: list[Path]) -> None:
     for report in reports:
         if report["partition"] != "development" or report["final_test_unsealed"] is not False:
             raise RuntimeError("reports must contain sealed development-only evidence")
-    labels = ["E1 image only", "E2 image + state"]
+    labels = ["E2 image only", "E1 image + state"]
     pooled = [report["metrics"]["pooled"] for report in reports]
     best = [report["metrics"]["operating_point_sweep"]["best_f1_point"] for report in reports]
 
@@ -267,7 +267,7 @@ def generate_development_graph(output: Path, report_paths: list[Path]) -> None:
 
 
 def generate_threshold_graph(output: Path, report_paths: list[Path]) -> None:
-    labels = ["E1 image only", "E2 image + flight state"]
+    labels = ["E2 image only", "E1 image + flight state"]
     colors = [CYAN, AMBER]
     figure, axes = plt.subplots(1, 2, figsize=(16, 7.8), facecolor=BG, sharey=True)
     figure.suptitle("Choosing the confidence threshold on development data", color=TEXT, fontsize=22, fontweight="bold", y=0.98)
@@ -306,7 +306,7 @@ def generate_threshold_graph(output: Path, report_paths: list[Path]) -> None:
 def generate_per_class_graph(output: Path, report_paths: list[Path]) -> None:
     reports = [read_json(path) for path in report_paths]
     per_class = [report["metrics"]["pooled"]["per_class"] for report in reports]
-    labels = ["E1 image only", "E2 image + state"]
+    labels = ["E2 image only", "E1 image + state"]
     colors = [CYAN, AMBER]
     x = np.arange(len(CLASS_NAMES))
     width = 0.36
@@ -346,7 +346,7 @@ def generate_per_class_graph(output: Path, report_paths: list[Path]) -> None:
 
 def generate_robustness_graph(output: Path, report_paths: list[Path]) -> None:
     reports = [read_json(path) for path in report_paths]
-    labels = ["E1\nimage only", "E2\npaired state", "E2\nstate masked", "E2\nstate shifted"]
+    labels = ["E2\nimage only", "E1\npaired state", "E1\nstate masked", "E1\nstate shifted"]
     colors = [CYAN, AMBER, PURPLE, RED]
     pooled = [report["metrics"]["pooled"] for report in reports]
     best = [report["metrics"]["operating_point_sweep"]["best_f1_point"] for report in reports]
@@ -356,7 +356,7 @@ def generate_robustness_graph(output: Path, report_paths: list[Path]) -> None:
     figure.text(
         0.5,
         0.925,
-        "Same frozen development flight; E2 uses correct, absent, and deliberately shifted state",
+        "Same frozen development flight; E1 uses correct, absent, and deliberately shifted state",
         ha="center",
         color=MUTED,
         fontsize=11,
@@ -411,19 +411,19 @@ def generate_robustness_graph(output: Path, report_paths: list[Path]) -> None:
 def main() -> None:
     root = Path(__file__).resolve().parents[1]
     parser = argparse.ArgumentParser()
-    parser.add_argument("--e1-run", type=Path, default=root / "reports" / "review2" / "imagenet-e1-full-pass")
     parser.add_argument("--e2-run", type=Path, default=root / "reports" / "review2" / "imagenet-e2-full-pass")
-    parser.add_argument("--e1-evaluation", type=Path, default=root / "reports" / "evaluations" / "review2-imagenet-e1-full-pass.json")
+    parser.add_argument("--e1-run", type=Path, default=root / "reports" / "review2" / "imagenet-e1-full-pass")
     parser.add_argument("--e2-evaluation", type=Path, default=root / "reports" / "evaluations" / "review2-imagenet-e2-full-pass.json")
-    parser.add_argument("--e2-masked-evaluation", type=Path, default=root / "reports" / "evaluations" / "review2-imagenet-e2-masked-fallback.json")
-    parser.add_argument("--e2-shuffled-evaluation", type=Path, default=root / "reports" / "evaluations" / "review2-imagenet-e2-shuffled-state.json")
+    parser.add_argument("--e1-evaluation", type=Path, default=root / "reports" / "evaluations" / "review2-imagenet-e1-full-pass.json")
+    parser.add_argument("--e1-masked-evaluation", type=Path, default=root / "reports" / "evaluations" / "review2-imagenet-e1-masked-fallback.json")
+    parser.add_argument("--e1-shuffled-evaluation", type=Path, default=root / "reports" / "evaluations" / "review2-imagenet-e1-shuffled-state.json")
     parser.add_argument("--output", type=Path, default=root / "docs" / "assets")
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
 
     generate_split_graph(args.output)
-    run_paths = [args.e1_run, args.e2_run]
-    report_paths = [args.e1_evaluation, args.e2_evaluation]
+    run_paths = [args.e2_run, args.e1_run]
+    report_paths = [args.e2_evaluation, args.e1_evaluation]
     generate_loss_graph(args.output, run_paths)
     generate_component_graph(args.output, run_paths)
     generate_development_graph(args.output, report_paths)
@@ -432,10 +432,10 @@ def main() -> None:
     generate_robustness_graph(
         args.output,
         [
-            args.e1_evaluation,
             args.e2_evaluation,
-            args.e2_masked_evaluation,
-            args.e2_shuffled_evaluation,
+            args.e1_evaluation,
+            args.e1_masked_evaluation,
+            args.e1_shuffled_evaluation,
         ],
     )
     print("Generated Review 2 split, loss, metric, threshold, class, and robustness graphs")

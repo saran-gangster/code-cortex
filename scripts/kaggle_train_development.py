@@ -336,7 +336,7 @@ def main() -> None:
         "artifact_kind": "matched_development_training_not_benchmark",
         "benchmark_claim": False,
         "experiment_arm": args.experiment_arm
-        or ("E2_paired_film" if args.mode == "paired" else "E1_rgb_masked"),
+        or ("E1_paired_film" if args.mode == "paired" else "E2_rgb_masked"),
         "completed_steps": int(trainer.global_step),
         "requested_steps": args.steps,
         "resumed_from_step": start_step,

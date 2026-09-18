@@ -485,9 +485,9 @@
   ],
   "partition": "development",
   "prediction_source": "computed",
-  "provenance": "Real AU-AIR development images with stored GPU-computed E1 and E4 predictions",
+  "provenance": "Real AU-AIR development images with stored GPU-computed E2 and E4 predictions",
   "recording_root": "20190905091750",
-  "rgb_model_id": "imagenet-full-pass-e1-rgb-masked",
+  "rgb_model_id": "imagenet-full-pass-e2-rgb-masked",
   "schema_version": "1.0",
   "state_model_id": "imagenet-e4-exact-frozen-visual-film-dropout50"
 }

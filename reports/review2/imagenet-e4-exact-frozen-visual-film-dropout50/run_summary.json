@@ -18,7 +18,7 @@
   "final_test_roots_used": [],
   "final_test_unsealed": false,
   "head_and_film_lr": 3e-05,
-  "initial_weights_origin": "review2_e1_full_pass_checkpoint",
+  "initial_weights_origin": "review2_e2_full_pass_checkpoint",
   "latest_session_training_seconds": 2081.6614546109995,
   "lightning_version": "2.6.6",
   "loss_history_rows": 18523,

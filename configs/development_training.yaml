@@ -15,10 +15,10 @@ normalizer_sha256: 11b40c1ce508a4a644a71708f6a6709ae81ed81b4618689b59b2954383a48
 protocol_sha256: c848194b212301de811fc835eb561bfbc6d4ee60bf9f39fb7497c06b97f7a1cc
 final_test_unsealed: false
 arms:
-  E1_rgb_masked:
+  E2_rgb_masked:
     physical_gpu_id: 0
     state_mask: 0.0
-  E2_paired_film:
+  E1_paired_film:
     physical_gpu_id: 1
     state_mask: 1.0
 runs:

@@ -18,7 +18,7 @@ We split by complete flight recording. We do not randomly mix video frames. This
 
 ## Slide 4: Matched model architecture
 
-“Both models use the same FCOS object detector with a ResNet 50 feature pyramid. E1 is the image-only control. Its state gate is zero. E2 receives eight normalized flight values. A small FiLM network uses those values to adjust five feature levels.
+“Both models use the same FCOS object detector with a ResNet 50 feature pyramid. E2 is the image-only control. Its state gate is zero. E1 receives eight normalized flight values. A small FiLM network uses those values to adjust five feature levels.
 
 Both models started from the same ImageNet backbone and saw the same image order. Flight state was the controlled difference.”
 
@@ -26,19 +26,19 @@ Both models started from the same ImageNet backbone and saw the same image order
 
 “Review 1 used 5,000 training samples per model. We have now scaled each model to all 18,523 training frames, which is one complete pass. Both runs used PyTorch Lightning and ran at the same time on separate Tesla T4 GPUs.
 
-We saved the loss at every optimizer step. The faint lines show every value. The strong lines are 200-step moving averages so the trend is easier to read. E1’s average loss moved from 2.2207 in the first 200 steps to 1.3254 in the last 200. E2 moved from 2.2235 to 1.3287.”
+We saved the loss at every optimizer step. The faint lines show every value. The strong lines are 200-step moving averages so the trend is easier to read. E2’s average loss moved from 2.2207 in the first 200 steps to 1.3254 in the last 200. E1 moved from 2.2235 to 1.3287.”
 
 ## Slide 6: Held-out development results
 
-“We evaluated both models on one complete flight that training never used. E1 reached AP50 0.1698. E2 reached 0.1146. At each model’s best development threshold, E1 reached F1 0.4503 and detection accuracy 0.2906. E2 reached F1 0.2515 and detection accuracy 0.1438.
+“We evaluated both models on one complete flight that training never used. E2 reached AP50 0.1698. E1 reached 0.1146. At each model’s best development threshold, E2 reached F1 0.4503 and detection accuracy 0.2906. E1 reached F1 0.2515 and detection accuracy 0.1438.
 
 Detection accuracy here means true positives divided by true positives plus false positives plus false negatives. It is an object-detection measure, not image-classification accuracy.
 
 AP50 checks the full precision and recall curve. A predicted box counts as correct when it overlaps the labelled box by at least 50 percent. Higher is better.”
 
-## Slide 7: Why E2 fell behind
+## Slide 7: Why E1 fell behind
 
-“The full-pass result did not repeat the short Review 1 result where E2 led. We tested the same E2 checkpoint in three ways. Correct state gave AP50 0.1146. Masked state gave 0.1167. State shifted by 1,000 frames gave 0.1138.
+“The full-pass result did not repeat the short Review 1 result where E1 led. We tested the same E1 checkpoint in three ways. Correct state gave AP50 0.1146. Masked state gave 0.1167. State shifted by 1,000 frames gave 0.1138.
 
 These numbers are almost the same. This tells us the main problem was not one wrong state value during inference. Joint training changed the visual detector weights, and those weights generalized poorly to the held-out flight.”
 
@@ -46,9 +46,9 @@ These numbers are almost the same. This tells us the main problem was not one wr
 
 “The FastAPI backend is complete for health checks, capability discovery, reports, inference, replay, and idempotent human reviews. The UI team can work against that stable contract.
 
-We also completed a safer follow-up experiment. E3 and E4 began from the stronger E1 detector. We froze and byte-checked every visual detector tensor, then trained only the small state adapter across all 18,523 training frames. E4 hid state on half of its training steps.
+We also completed a safer follow-up experiment. E3 and E4 began from the stronger E2 detector. We froze and byte-checked every visual detector tensor, then trained only the small state adapter across all 18,523 training frames. E4 hid state on half of its training steps.
 
-E4 recovered almost all of E1's performance: AP50 was 0.1697 compared with E1's 0.1698, and F1 was 0.4493 compared with 0.4503. It did not beat E1, so we keep E1 as the honest development winner. The final test stays sealed until the model and confidence threshold are frozen.”
+E4 recovered almost all of E2's performance: AP50 was 0.1697 compared with E2's 0.1698, and F1 was 0.4493 compared with 0.4503. It did not beat E2, so we keep E2 as the honest development winner. The final test stays sealed until the model and confidence threshold are frozen.”
 
 ## Short answers for likely judge questions
 
@@ -58,7 +58,7 @@ E4 recovered almost all of E1's performance: AP50 was 0.1697 compared with E1's 
 
 ### What is the accuracy?
 
-“At the best development threshold, E1 detection accuracy is 0.2906 and E2 detection accuracy is 0.1438. We define it as TP divided by TP plus FP plus FN. We also report AP50, precision, recall, and F1 because one classification accuracy number is not enough for object detection.”
+“At the best development threshold, E2 detection accuracy is 0.2906 and E1 detection accuracy is 0.1438. We define it as TP divided by TP plus FP plus FN. We also report AP50, precision, recall, and F1 because one classification accuracy number is not enough for object detection.”
 
 ### Why is the accuracy not close to 100 percent?
 
@@ -66,11 +66,11 @@ E4 recovered almost all of E1's performance: AP50 was 0.1697 compared with E1's 
 
 ### Did the loss decrease?
 
-“Yes. The first-to-last 200-step mean moved from 2.2207 to 1.3254 for E1 and from 2.2235 to 1.3287 for E2. The repository includes all 18,523 loss rows for each model.”
+“Yes. The first-to-last 200-step mean moved from 2.2207 to 1.3254 for E2 and from 2.2235 to 1.3287 for E1. The repository includes all 18,523 loss rows for each model.”
 
 ### Did flight state help?
 
-“Not reliably. E1 led on the held-out development flight. The frozen-visual E4 follow-up recovered almost all of E1's performance but did not beat it. This confirms that visual-weight drift caused most of E2's drop, while the current flight-state adapter still does not add a measurable development gain.”
+“Not reliably. E2 led on the held-out development flight. The frozen-visual E4 follow-up recovered almost all of E2's performance but did not beat it. This confirms that visual-weight drift caused most of E1's drop, while the current flight-state adapter still does not add a measurable development gain.”
 
 ### Did you use the final test?
 

@@ -18,7 +18,7 @@ The operator can see what the model found, which inputs it used, and when an inp
 
 ## 0:55–1:40 — Speaker 1: the solution and data
 
-“We compare two versions of the same detector. E1 sees the colour image. E2 sees the image and paired flight state. Both get the same training budget and image order.
+“We compare two versions of the same detector. E2 sees the colour image. E1 sees the image and paired flight state. Both get the same training budget and image order.
 
 AU-AIR has 32,823 paired frames. Our parser rejected and logged 54 invalid boxes, leaving 131,977 valid boxes across eight classes.
 
@@ -34,13 +34,13 @@ Speaker 2 will explain how the model uses this data.”
 
 Both paths use FCOS with ResNet-50 and a feature pyramid. These find image patterns at several scales. FCOS predicts boxes, classes and scores.
 
-E2 uses height, three speed values, roll, pitch and two yaw values. FiLM scales and shifts image features using this state. A gate switches the adjustment off when state is missing. Invalid values are cleaned first.
+E1 uses height, three speed values, roll, pitch and two yaw values. FiLM scales and shifts image features using this state. A gate switches the adjustment off when state is missing. Invalid values are cleaned first.
 
 Python, PyTorch, TorchVision and Lightning handle training and checkpoints. FastAPI and Pydantic handle requests and input checks. React, TypeScript and Vite build the console. Evidence and reviews use local JSON and JSONL files.”
 
 ## 2:50–3:50 — Speaker 2: real engineering evidence
 
-“We have trained models. The saved random-control reports show 5,000 updates for each arm. Both used a pool of 18,523 training records and the same start weights and image schedule. E1 used physical T4 GPU zero; E2 used GPU one. Both used Lightning and full precision.
+“We have trained models. The saved random-control reports show 5,000 updates for each arm. Both used a pool of 18,523 training records and the same start weights and image schedule. E2 used physical T4 GPU zero; E1 used GPU one. Both used Lightning and full precision.
 
 Checkpoint hashes identify each saved model. Final training losses are about 1.635 and 1.671. They do not tell us which model is more accurate.
 
@@ -72,9 +72,9 @@ Speaker 3 will show how the operator reviews the evidence.”
 
 ## 4:55–5:50 — Speaker 3: evaluation and limits
 
-“We evaluated all four checkpoints on the same frozen development recording. In the matched ImageNet pair, E1 reached AP50 0.0120 and AP50:95 0.0024. E2 reached 0.0692 and 0.0234. Overall recall rose from 0.333 to 0.493, and human recall rose from 0.014 to 0.061.
+“We evaluated all four checkpoints on the same frozen development recording. In the matched ImageNet pair, E2 reached AP50 0.0120 and AP50:95 0.0024. E1 reached 0.0692 and 0.0234. Overall recall rose from 0.333 to 0.493, and human recall rose from 0.014 to 0.061.
 
-This supports E2 on the development recording. It does not prove broad generalization, and the final test is still sealed. The current 0.30 display threshold gives many false positives, so the release threshold and missing-state fallback are not frozen.
+This supports E1 on the development recording. It does not prove broad generalization, and the final test is still sealed. The current 0.30 display threshold gives many false positives, so the release threshold and missing-state fallback are not frozen.
 
 VisDrone will be an external image-only test. It has no paired flight state, so we will mark state unavailable. That checks behavior on another dataset.
 
@@ -82,9 +82,9 @@ Eight recording roots give limited variety. We also need more empty-scene checks
 
 ## 5:50–6:30 — Speaker 1: progress and closing
 
-“For Review 1, we have data checks, a fixed split, real training records, state gating, development evidence and a review workflow. E2 is the leading checkpoint, but the release model still needs fallback selection and local runtime integration.
+“For Review 1, we have data checks, a fixed split, real training records, state gating, development evidence and a review workflow. E1 is the leading checkpoint, but the release model still needs fallback selection and local runtime integration.
 
-Next, we will test E2 with missing state, choose the operating threshold, run the external test, and rehearse the demo offline. At larger scale, the plan adds object storage, a database and queued GPU workers. Those are future work.
+Next, we will test E1 with missing state, choose the operating threshold, run the external test, and rehearse the demo offline. At larger scale, the plan adds object storage, a database and queued GPU workers. Those are future work.
 
 AeroGuard makes aerial detections easier to inspect: what the model found, which flight context it used, and what happens when that context is missing. Thank you.”
 
@@ -94,13 +94,13 @@ AeroGuard makes aerial detections easier to inspect: what the model found, which
 
 **What is new here?** Our contribution is the controlled use of paired flight state, missing-state handling and a review workflow with traceable evidence. FCOS and FiLM are existing methods that we build on.
 
-**Does flight state improve accuracy?** On the single frozen development recording, yes: the matched ImageNet E2 arm is above E1 on AP and recall. That supports the idea but does not prove generalization. Final-test results are unavailable, and training losses were not used for this conclusion.
+**Does flight state improve accuracy?** On the single frozen development recording, yes: the matched ImageNet E1 arm is above E2 on AP and recall. That supports the idea but does not prove generalization. Final-test results are unavailable, and training losses were not used for this conclusion.
 
 **Why FCOS?** Its feature pyramid is accessible, so we can add and test conditioning at a clear point. It already provides detection outputs and losses. We do not claim it is the fastest detector.
 
 **What does FiLM do?** It scales and shifts feature channels using flight state. Its last layers start at zero, so the initial transform changes nothing. Training can learn useful adjustments.
 
-**Is missing-state E2 exactly the same as E1?** No. The zero gate removes E2's state adjustment, but its image weights may have changed during training. We must compare both paths on development data before choosing a fallback.
+**Is missing-state E1 exactly the same as E2?** No. The zero gate removes E1's state adjustment, but its image weights may have changed during training. We must compare both paths on development data before choosing a fallback.
 
 **How do you avoid leakage?** Related streams stay in one recording-root partition. State scaling uses training roots only. GPS, filenames, dates and recording IDs are excluded from model inputs. The saved runs list no development or final-test roots used for training.
 
@@ -122,6 +122,6 @@ AeroGuard makes aerial detections easier to inspect: what the model found, which
 
 ## Evidence for the presenters
 
-Use [random E1](../reports/development_random_e1_summary.json), [random E2](../reports/development_random_e2_summary.json), [ImageNet E1](../reports/development_imagenet_e1_summary.json), [ImageNet E2](../reports/development_imagenet_e2_summary.json), [weight origin](../reports/shared_imagenet_warmstart_summary.json) and [resolved config](../configs/development_training.yaml) for training statements. Use [development results](DEVELOPMENT_RESULTS.md) and its four linked JSON reports for accuracy statements. The [smoke report](../reports/fcos_overfit_gate_summary.json) and [inference record](../reports/fcos_overfit_gate_inference.json) are engineering evidence only. The [synthetic report](../reports/evaluation_pipeline_fixture.json) tests the evaluator only.
+Use [random E2](../reports/development_random_e2_summary.json), [random E1](../reports/development_random_e1_summary.json), [ImageNet E2](../reports/development_imagenet_e2_summary.json), [ImageNet E1](../reports/development_imagenet_e1_summary.json), [weight origin](../reports/shared_imagenet_warmstart_summary.json) and [resolved config](../configs/development_training.yaml) for training statements. Use [development results](DEVELOPMENT_RESULTS.md) and its four linked JSON reports for accuracy statements. The [smoke report](../reports/fcos_overfit_gate_summary.json) and [inference record](../reports/fcos_overfit_gate_inference.json) are engineering evidence only. The [synthetic report](../reports/evaluation_pipeline_fixture.json) tests the evaluator only.
 
 Scope, model details and limits come from [README](../README.md), [model card](MODEL_CARD.md), [data card](DATA_CARD.md), [architecture](ARCHITECTURE.md), [development results](DEVELOPMENT_RESULTS.md), and the machine-readable reports. No live status or submission claim follows from those files.

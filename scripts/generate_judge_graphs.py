@@ -12,10 +12,10 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "docs" / "assets"
 
 RUNS = [
-    ("Random E1\nimage only", "development_random_e1_summary.json", "random-control-e1.json"),
-    ("Random E2\nimage + state", "development_random_e2_summary.json", "random-control-e2.json"),
-    ("ImageNet E1\nimage only", "development_imagenet_e1_summary.json", "imagenet-finetune-e1.json"),
-    ("ImageNet E2\nimage + state", "development_imagenet_e2_summary.json", "imagenet-finetune-e2.json"),
+    ("Random E2\nimage only", "development_random_e2_summary.json", "random-control-e2.json"),
+    ("Random E1\nimage + state", "development_random_e1_summary.json", "random-control-e1.json"),
+    ("ImageNet E2\nimage only", "development_imagenet_e2_summary.json", "imagenet-finetune-e2.json"),
+    ("ImageNet E1\nimage + state", "development_imagenet_e1_summary.json", "imagenet-finetune-e1.json"),
 ]
 
 COLORS = ["#64748B", "#22D3EE", "#94A3B8", "#F59E0B"]
@@ -160,7 +160,7 @@ def development_metrics(rows: list[dict]) -> None:
     fig.text(
         0.5,
         0.025,
-        "E2 leads both matched comparisons; absolute accuracy and false-positive rate still require improvement",
+        "E1 leads both matched comparisons; absolute accuracy and false-positive rate still require improvement",
         ha="center",
         color=MUTED,
         fontsize=10,

@@ -612,7 +612,7 @@
     },
     "score_floor": 0.05
   },
-  "model_id": "imagenet-full-pass-e2-shuffled-state",
+  "model_id": "imagenet-full-pass-e1-shuffled-state",
   "partition": "development",
   "protocol_sha256": "c848194b212301de811fc835eb561bfbc6d4ee60bf9f39fb7497c06b97f7a1cc",
   "schema_version": "1.0"

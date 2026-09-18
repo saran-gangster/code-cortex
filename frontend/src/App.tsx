@@ -17,10 +17,10 @@ const pageFromHash = (): Page => {
   return value === 'results' || value === 'architecture' ? value : 'live'
 }
 
-const modelKind = (id: string): 'e1' | 'e2' | 'other' => {
+const modelKind = (id: string): 'e2' | 'e1' | 'other' => {
   const value = id.toLowerCase()
-  if (/(^|[-_])e1([-_]|$)|rgb[-_]?masked|vision/.test(value)) return 'e1'
-  if (/(^|[-_])e2([-_]|$)|film|fusion/.test(value)) return 'e2'
+  if (/(^|[-_])e2([-_]|$)|rgb[-_]?masked|vision/.test(value)) return 'e2'
+  if (/(^|[-_])e1([-_]|$)|film|fusion/.test(value)) return 'e1'
   return 'other'
 }
 
@@ -31,7 +31,7 @@ const shortHash = (value: string) => value === '0'.repeat(64) ? 'not applicable'
 const formatTime = (milliseconds: number | null) => milliseconds == null ? 'Not supplied' : `${Math.floor(milliseconds / 60_000).toString().padStart(2, '0')}:${Math.floor((milliseconds % 60_000) / 1000).toString().padStart(2, '0')}.${Math.floor(milliseconds % 1000 / 100)}`
 const formatMetric = (value: number | null, digits = 4) => value == null ? '—' : value.toFixed(digits)
 const frameNumber = (frame: InferenceRecord) => frame.frame_id.replace(/^.*?([0-9]+)$/, '$1').replace(/^0+(?=\d{3})/, '')
-const stateModelLabel = (frame: InferenceRecord | null) => frame?.state_model_id?.match(/(?:^|-)e(\d+)(?:-|$)/)?.[1] ? `E${frame.state_model_id.match(/(?:^|-)e(\d+)(?:-|$)/)![1]}` : 'E2'
+const stateModelLabel = (frame: InferenceRecord | null) => frame?.state_model_id?.match(/(?:^|-)e(\d+)(?:-|$)/)?.[1] ? `E${frame.state_model_id.match(/(?:^|-)e(\d+)(?:-|$)/)![1]}` : 'E1'
 const frameStatus = (frame: InferenceRecord) => frame.quality_flags.some((flag) => /invalid/i.test(flag)) ? 'invalid' : frame.quality_flags.length ? 'delayed' : 'valid'
 
 function pathNumber(source: Record<string, unknown>, path: string): number | null {
@@ -131,8 +131,8 @@ export default function App() {
   const [playing, setPlaying] = useState(true)
   const [frameDetailWarning, setFrameDetailWarning] = useState('')
   const [modelView, setModelView] = useState<ModelView>('split')
-  const [e1ModelId, setE1ModelId] = useState('')
   const [e2ModelId, setE2ModelId] = useState('')
+  const [e1ModelId, setE1ModelId] = useState('')
   const [modelDetailNote, setModelDetailNote] = useState('')
   const [intervention, setIntervention] = useState<Intervention>('recorded')
   const [drawerOpen, setDrawerOpen] = useState(false)
@@ -198,8 +198,8 @@ export default function App() {
 
   useEffect(() => {
     if (!snapshot.models.length) return
-    setE1ModelId((current) => current || snapshot.models.find((model) => modelKind(model.model_id) === 'e1')?.model_id || snapshot.models[0].model_id)
-    setE2ModelId((current) => current || snapshot.models.find((model) => modelKind(model.model_id) === 'e2')?.model_id || snapshot.models[1]?.model_id || snapshot.models[0].model_id)
+    setE2ModelId((current) => current || snapshot.models.find((model) => modelKind(model.model_id) === 'e2')?.model_id || snapshot.models[0].model_id)
+    setE1ModelId((current) => current || snapshot.models.find((model) => modelKind(model.model_id) === 'e1')?.model_id || snapshot.models[1]?.model_id || snapshot.models[0].model_id)
   }, [snapshot.models])
 
   useEffect(() => {
@@ -297,8 +297,8 @@ export default function App() {
   const frameReviews = useMemo(() => snapshot.reviews.filter((review) => review.run_id === activeRunId && review.frame_id === selectedFrameId), [activeRunId, selectedFrameId, snapshot.reviews])
   const availableRuns = useMemo(() => snapshot.runs.some((run) => run.run_id === OFFLINE_RUN_ID) ? snapshot.runs : [...snapshot.runs, offlineRun], [snapshot.runs])
 
-  const inspectModel = async (kind: 'e1' | 'e2', modelId: string) => {
-    if (kind === 'e1') setE1ModelId(modelId); else setE2ModelId(modelId)
+  const inspectModel = async (kind: 'e2' | 'e1', modelId: string) => {
+    if (kind === 'e2') setE2ModelId(modelId); else setE1ModelId(modelId)
     setModelDetailNote('')
     if (serviceMode === 'offline') return
     try { const detail = await api.model(modelId); setModelDetailNote(`${detail.model_id} verified against the model detail endpoint.`) }
@@ -343,7 +343,7 @@ export default function App() {
     const payload = {
       run_id: activeRun.run_id, frame_id: selectedFrame.frame_id, decision: decision || 'undecided', comment,
       frame_provenance: selectedFrame.prediction_source, model_id: selectedFrame.model_id, exported_at: new Date().toISOString(),
-      note: activeRunId === OFFLINE_RUN_ID ? 'AU-AIR development replay; cached GPU-computed E1 and E4 detections. Not a benchmark claim.' : 'Local copy of an operator review.',
+      note: activeRunId === OFFLINE_RUN_ID ? 'AU-AIR development replay; cached GPU-computed E2 and E4 detections. Not a benchmark claim.' : 'Local copy of an operator review.',
     }
     const url = URL.createObjectURL(new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' }))
     const anchor = document.createElement('a'); anchor.href = url; anchor.download = `aeroguard-review-${selectedFrame.frame_id}.json`; anchor.click(); URL.revokeObjectURL(url)
@@ -356,7 +356,7 @@ export default function App() {
     </header>
     <div className="app-layout" inert={drawerOpen || chooserOpen}>
       <main className="main-content" id="main-content">
-        {page === 'live' && <LiveReview playing={playing && frames.length > 1} onTogglePlayback={() => setPlaying((current) => !current)} serviceMode={serviceMode} workspaceError={workspaceError} activeRun={activeRun} activeRunId={activeRunId} frames={frames} framesState={framesState} framesError={framesError} selectedFrame={selectedFrame} selectedFrameId={selectedFrameId} setSelectedFrameId={seekFrame} frameDetailWarning={frameDetailWarning} modelView={modelView} setModelView={setModelView} models={snapshot.models} e1ModelId={e1ModelId} e2ModelId={e2ModelId} inspectModel={inspectModel} modelDetailNote={modelDetailNote} intervention={intervention} setIntervention={setIntervention} onOpenChooser={() => setChooserOpen(true)} onOpenEvidence={() => setDrawerOpen(true)} onUseOffline={() => setActiveRunId(OFFLINE_RUN_ID)} onRetry={() => void loadWorkspace()} />}
+        {page === 'live' && <LiveReview playing={playing && frames.length > 1} onTogglePlayback={() => setPlaying((current) => !current)} serviceMode={serviceMode} workspaceError={workspaceError} activeRun={activeRun} activeRunId={activeRunId} frames={frames} framesState={framesState} framesError={framesError} selectedFrame={selectedFrame} selectedFrameId={selectedFrameId} setSelectedFrameId={seekFrame} frameDetailWarning={frameDetailWarning} modelView={modelView} setModelView={setModelView} models={snapshot.models} e2ModelId={e2ModelId} e1ModelId={e1ModelId} inspectModel={inspectModel} modelDetailNote={modelDetailNote} intervention={intervention} setIntervention={setIntervention} onOpenChooser={() => setChooserOpen(true)} onOpenEvidence={() => setDrawerOpen(true)} onUseOffline={() => setActiveRunId(OFFLINE_RUN_ID)} onRetry={() => void loadWorkspace()} />}
         {page === 'results' && <ResultsEvidence mode={serviceMode} reports={snapshot.reports} reportsFallback={snapshot.reportsFallback} models={snapshot.models} reviews={snapshot.reviews} error={workspaceError} selectedReport={selectedReport} reportDetailState={reportDetailState} reportDetailError={reportDetailError} onInspectReport={(report) => void inspectReport(report)} onCloseReport={() => { reportRequestRef.current += 1; setSelectedReport(null) }} onRetry={() => void loadWorkspace()} />}
         {page === 'architecture' && <Architecture capabilities={snapshot.capabilities} readiness={snapshot.readiness} mode={serviceMode} />}
       </main>
@@ -376,24 +376,24 @@ type LiveReviewProps = {
   serviceMode: ServiceMode; workspaceError: string; activeRun: RunSummary | null; activeRunId: string; frames: InferenceRecord[]
   framesState: 'idle' | 'loading' | 'ready' | 'empty' | 'error'; framesError: string; selectedFrame: InferenceRecord | null
   selectedFrameId: string; setSelectedFrameId: (id: string) => void; frameDetailWarning: string; modelView: ModelView
-  setModelView: (view: ModelView) => void; models: ModelSummary[]; e1ModelId: string; e2ModelId: string
-  inspectModel: (kind: 'e1' | 'e2', id: string) => void; modelDetailNote: string; intervention: Intervention
+  setModelView: (view: ModelView) => void; models: ModelSummary[]; e2ModelId: string; e1ModelId: string
+  inspectModel: (kind: 'e2' | 'e1', id: string) => void; modelDetailNote: string; intervention: Intervention
   setIntervention: (value: Intervention) => void; onOpenChooser: () => void; onOpenEvidence: () => void
   onUseOffline: () => void; onRetry: () => void
 }
 
 function LiveReview(props: LiveReviewProps) {
-  const { serviceMode, workspaceError, activeRun, activeRunId, frames, framesState, framesError, selectedFrame, selectedFrameId, setSelectedFrameId, frameDetailWarning, modelView, setModelView, models, e1ModelId, e2ModelId, inspectModel, modelDetailNote, intervention, setIntervention, onOpenChooser, onOpenEvidence, onUseOffline, onRetry } = props
-  const e1Models = models.filter((model) => modelKind(model.model_id) === 'e1')
+  const { serviceMode, workspaceError, activeRun, activeRunId, frames, framesState, framesError, selectedFrame, selectedFrameId, setSelectedFrameId, frameDetailWarning, modelView, setModelView, models, e2ModelId, e1ModelId, inspectModel, modelDetailNote, intervention, setIntervention, onOpenChooser, onOpenEvidence, onUseOffline, onRetry } = props
   const e2Models = models.filter((model) => modelKind(model.model_id) === 'e2')
+  const e1Models = models.filter((model) => modelKind(model.model_id) === 'e1')
   const liveFrame = selectedFrame
   return <div className="page live-page">
     {framesState === 'loading' && <LoadingState label="Loading replay manifest…" />}
     {framesState === 'error' && <ErrorState title="Replay could not be loaded" message={framesError} onRetry={onRetry} secondary={{ label: 'Open AU-AIR replay', action: onUseOffline }} />}
     {framesState === 'empty' && <EmptyState onUseOffline={onUseOffline} />}
     {framesState === 'ready' && selectedFrame && <>
-      <section className="review-panel"><div className="compare-head"><div><p className="eyebrow">Comparison lens — same frame / same protocol</p><h1>Live aerial review</h1></div><div className="segmented" role="group" aria-label="Model comparison view">{([['e1', 'E1 RGB'], ['e2', `${stateModelLabel(selectedFrame)} + STATE`], ['split', 'Split']] as const).map(([id, label]) => <button key={id} aria-pressed={modelView === id} className={modelView === id ? 'selected' : ''} onClick={() => setModelView(id)}>{label}</button>)}</div></div>
-        {liveFrame && <div key={modelView} className={`feed-layout view-${modelView}`}><div className="feeds">{modelView !== 'e2' && <Feed kind="e1" modelId={e1ModelId} frame={liveFrame} offline={activeRunId === OFFLINE_RUN_ID} intervention={intervention} />}{modelView !== 'e1' && <Feed kind="e2" modelId={e2ModelId} frame={liveFrame} offline={activeRunId === OFFLINE_RUN_ID} intervention={intervention} />}</div><DetectionDetail frame={liveFrame} modelView={modelView} intervention={intervention} /></div>}
+      <section className="review-panel"><div className="compare-head"><div><p className="eyebrow">Comparison lens — same frame / same protocol</p><h1>Live aerial review</h1></div><div className="segmented" role="group" aria-label="Model comparison view">{([['e2', 'E2 RGB'], ['e1', `${stateModelLabel(selectedFrame)} + STATE`], ['split', 'Split']] as const).map(([id, label]) => <button key={id} aria-pressed={modelView === id} className={modelView === id ? 'selected' : ''} onClick={() => setModelView(id)}>{label}</button>)}</div></div>
+        {liveFrame && <div key={modelView} className={`feed-layout view-${modelView}`}><div className="feeds">{modelView !== 'e1' && <Feed kind="e2" modelId={e2ModelId} frame={liveFrame} offline={activeRunId === OFFLINE_RUN_ID} intervention={intervention} />}{modelView !== 'e2' && <Feed kind="e1" modelId={e1ModelId} frame={liveFrame} offline={activeRunId === OFFLINE_RUN_ID} intervention={intervention} />}</div><DetectionDetail frame={liveFrame} modelView={modelView} intervention={intervention} /></div>}
       </section>
       {frameDetailWarning && <div className="micro-warning"><AlertTriangle size={13} />{frameDetailWarning}</div>}
       <Timeline frames={frames} selectedFrameId={selectedFrameId} onSelect={setSelectedFrameId} playing={props.playing} onTogglePlayback={props.onTogglePlayback} />
@@ -401,19 +401,19 @@ function LiveReview(props: LiveReviewProps) {
       <section className="history-panel"><div className="panel-heading"><div><p className="eyebrow">History capture</p><h2>Selected timeline frame</h2></div><span key={`${selectedFrame.frame_id}-status`} className={`quality-badge ${frameStatus(selectedFrame)}`}>{frameStatus(selectedFrame) === 'invalid' ? 'Invalid' : frameStatus(selectedFrame) === 'delayed' ? 'Flagged' : 'Valid'}</span></div><div key={selectedFrame.frame_id} className="history-grid"><FrameVisual frame={selectedFrame} detections={selectedFrame.detections} label="Recorded replay evidence" /><HistoryDetail frame={selectedFrame} /></div></section>
       <details className="review-settings"><summary>Review controls · {serviceMode === 'offline' ? 'AU-AIR development replay · cached evidence' : 'Recording and models'}</summary>
         {workspaceError && <div className="inline-notice amber"><AlertTriangle size={17} /><div><strong>{serviceMode === 'offline' ? 'API unavailable — bundled AU-AIR development replay' : 'Partial workspace response'}</strong><span>{workspaceError}</span></div><button onClick={onRetry}><RefreshCw size={14} /> Retry</button></div>}
-        <div className="model-selectors" aria-label="Comparison models"><label>E1 model<select value={e1ModelId} onChange={(event) => void inspectModel('e1', event.target.value)}>{(e1Models.length ? e1Models : models).map((model) => <option key={model.model_id}>{model.model_id}</option>)}</select></label><label>E2 model<select value={e2ModelId} onChange={(event) => void inspectModel('e2', event.target.value)}>{(e2Models.length ? e2Models : models).map((model) => <option key={model.model_id}>{model.model_id}</option>)}</select></label>{modelDetailNote && <span className="model-note">{modelDetailNote}</span>}</div>
+        <div className="model-selectors" aria-label="Comparison models"><label>E2 model<select value={e2ModelId} onChange={(event) => void inspectModel('e2', event.target.value)}>{(e2Models.length ? e2Models : models).map((model) => <option key={model.model_id}>{model.model_id}</option>)}</select></label><label>E1 model<select value={e1ModelId} onChange={(event) => void inspectModel('e1', event.target.value)}>{(e1Models.length ? e1Models : models).map((model) => <option key={model.model_id}>{model.model_id}</option>)}</select></label>{modelDetailNote && <span className="model-note">{modelDetailNote}</span>}</div>
         <InterventionPanel value={intervention} onChange={setIntervention} />
       </details>
     </>}
   </div>
 }
 
-function Feed({ kind, modelId, frame, offline, intervention }: { kind: 'e1' | 'e2'; modelId: string; frame: InferenceRecord; offline: boolean; intervention: Intervention }) {
+function Feed({ kind, modelId, frame, offline, intervention }: { kind: 'e2' | 'e1'; modelId: string; frame: InferenceRecord; offline: boolean; intervention: Intervention }) {
   const paired = Boolean(frame.rgb_detections && frame.state_detections)
   const matches = paired || modelKind(frame.model_id) === kind || modelKind(frame.model_id) === 'other'
   const available = offline || matches
   const detections = offline || paired ? fixtureDetections(frame, kind) : available ? frame.detections : []
-  return <article className={`feed-card feed-${kind}`}><header><div><p>{kind === 'e1' ? 'E1 RGB stream' : `${stateModelLabel(frame)} + state stream`}</p><h3>{kind === 'e1' ? 'E1 · FCOS — ResNet-50 FPN' : `${stateModelLabel(frame)} · FCOS + gated FiLM`}</h3></div><Badge tone={available ? sourceTone(frame.prediction_source) : 'neutral'}>{available ? sourceLabel(frame.prediction_source) : 'NO OUTPUT'}</Badge></header><div className="feed-visual"><FrameVisual frame={frame} detections={detections} label={`${kind === 'e1' ? 'E1' : stateModelLabel(frame)} frame output`} compact />{!available && <div className="unavailable-overlay"><Box size={20} /><strong>No replay output</strong><span>{modelId || `${kind.toUpperCase()} model`} has no record for this frame.</span></div>}</div><footer><span><b>{detections.length}</b> detections</span><span>{kind === 'e2' ? `${intervention === 'recorded' ? 'Recorded state' : `Intervention: ${intervention}`}` : 'RGB inference'}{frame.latency.end_to_end_ms != null ? ` · ${frame.latency.end_to_end_ms.toFixed(0)} ms` : ''}</span></footer></article>
+  return <article className={`feed-card feed-${kind}`}><header><div><p>{kind === 'e2' ? 'E2 RGB stream' : `${stateModelLabel(frame)} + state stream`}</p><h3>{kind === 'e2' ? 'E2 · FCOS — ResNet-50 FPN' : `${stateModelLabel(frame)} · FCOS + gated FiLM`}</h3></div><Badge tone={available ? sourceTone(frame.prediction_source) : 'neutral'}>{available ? sourceLabel(frame.prediction_source) : 'NO OUTPUT'}</Badge></header><div className="feed-visual"><FrameVisual frame={frame} detections={detections} label={`${kind === 'e2' ? 'E2' : stateModelLabel(frame)} frame output`} compact />{!available && <div className="unavailable-overlay"><Box size={20} /><strong>No replay output</strong><span>{modelId || `${kind.toUpperCase()} model`} has no record for this frame.</span></div>}</div><footer><span><b>{detections.length}</b> detections</span><span>{kind === 'e1' ? `${intervention === 'recorded' ? 'Recorded state' : `Intervention: ${intervention}`}` : 'RGB inference'}{frame.latency.end_to_end_ms != null ? ` · ${frame.latency.end_to_end_ms.toFixed(0)} ms` : ''}</span></footer></article>
 }
 
 function FrameVisual({ frame, detections, label, compact = false }: { frame: InferenceRecord; detections: Detection[]; label: string; compact?: boolean }) {
@@ -448,11 +448,11 @@ function FrameVisual({ frame, detections, label, compact = false }: { frame: Inf
 function DetectionDetail({ frame, modelView, intervention }: { frame: InferenceRecord; modelView: ModelView; intervention: Intervention }) {
   const effectiveMode = intervention === 'missing' ? 'state_masked' : frame.input_mode
   const effectiveAlignment = intervention === 'delayed' ? 'injected_delay' : intervention === 'invalid' ? 'unavailable' : frame.metadata_alignment
-  return <aside className="detection-detail"><div className="detail-head"><div><p>Live frame detection detail</p><h3>Frame {frameNumber(frame)}</h3></div><span>{formatTime(frame.source_time_ms)}</span></div>{(['e1', 'e2'] as const).filter((kind) => modelView === 'split' || modelView === kind).map((kind) => {
+  return <aside className="detection-detail"><div className="detail-head"><div><p>Live frame detection detail</p><h3>Frame {frameNumber(frame)}</h3></div><span>{formatTime(frame.source_time_ms)}</span></div>{(['e2', 'e1'] as const).filter((kind) => modelView === 'split' || modelView === kind).map((kind) => {
     const offline = Boolean(frame.rgb_detections && frame.state_detections)
     const available = offline || modelKind(frame.model_id) === kind || modelKind(frame.model_id) === 'other'
     const detections = offline ? fixtureDetections(frame, kind) : available ? frame.detections : []
-    return <section className={`detail-model detail-${kind}`} key={kind}><div className="detail-model-heading"><span>{kind === 'e1' ? 'E1 / RGB' : `${stateModelLabel(frame)} / STATE`}</span><span>{available ? sourceLabel(frame.prediction_source).toLowerCase() : 'no output'}</span></div><div className="detail-list">{detections.map((item, index) => <div key={index}><span>{item.class_name}</span><strong>{scoreLabel(item.raw_score)}</strong></div>)}{!available && <p className="empty-copy">No replay output for this model.</p>}</div></section>
+    return <section className={`detail-model detail-${kind}`} key={kind}><div className="detail-model-heading"><span>{kind === 'e2' ? 'E2 / RGB' : `${stateModelLabel(frame)} / STATE`}</span><span>{available ? sourceLabel(frame.prediction_source).toLowerCase() : 'no output'}</span></div><div className="detail-list">{detections.map((item, index) => <div key={index}><span>{item.class_name}</span><strong>{scoreLabel(item.raw_score)}</strong></div>)}{!available && <p className="empty-copy">No replay output for this model.</p>}</div></section>
   })}<div className="state-summary"><p>Scene state</p><strong>{intervention === 'recorded' ? effectiveMode.replace(/_/g, ' ') : `SIMULATED ${intervention.toUpperCase()}`}</strong><span>{frame.state ? `AU-AIR · altitude ${frame.state[0].toFixed(2)} m` : effectiveAlignment.replace(/_/g, ' ')} · {frame.original_size.width} × {frame.original_size.height}</span></div></aside>
 }
 
@@ -466,10 +466,10 @@ function Timeline({ frames, selectedFrameId, onSelect, playing, onTogglePlayback
 
 function HistoryDetail({ frame }: { frame: InferenceRecord }) {
   const offline = Boolean(frame.rgb_detections && frame.state_detections)
-  return <aside className="history-detail"><SectionLabel>History frame detection detail</SectionLabel><h3>Frame {frameNumber(frame)} · {formatTime(frame.source_time_ms)}</h3><div className="history-scene"><SectionLabel>Scene</SectionLabel><p>{frame.input_mode.replace(/_/g, ' ')}</p><p>{frame.state ? `Altitude ${frame.state[0].toFixed(2)} m` : frame.metadata_alignment.replace(/_/g, ' ')} · {frame.original_size.width} × {frame.original_size.height}</p></div>{(['e1', 'e2'] as const).map((kind) => {
+  return <aside className="history-detail"><SectionLabel>History frame detection detail</SectionLabel><h3>Frame {frameNumber(frame)} · {formatTime(frame.source_time_ms)}</h3><div className="history-scene"><SectionLabel>Scene</SectionLabel><p>{frame.input_mode.replace(/_/g, ' ')}</p><p>{frame.state ? `Altitude ${frame.state[0].toFixed(2)} m` : frame.metadata_alignment.replace(/_/g, ' ')} · {frame.original_size.width} × {frame.original_size.height}</p></div>{(['e2', 'e1'] as const).map((kind) => {
     const available = offline || modelKind(frame.model_id) === kind || modelKind(frame.model_id) === 'other'
     const detections = offline ? fixtureDetections(frame, kind) : available ? frame.detections : []
-    return <div key={kind} className={`history-model ${kind}`}><strong>{kind === 'e1' ? 'E1 RGB' : `${stateModelLabel(frame)} + STATE`} · {available ? `${detections.length} detections` : 'No output'}</strong><p>{detections.map((item) => `${item.class_name} ${scoreLabel(item.raw_score)}`).join(' · ') || 'No replay evidence available'}</p>{kind === 'e2' && <p>{frame.prediction_source === 'fixture' ? 'Illustrative fixture — not measured evidence' : `${sourceLabel(frame.prediction_source)} · ${frame.latency.end_to_end_ms == null ? 'Latency not recorded' : `${frame.latency.end_to_end_ms.toFixed(1)} ms`}`}</p>}</div>
+    return <div key={kind} className={`history-model ${kind}`}><strong>{kind === 'e2' ? 'E2 RGB' : `${stateModelLabel(frame)} + STATE`} · {available ? `${detections.length} detections` : 'No output'}</strong><p>{detections.map((item) => `${item.class_name} ${scoreLabel(item.raw_score)}`).join(' · ') || 'No replay evidence available'}</p>{kind === 'e1' && <p>{frame.prediction_source === 'fixture' ? 'Illustrative fixture — not measured evidence' : `${sourceLabel(frame.prediction_source)} · ${frame.latency.end_to_end_ms == null ? 'Latency not recorded' : `${frame.latency.end_to_end_ms.toFixed(1)} ms`}`}</p>}</div>
   })}</aside>
 }
 
@@ -510,7 +510,7 @@ function Architecture({ capabilities, readiness, mode }: { capabilities: Capabil
   const details = [
     ['01 — Source recordings', 'AU-AIR: 32,823 matched RGB frames at 1920×1080 with 5 Hz telemetry. Training uses 18,523 frames; development uses 5,734; 8,566 final-test frames remain sealed.', ['AU-AIR dataset', 'VisDrone RGB', '1920×1080', '5 Hz source']],
     ['02 — Validation + pairing', 'Schema validation, timestamp alignment, and declared split construction preserve frame/state provenance before any model call.', ['Schema validation', 'Timestamp alignment', 'Split construction', 'Sealed test roots']],
-    ['03 — Model gate + FiLM', 'E1 is an image-only FCOS baseline. E2 adds gated FiLM conditioning from flight state; invalid state is sanitized before encoding.', ['FCOS · ResNet-50 FPN', 'Gated FiLM', '8-feature state vector', 'Invalid-state sanitization']],
+    ['03 — Model gate + FiLM', 'E2 is an image-only FCOS baseline. E1 adds gated FiLM conditioning from flight state; invalid state is sanitized before encoding.', ['FCOS · ResNet-50 FPN', 'Gated FiLM', '8-feature state vector', 'Invalid-state sanitization']],
     ['04 — Inference API', `FastAPI exposes health, readiness, replay, model reports, inference, and idempotent human review. Computed inference is ${readiness?.computed_inference_ready ? 'ready' : 'currently unavailable'}; replay remains ${readiness?.replay_ready === false ? 'unavailable' : 'ready'}.`, ['Typed JSON contracts', 'Bounded inference', 'Replay fallback', 'Review persistence']],
     ['05 — Review console', 'The website loads API runs, frames, models, reports, and reviews. Offline fixture replay is kept separate from measured development reports.', ['React + Vite', 'Typed API client', 'Fixture labelling', 'JSON export']],
     ['06 — Storage + monitoring', 'Planned production path: immutable object storage, PostgreSQL audit records, queued GPU workers, and drift monitoring.', ['S3-compatible store', 'PostgreSQL', 'Queued workers', 'Drift monitoring']],
@@ -519,7 +519,7 @@ function Architecture({ capabilities, readiness, mode }: { capabilities: Capabil
     <section className="pipeline panel"><div className="panel-heading"><SectionLabel icon={Layers3}>Primary pipeline</SectionLabel><Badge tone={mode === 'offline' ? 'amber' : 'green'}>{mode === 'offline' ? 'OFFLINE VIEW' : `API ${capabilities?.api_version ?? 'CONNECTED'}`}</Badge></div><div className="pipeline-row">{pipeline.map(([number, title, subtitle, status], index) => <div className="pipeline-step" key={number}><article className={status}><span>{number}</span><strong>{title}</strong><small>{subtitle}</small><Badge tone={status === 'current' ? 'green' : 'amber'}>{status.toUpperCase()}</Badge></article>{index < pipeline.length - 1 && <ArrowRight aria-hidden size={15} />}</div>)}</div></section>
     <div className="architecture-details">{details.map(([title, copy, tags], index) => <article className={`architecture-card ${index === 5 ? 'planned' : ''}`} key={title as string}><div><span>{title}</span><Badge tone={index === 5 ? 'amber' : 'green'}>{index === 5 ? 'PLANNED' : 'CURRENT'}</Badge></div><p>{copy as string}</p><footer>{(tags as string[]).map((tag) => <span key={tag}>{tag}</span>)}</footer></article>)}</div>
     <section className="scale-path panel"><div><SectionLabel icon={HardDrive}>Scale path</SectionLabel><h2>Planned production architecture</h2><p>Object storage, PostgreSQL, queued GPU workers, and drift monitoring are design specifications. They are not represented as operational services.</p></div><Badge tone="amber">NOT IMPLEMENTED</Badge></section>
-    <section className="model-architecture"><article><div className="model-letter">E1</div><div><p className="eyebrow">RGB baseline</p><h2>FCOS · ResNet-50 FPN</h2><p>Image-only object detection. Flight state is not ingested. Output is bounding boxes, class labels, and confidence scores.</p><dl><div><dt>Backbone</dt><dd>ResNet-50 FPN</dd></div><div><dt>Head</dt><dd>FCOS · anchor-free</dd></div><div><dt>State</dt><dd>Not used</dd></div></dl></div></article><article><div className="model-letter cyan">E2</div><div><p className="eyebrow">Flight-aware</p><h2>FCOS + gated FiLM</h2><p>Flight state conditions feature channels. Missing or invalid state is sanitized and the gate can bypass adjustment.</p><dl><div><dt>Backbone</dt><dd>ResNet-50 FPN</dd></div><div><dt>Head</dt><dd>FCOS + gated FiLM</dd></div><div><dt>State</dt><dd>alt, vXYZ, roll, pitch, sin/cos(yaw)</dd></div></dl></div></article></section>
+    <section className="model-architecture"><article><div className="model-letter">E2</div><div><p className="eyebrow">RGB baseline</p><h2>FCOS · ResNet-50 FPN</h2><p>Image-only object detection. Flight state is not ingested. Output is bounding boxes, class labels, and confidence scores.</p><dl><div><dt>Backbone</dt><dd>ResNet-50 FPN</dd></div><div><dt>Head</dt><dd>FCOS · anchor-free</dd></div><div><dt>State</dt><dd>Not used</dd></div></dl></div></article><article><div className="model-letter cyan">E1</div><div><p className="eyebrow">Flight-aware</p><h2>FCOS + gated FiLM</h2><p>Flight state conditions feature channels. Missing or invalid state is sanitized and the gate can bypass adjustment.</p><dl><div><dt>Backbone</dt><dd>ResNet-50 FPN</dd></div><div><dt>Head</dt><dd>FCOS + gated FiLM</dd></div><div><dt>State</dt><dd>alt, vXYZ, roll, pitch, sin/cos(yaw)</dd></div></dl></div></article></section>
   </div>
 }
 

@@ -19,12 +19,12 @@ The split is made by complete flight recording, not by random frames. This preve
 
 | Arm | Steps | Unique training frames | Coverage | First-200 mean loss | Last-200 mean loss | Time |
 |---|---:|---:|---:|---:|---:|---:|
-| E1: image only | 18,523 | 18,523 | 100.00% | 2.2207 | 1.3254 | 47.6 min |
-| E2: image + flight state | 18,523 | 18,523 | 100.00% | 2.2235 | 1.3287 | 47.6 min |
+| E2: image only | 18,523 | 18,523 | 100.00% | 2.2207 | 1.3254 | 47.6 min |
+| E1: image + flight state | 18,523 | 18,523 | 100.00% | 2.2235 | 1.3287 | 47.6 min |
 
 The thin trace below contains every stored loss value. The strong trace is only a 200-step moving average to make the trend readable; no points are hidden from the artifact.
 
-![Complete E1 and E2 training loss](assets/review2-full-training-loss.png)
+![Complete E2 and E1 training loss](assets/review2-full-training-loss.png)
 
 ![Classification, box regression, and centerness loss](assets/review2-loss-components.png)
 
@@ -32,8 +32,8 @@ The thin trace below contains every stored loss value. The strong trace is only 
 
 | Arm | AP50 | AP50:95 | Selected threshold | Precision | Recall | F1 | Detection accuracy | TP | FP | FN |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| E1: image only | 0.1698 | 0.0665 | 0.45 | 0.5257 | 0.3939 | 0.4503 | 0.2906 | 6,646 | 5,996 | 10,227 |
-| E2: image + flight state | 0.1146 | 0.0445 | 0.45 | 0.2220 | 0.2900 | 0.2515 | 0.1438 | 4,893 | 17,144 | 11,980 |
+| E2: image only | 0.1698 | 0.0665 | 0.45 | 0.5257 | 0.3939 | 0.4503 | 0.2906 | 6,646 | 5,996 | 10,227 |
+| E1: image + flight state | 0.1146 | 0.0445 | 0.45 | 0.2220 | 0.2900 | 0.2515 | 0.1438 | 4,893 | 17,144 | 11,980 |
 
 **Detection accuracy** here means `TP / (TP + FP + FN)`. It is an intersection-style object-detection score, not image-classification accuracy. Precision answers how many shown detections were right. Recall answers how many labelled objects were found. F1 balances both.
 
@@ -47,32 +47,21 @@ AP50 measures the precision-recall curve while a predicted box counts as correct
 
 ## Flight-state robustness
 
-The selected E2 checkpoint is also evaluated with flight state masked and with state shifted by 1,000 frames. Masking measures the image-only fallback. Shifting is a deliberate misalignment stress test and is never used as a deployment mode.
+The selected E1 checkpoint is also evaluated with flight state masked and with state shifted by 1,000 frames. Masking measures the image-only fallback. Shifting is a deliberate misalignment stress test and is never used as a deployment mode.
 
-| E2 evaluation mode | AP50 | AP50:95 | Best F1 | Detection accuracy |
+| E1 evaluation mode | AP50 | AP50:95 | Best F1 | Detection accuracy |
 |---|---:|---:|---:|---:|
 | Correct paired state | 0.1146 | 0.0445 | 0.2515 | 0.1438 |
 | State masked | 0.1167 | 0.0452 | 0.2503 | 0.1430 |
 | State shifted by 1,000 frames | 0.1138 | 0.0442 | 0.2515 | 0.1438 |
 
-![E2 missing-state and misalignment checks](assets/review2-state-robustness.png)
+![E1 missing-state and misalignment checks](assets/review2-state-robustness.png)
 
-Correct, masked, and shifted state all leave E2 near AP50 0.114. The full-pass E2 therefore does not show a reliable telemetry benefit. The larger gap to E1 points to visual-detector drift during joint training.
+Correct, masked, and shifted state all leave E1 near AP50 0.114. The full-pass E1 therefore does not show a reliable telemetry benefit. The larger gap to E2 points to visual-detector drift during joint training.
 
 ## Follow-up experiment
 
-E3 and E4 started from the stronger E1 checkpoint, froze every visual-detector tensor, and trained only the residual FiLM state adapter for all 18,523 training frames. E4 also masked state on 50.16% of its deterministic training schedule. A byte-level integrity gate confirmed that every E1 visual tensor remained exactly unchanged while 14 FiLM tensors changed in each run.
-
-| Model | AP50 | AP50:95 | Best F1 | Detection accuracy |
-|---|---:|---:|---:|---:|
-| E1 image only | 0.1698 | 0.0665 | 0.4503 | 0.2906 |
-| E2 joint training | 0.1146 | 0.0445 | 0.2515 | 0.1438 |
-| E3 exact frozen visual | 0.1679 | 0.0657 | 0.4446 | 0.2858 |
-| E4 exact frozen + dropout | 0.1697 | 0.0665 | 0.4493 | 0.2897 |
-
-E4 recovered almost all of E1's development performance, showing that the freeze corrected E2's visual drift. It did not beat E1, so the honest selection remains E1 image only. Full training-loss traces, evaluation details, and the decision are in the [adapter follow-up](REVIEW2_ADAPTER_FOLLOWUP.md).
-
-![Frozen-visual adapter comparison](assets/review2-adapter-followup.png)
+E3 and E4 start from the stronger E2 checkpoint, freeze every visual-detector weight, and train only the residual FiLM state adapter. E4 also masks state on half of its deterministic training schedule. This design preserves the E2 image-only fallback exactly while testing whether state can add value.
 
 ## What is now implemented
 

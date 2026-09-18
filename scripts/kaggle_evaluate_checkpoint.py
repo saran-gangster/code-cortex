@@ -139,7 +139,7 @@ def main() -> None:
     training_summary = json.loads(training_summary_path.read_text(encoding="utf-8"))
     checkpoint_arm = args.checkpoint_arm or ("paired" if args.mode == "shuffled" else args.mode)
     expected_arm = args.expected_experiment_arm or (
-        "E2_paired_film" if checkpoint_arm == "paired" else "E1_rgb_masked"
+        "E1_paired_film" if checkpoint_arm == "paired" else "E2_rgb_masked"
     )
     relative_checkpoint = str(args.checkpoint.relative_to(run_root)).replace("\\", "/")
     expected_checkpoint_sha = training_summary.get("checkpoint_sha256s", {}).get(

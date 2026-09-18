@@ -116,5 +116,5 @@ export type Review = ReviewRequest & {
 
 export type ServiceMode = 'loading' | 'online' | 'degraded' | 'offline'
 export type Intervention = 'recorded' | 'missing' | 'invalid' | 'delayed'
-export type ModelView = 'e1' | 'e2' | 'split'
+export type ModelView = 'e2' | 'e1' | 'split'
 export type Page = 'live' | 'results' | 'architecture'

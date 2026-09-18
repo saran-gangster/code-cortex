@@ -85,7 +85,7 @@ and recorded for trusted local checkpoints that predate summaries.
 
 ```bash
 python scripts/export_onnx_tensorrt.py \
-  --checkpoint runs/E2/checkpoints/final.ckpt \
+  --checkpoint runs/E1/checkpoints/final.ckpt \
   --config deployment/tensorrt/deployment.example.json \
   --output build/aeroguard_raw.onnx
 ```
@@ -134,7 +134,7 @@ not retrofitted after seeing failures.
 
 ```bash
 python scripts/tensorrt_validate.py \
-  --checkpoint runs/E2/checkpoints/final.ckpt \
+  --checkpoint runs/E1/checkpoints/final.ckpt \
   --config deployment/tensorrt/deployment.example.json \
   --image sample.jpg \
   --state 24.0 0.1 0.0 0.0 -0.05 0.10 0.44 0.90 \
@@ -143,7 +143,7 @@ python scripts/tensorrt_validate.py \
   --artifact build/aeroguard_raw.onnx
 
 python scripts/tensorrt_validate.py \
-  --checkpoint runs/E2/checkpoints/final.ckpt \
+  --checkpoint runs/E1/checkpoints/final.ckpt \
   --config deployment/tensorrt/deployment.example.json \
   --image sample.jpg \
   --state 24.0 0.1 0.0 0.0 -0.05 0.10 0.44 0.90 \

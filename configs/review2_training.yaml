@@ -34,10 +34,10 @@ data_split:
     proportion: 0.2610
     recording_roots: 2
 arms:
-  E1_rgb_masked:
+  E2_rgb_masked:
     physical_gpu_id: 0
     state_mask: 0.0
-  E2_paired_film:
+  E1_paired_film:
     physical_gpu_id: 1
     state_mask: 1.0
 warmstart_origin: torchvision_resnet50_imagenet1k_v2_backbone
@@ -48,12 +48,12 @@ evaluation:
   threshold_selection: maximum_f1
   accuracy_definition: TP / (TP + FP + FN), not image-classification accuracy
   robustness_checks:
-    e2_masked_fallback:
-      checkpoint_arm: E2_paired_film
+    e1_masked_fallback:
+      checkpoint_arm: E1_paired_film
       state_mask: 0.0
-      purpose: measure the image-only fallback of the selected E2 checkpoint
-    e2_shifted_state:
-      checkpoint_arm: E2_paired_film
+      purpose: measure the image-only fallback of the selected E1 checkpoint
+    e1_shifted_state:
+      checkpoint_arm: E1_paired_film
       state_mask: 1.0
       state_index_offset_frames: 1000
       purpose: deliberately misalign telemetry to test sensitivity to correct pairing
