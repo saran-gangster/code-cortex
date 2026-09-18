@@ -6,6 +6,10 @@ ROOT = Path(__file__).resolve().parents[1]
 RUN_ROOT = ROOT / "reports" / "review2"
 EVALUATION_ROOT = ROOT / "reports" / "evaluations"
 RUN_NAMES = ("imagenet-e1-full-pass", "imagenet-e2-full-pass")
+ADAPTER_NAMES = (
+    "imagenet-e3-exact-frozen-visual-film",
+    "imagenet-e4-exact-frozen-visual-film-dropout50",
+)
 
 
 def read_json(path: Path) -> dict:
@@ -85,3 +89,59 @@ def test_review2_evaluations_are_development_only_and_traceable():
     assert reports["imagenet-e2-shuffled-state"]["config"]["state_alignment"] == (
         "deliberately_1000_frame_shifted"
     )
+
+
+def test_review2_frozen_visual_adapters_are_complete_and_traceable():
+    e1_summary = read_json(RUN_ROOT / RUN_NAMES[0] / "run_summary.json")
+    warmstart = read_json(RUN_ROOT / "e1-frozen-visual-warmstart-summary.json")
+    summaries = {
+        name: read_json(RUN_ROOT / name / "run_summary.json")
+        for name in ADAPTER_NAMES
+    }
+
+    assert warmstart["source_checkpoint_sha256"] == e1_summary["checkpoint_sha256"]
+    assert warmstart["visual_detector_will_be_frozen"] is True
+    for name, summary in summaries.items():
+        history_path = RUN_ROOT / name / "loss_history.jsonl"
+        history = read_jsonl(history_path)
+        assert summary["completed_steps"] == summary["requested_steps"] == 18_523
+        assert summary["unique_training_frames_presented"] == 18_523
+        assert summary["training_frame_coverage_fraction"] == 1.0
+        assert summary["loss_history_rows"] == len(history) == 18_523
+        assert [row["step"] for row in history] == list(range(1, 18_524))
+        assert sha256_file(history_path) == summary["loss_history_sha256"]
+        assert summary["shared_warmstart_sha256"] == warmstart["checkpoint_sha256"]
+        assert summary["visual_detector_frozen"] is True
+        assert summary["visual_running_statistics_frozen"] is True
+        assert summary["final_test_unsealed"] is False
+        assert summary["development_roots_used"] == []
+        assert summary["final_test_roots_used"] == []
+
+    assert summaries[ADAPTER_NAMES[0]]["matched_frame_schedule_sha256"] == (
+        summaries[ADAPTER_NAMES[1]]["matched_frame_schedule_sha256"]
+    )
+    assert summaries[ADAPTER_NAMES[0]]["effective_state_mask_mean"] == 1.0
+    assert 0.49 <= summaries[ADAPTER_NAMES[1]]["effective_state_mask_mean"] <= 0.51
+    assert {summary["physical_gpu_id"] for summary in summaries.values()} == {"0", "1"}
+
+
+def test_review2_adapter_integrity_and_evaluations_are_sealed():
+    summaries = {
+        name: read_json(RUN_ROOT / name / "run_summary.json")
+        for name in ADAPTER_NAMES
+    }
+    integrity = read_json(RUN_ROOT / "adapter_integrity_summary.json")
+
+    assert integrity["all_visual_tensors_exactly_equal"] is True
+    assert integrity["final_test_unsealed"] is False
+    for name in ADAPTER_NAMES:
+        run = integrity["runs"][name]
+        report = read_json(EVALUATION_ROOT / f"review2-{name}.json")
+        assert run["visual_tensors_exactly_equal"] is True
+        assert run["visual_state_sha256"] == integrity["parent_visual_state_sha256"]
+        assert run["changed_film_tensor_count"] > 0
+        assert report["partition"] == "development"
+        assert report["benchmark_claim"] is False
+        assert report["final_test_unsealed"] is False
+        assert report["checkpoint_id"] == summaries[name]["checkpoint_sha256"]
+        assert report["metrics"]["evaluated_frame_count"] == 5_734

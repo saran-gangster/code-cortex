@@ -61,7 +61,18 @@ Correct, masked, and shifted state all leave E2 near AP50 0.114. The full-pass E
 
 ## Follow-up experiment
 
-E3 and E4 start from the stronger E1 checkpoint, freeze every visual-detector weight, and train only the residual FiLM state adapter. E4 also masks state on half of its deterministic training schedule. This design preserves the E1 image-only fallback exactly while testing whether state can add value.
+E3 and E4 started from the stronger E1 checkpoint, froze every visual-detector tensor, and trained only the residual FiLM state adapter for all 18,523 training frames. E4 also masked state on 50.16% of its deterministic training schedule. A byte-level integrity gate confirmed that every E1 visual tensor remained exactly unchanged while 14 FiLM tensors changed in each run.
+
+| Model | AP50 | AP50:95 | Best F1 | Detection accuracy |
+|---|---:|---:|---:|---:|
+| E1 image only | 0.1698 | 0.0665 | 0.4503 | 0.2906 |
+| E2 joint training | 0.1146 | 0.0445 | 0.2515 | 0.1438 |
+| E3 exact frozen visual | 0.1679 | 0.0657 | 0.4446 | 0.2858 |
+| E4 exact frozen + dropout | 0.1697 | 0.0665 | 0.4493 | 0.2897 |
+
+E4 recovered almost all of E1's development performance, showing that the freeze corrected E2's visual drift. It did not beat E1, so the honest selection remains E1 image only. Full training-loss traces, evaluation details, and the decision are in the [adapter follow-up](REVIEW2_ADAPTER_FOLLOWUP.md).
+
+![Frozen-visual adapter comparison](assets/review2-adapter-followup.png)
 
 ## What is now implemented
 

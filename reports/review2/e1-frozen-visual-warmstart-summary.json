@@ -1,0 +1,9 @@
+{
+  "artifact_kind": "e1_full_pass_detector_warmstart_for_frozen_visual_adapter",
+  "benchmark_claim": false,
+  "checkpoint_sha256": "a015b7eb4c45163ab3b5d2312cb47937a0f3975603307c2f57f0542322776389",
+  "final_test_unsealed": false,
+  "source_checkpoint_sha256": "7cea7f2cd4c6eef1c26e0fdc2df98df9267b8c23b6dc02d38c194661509bd5e2",
+  "visual_detector_will_be_frozen": true,
+  "weights_origin": "review2_e1_full_pass_checkpoint"
+}

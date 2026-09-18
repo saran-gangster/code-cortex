@@ -12,7 +12,7 @@ AeroGuard combines a TorchVision FCOS detector with gated FiLM conditioning so t
 - Reproducible Kaggle scripts for protocol construction, matched training, evaluation, and artifact capture.
 - A dual-T4 Lightning gate that ran matched E1 masked-state and E2 paired-state arms from one hashed initialization and image schedule.
 - A deterministic evaluator for AP50, AP50:95, per-class support, per-root results, fixed-point recall, calibration, and VisDrone ignore regions.
-- Judge-ready [Review 1 materials](docs/REVIEW1_OVERVIEW.md), [next-review evidence](docs/REVIEW2_EVIDENCE.md), [Review 2 deck](docs/AeroGuard_Review2_Evidence_Deck.pptx), [presentation script](docs/REVIEW2_PRESENTATION_SCRIPT.md), [system architecture](docs/assets/aeroguard-review1-architecture.png), and [E1/E2 model architecture](docs/assets/aeroguard-model-architecture.png).
+- Judge-ready [Review 1 materials](docs/REVIEW1_OVERVIEW.md), [Review 2 evidence](docs/REVIEW2_EVIDENCE.md), [frozen-visual adapter follow-up](docs/REVIEW2_ADAPTER_FOLLOWUP.md), [Review 2 deck](docs/AeroGuard_Review2_Evidence_Deck.pptx), [presentation script](docs/REVIEW2_PRESENTATION_SCRIPT.md), [system architecture](docs/assets/aeroguard-review1-architecture.png), and [E1/E2 model architecture](docs/assets/aeroguard-model-architecture.png).
 
 Training and benchmark values appear only after a run writes machine-generated result artifacts. Missing values remain unavailable; the UI never substitutes invented metrics.
 
@@ -26,6 +26,7 @@ Training and benchmark values appear only after a run writes machine-generated r
 - On the frozen development root, the matched ImageNet E2 flight-state arm reached AP50 0.0692 and AP50:95 0.0234 versus E1's 0.0120 and 0.0024. This supports E2 on development only; the final test remains sealed.
 - The Review 2 pair completed one full pass over all 18,523 training frames per arm. Every optimizer-step loss is stored and hashed, both arms use the same frame order and ImageNet warmstart, and physical GPUs 0 and 1 ran concurrently.
 - On the same held-out development flight after the full pass, E1 reached AP50 0.1698, best F1 0.4503, and detection accuracy 0.2906. Jointly trained E2 reached AP50 0.1146, best F1 0.2515, and detection accuracy 0.1438. E2 with correct, masked, and shifted state stayed near AP50 0.114, pointing to visual-weight drift rather than a single bad telemetry value.
+- The corrective E3/E4 runs froze and byte-verified every E1 visual tensor while training only the FiLM adapter for 18,523 steps. E4 with 50% state dropout nearly matched E1 at AP50 0.1697, F1 0.4493, and detection accuracy 0.2897, but did not beat it. E1 therefore remains the development-selected model.
 
 The smoke and 40-step runs are implementation gates. The separate [development results](docs/DEVELOPMENT_RESULTS.md) are real held-out development evidence, not final-test or safety evidence.
 
@@ -44,6 +45,10 @@ The smoke and 40-step runs are implementation gates. The separate [development r
 ![Per-class development results](docs/assets/review2-per-class-metrics.png)
 
 ![Flight-state robustness checks](docs/assets/review2-state-robustness.png)
+
+![Complete frozen-visual adapter training loss](docs/assets/review2-adapter-loss.png)
+
+![Frozen-visual adapter development comparison](docs/assets/review2-adapter-followup.png)
 
 ![Training completion and final logged loss](docs/assets/training-summary.png)
 
@@ -96,7 +101,7 @@ Open the printed local URL. The bundled demonstration is explicitly labeled `FIX
 
 ## Current limitations
 
-- Development metrics guide model selection only. A frozen-visual state-adapter follow-up is in progress; the release threshold and final-test metrics remain deliberately unfrozen and sealed.
+- Development metrics guide model selection only. The frozen-visual adapter follow-up is complete and did not beat E1; the release threshold and final-test metrics remain deliberately unfrozen and sealed.
 - The checked-in evaluation fixture proves software behavior only; it is not model performance.
 - AU-AIR provides paired annotation metadata, not proven zero-latency sensor timestamps.
 - With eight recording roots, evaluation is session-held-out but not broad new-location validation.

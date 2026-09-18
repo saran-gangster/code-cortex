@@ -1,0 +1,27 @@
+{
+  "all_visual_tensors_exactly_equal": true,
+  "artifact_kind": "exact_frozen_visual_adapter_integrity",
+  "benchmark_claim": false,
+  "film_tensor_count": 14,
+  "final_test_unsealed": false,
+  "parent_film_state_sha256": "4310f56e148a5b6572d542123c25a62f8c0313d7270436b1370129ded06987fc",
+  "parent_visual_state_sha256": "95378e7ef3cdfd8b34d4370a54a396309e6a336f0326aa66fb9c7a4cee13b176",
+  "parent_warmstart": "/kaggle/working/code-cortex/runs/review2/e1-frozen-visual-warmstart.pt",
+  "runs": {
+    "imagenet-e3-exact-frozen-visual-film": {
+      "changed_film_tensor_count": 14,
+      "checkpoint": "/kaggle/working/code-cortex/runs/review2/imagenet-e3-exact-frozen-visual-film/final.ckpt",
+      "film_state_sha256": "d82b36822ffe490b5ee6dd38ecde8bf1ceb4739180cf17ad6ac08791f7b8e13d",
+      "visual_state_sha256": "95378e7ef3cdfd8b34d4370a54a396309e6a336f0326aa66fb9c7a4cee13b176",
+      "visual_tensors_exactly_equal": true
+    },
+    "imagenet-e4-exact-frozen-visual-film-dropout50": {
+      "changed_film_tensor_count": 14,
+      "checkpoint": "/kaggle/working/code-cortex/runs/review2/imagenet-e4-exact-frozen-visual-film-dropout50/final.ckpt",
+      "film_state_sha256": "e92b36fb3c7c903c5c495cb7212be78746285c5a13e7003897d9a4279127a375",
+      "visual_state_sha256": "95378e7ef3cdfd8b34d4370a54a396309e6a336f0326aa66fb9c7a4cee13b176",
+      "visual_tensors_exactly_equal": true
+    }
+  },
+  "visual_tensor_count": 372
+}

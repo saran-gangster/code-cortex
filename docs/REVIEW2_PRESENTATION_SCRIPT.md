@@ -46,9 +46,9 @@ These numbers are almost the same. This tells us the main problem was not one wr
 
 “The FastAPI backend is complete for health checks, capability discovery, reports, inference, replay, and idempotent human reviews. The UI team can work against that stable contract.
 
-We also started a safer follow-up experiment. E3 and E4 begin from the stronger E1 detector. We freeze every visual detector weight and train only the small state adapter. E4 also hides state on half of its training steps to make missing-state behavior more robust.
+We also completed a safer follow-up experiment. E3 and E4 began from the stronger E1 detector. We froze and byte-checked every visual detector tensor, then trained only the small state adapter across all 18,523 training frames. E4 hid state on half of its training steps.
 
-Our decision rule is simple. We keep E1 unless a frozen-visual adapter beats it on development without weakening the image-only fallback. The final test stays sealed until the model and confidence threshold are frozen.”
+E4 recovered almost all of E1's performance: AP50 was 0.1697 compared with E1's 0.1698, and F1 was 0.4493 compared with 0.4503. It did not beat E1, so we keep E1 as the honest development winner. The final test stays sealed until the model and confidence threshold are frozen.”
 
 ## Short answers for likely judge questions
 
@@ -70,7 +70,7 @@ Our decision rule is simple. We keep E1 unless a frozen-visual adapter beats it 
 
 ### Did flight state help?
 
-“Not reliably in the full-pass jointly trained model. E1 led on the held-out development flight. The stress test showed that visual-weight drift was the main issue. We are now testing a frozen-visual state adapter that cannot rewrite the stronger image detector.”
+“Not reliably. E1 led on the held-out development flight. The frozen-visual E4 follow-up recovered almost all of E1's performance but did not beat it. This confirms that visual-weight drift caused most of E2's drop, while the current flight-state adapter still does not add a measurable development gain.”
 
 ### Did you use the final test?
 
