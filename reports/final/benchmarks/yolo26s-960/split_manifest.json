@@ -1,0 +1,67 @@
+{
+  "manifest_sha256": "44fd3dfe2efad1afe587b0ddd96cee068d9c1d633806e924098dc4c09977fcc0",
+  "schema_version": 1,
+  "split_unit": "complete_recording_root",
+  "splits": {
+    "test": {
+      "boxes": 8148,
+      "class_boxes": {
+        "Bicycle": 94,
+        "Bus": 61,
+        "Car": 6740,
+        "Human": 266,
+        "Motorbike": 4,
+        "Trailer": 150,
+        "Truck": 259,
+        "Van": 574
+      },
+      "frames": 1580,
+      "percentage": 4.813697711970264,
+      "roots": [
+        "20190905143505"
+      ]
+    },
+    "train": {
+      "boxes": 106306,
+      "class_boxes": {
+        "Bicycle": 733,
+        "Bus": 637,
+        "Car": 81795,
+        "Human": 4408,
+        "Motorbike": 280,
+        "Trailer": 2051,
+        "Truck": 8289,
+        "Van": 8113
+      },
+      "frames": 28281,
+      "percentage": 86.16214240014624,
+      "roots": [
+        "20190829091111",
+        "20190905091750",
+        "20190905103112",
+        "20190905111947",
+        "20190905112522",
+        "20190906150731"
+      ]
+    },
+    "val": {
+      "boxes": 17523,
+      "class_boxes": {
+        "Bicycle": 301,
+        "Bus": 31,
+        "Car": 14046,
+        "Human": 478,
+        "Motorbike": 34,
+        "Trailer": 336,
+        "Truck": 992,
+        "Van": 1305
+      },
+      "frames": 2962,
+      "percentage": 9.024159887883496,
+      "roots": [
+        "20190905142119"
+      ]
+    }
+  },
+  "total_frames": 32823
+}

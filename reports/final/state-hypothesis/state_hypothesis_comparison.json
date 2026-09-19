@@ -1,0 +1,80 @@
+{
+  "artifact_kind": "flight_state_hypothesis_comparison",
+  "conclusion": "Smoke evidence is inconclusive/too small to justify scale-up; promotion gate failed. No large paired-state run was launched and final test remained sealed.",
+  "split": {
+    "train_frames": 28281,
+    "validation_root": "20190905142119",
+    "validation_frames": 2962,
+    "final_test_root": "20190905143505",
+    "final_test_frames": 1580,
+    "recording_level_integrity": true,
+    "final_test_evaluated": false
+  },
+  "architecture": {
+    "detector": "FCOS + zero-initialized GatedResidualFiLM",
+    "matched_seed": 17,
+    "steps": 1000,
+    "precision": "32-true",
+    "warmstart": "pretrained ImageNet ResNet-50"
+  },
+  "metrics": {
+    "image_only": {
+      "AP50": 0.03148553456028081,
+      "AP50_95": 0.00905612735016452,
+      "precision": 0.12040862009320119,
+      "recall": 0.3376704902128631,
+      "F1": 0.17751710068402737,
+      "detection_accuracy": 0.097403987028166,
+      "TP": 5917,
+      "FP": 43224,
+      "FN": 11606,
+      "best_F1": 0.23127913983951284
+    },
+    "paired_state": {
+      "AP50": 0.03176769157858728,
+      "AP50_95": 0.009188370412933933,
+      "precision": 0.124413999785936,
+      "recall": 0.3316783655766707,
+      "F1": 0.1809520844360036,
+      "detection_accuracy": 0.0994762605689248,
+      "TP": 5812,
+      "FP": 40903,
+      "FN": 11711,
+      "best_F1": 0.2310639928471069
+    }
+  },
+  "delta_paired_minus_image_only": {
+    "AP50": 0.00028215701830647255,
+    "AP50_95": 0.00013224306276941357,
+    "fixed_F1": 0.003434983751976234,
+    "fixed_F1_relative": 0.019350156907363837,
+    "best_F1": -0.0002151469924059346,
+    "FP": -2321
+  },
+  "promotion_gate": {
+    "AP50_gain_at_least_0.01": false,
+    "relative_F1_gain_at_least_0.03": false,
+    "false_alarms_not_worse": true,
+    "passed": false,
+    "large_state_run_started": false
+  },
+  "loss_history_verification": {
+    "image_only": {
+      "records": 1000,
+      "summary_records": 1000,
+      "requested_steps": 1000,
+      "completed_steps": 1000
+    },
+    "paired_state": {
+      "records": 1000,
+      "summary_records": 1000,
+      "requested_steps": 1000,
+      "completed_steps": 1000
+    }
+  },
+  "validation_loss_note": "Evaluator emitted detector validation metrics, not scalar validation loss; none fabricated.",
+  "artifacts": {
+    "image_only": "/kaggle/working/code-cortex-final/state-smoke/seed17_image_only",
+    "paired_state": "/kaggle/working/code-cortex-final/state-smoke/seed17_paired_state"
+  }
+}

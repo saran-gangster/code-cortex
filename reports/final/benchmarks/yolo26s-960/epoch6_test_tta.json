@@ -1,0 +1,18 @@
+{
+  "checkpoint": "/kaggle/working/code-cortex-final/benchmark/tta/yolo26s_epoch6_best.pt",
+  "partition": "test",
+  "results_dict": {
+    "fitness": 0.08257924375725492,
+    "metrics/mAP50(B)": 0.19922816018137265,
+    "metrics/mAP50-95(B)": 0.08257924375725492,
+    "metrics/precision(B)": 0.28000352775342285,
+    "metrics/recall(B)": 0.2987559366774759
+  },
+  "speed_ms": {
+    "inference": 27.144156926585275,
+    "loss": 0.0010955822716236464,
+    "postprocess": 0.968200169617249,
+    "preprocess": 1.200770965827164
+  },
+  "test_time_augmentation": true
+}

@@ -1,0 +1,13 @@
+path: /kaggle/working/code-cortex-final/benchmark/yolo26s-960-trainheavy/dataset
+train: images/train
+val: images/val
+test: images/test
+names:
+  0: Human
+  1: Car
+  2: Truck
+  3: Van
+  4: Motorbike
+  5: Bicycle
+  6: Bus
+  7: Trailer

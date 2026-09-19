@@ -1,0 +1,103 @@
+{
+  "candidates": [
+    {
+      "candidate": "yolo26m-832",
+      "checkpoint": "/kaggle/working/code-cortex-final/benchmark/yolo26m-832-trainheavy/runs/yolo26m-832-trainheavy/weights/best.pt",
+      "epochs_completed": 5,
+      "final_test": {
+        "ap50": 0.20839234206412913,
+        "ap50_95": 0.0843944863285099,
+        "detection_accuracy": 0.2096795205836373,
+        "f1": 0.3466695385278122,
+        "false_negatives": 4486,
+        "false_positives": 7647,
+        "loss": {
+          "batches": 395,
+          "checkpoint": "/kaggle/working/code-cortex-final/benchmark/yolo26m-832-trainheavy/runs/yolo26m-832-trainheavy/weights/best.pt",
+          "data_yaml": "/kaggle/working/code-cortex-final/benchmark/yolo26m-832-trainheavy/auair_trainheavy.yaml",
+          "images": 1580,
+          "mixed_precision": true,
+          "partition": "test",
+          "test/box_loss": 2.175743341445923,
+          "test/cls_loss": 2.2387259006500244,
+          "test/l1_loss": 0.00809548981487751,
+          "test_loss_total": 4.422564731910825
+        },
+        "precision": 0.2962451684152402,
+        "recall": 0.41778066190785207,
+        "true_positives": 3219
+      },
+      "image_size": 832,
+      "loss_curve": {
+        "final_test": 4.422564731910825,
+        "training_final": 3.76546,
+        "training_initial": 4.38055,
+        "validation_final": 4.069170000000001,
+        "validation_initial": 4.38424
+      },
+      "model": "yolo26m.pt",
+      "validation": {
+        "ap50": 0.2404903366707199,
+        "ap50_95": 0.09091607725938083,
+        "detection_accuracy": 0.2678330647548262,
+        "f1": 0.422505252782029,
+        "false_negatives": 8417,
+        "false_positives": 13846,
+        "precision": 0.37035015916325603,
+        "recall": 0.49175774409757866,
+        "true_positives": 8144
+      }
+    },
+    {
+      "candidate": "yolo26s-960",
+      "checkpoint": "/kaggle/working/code-cortex-final/benchmark/yolo26s-960-trainheavy/runs/yolo26s-960-trainheavy/weights/best.pt",
+      "epochs_completed": 7,
+      "final_test": {
+        "ap50": 0.2083076185090999,
+        "ap50_95": 0.08516033575457502,
+        "detection_accuracy": 0.22332658445303394,
+        "f1": 0.36511359646923114,
+        "false_negatives": 4038,
+        "false_positives": 8621,
+        "loss": {
+          "batches": 198,
+          "checkpoint": "/kaggle/working/code-cortex-final/benchmark/yolo26s-960-trainheavy/runs/yolo26s-960-trainheavy/weights/best.pt",
+          "data_yaml": "/kaggle/working/code-cortex-final/benchmark/yolo26s-960-trainheavy/auair_trainheavy.yaml",
+          "images": 1580,
+          "mixed_precision": true,
+          "partition": "test",
+          "test/box_loss": 2.1400890350341797,
+          "test/cls_loss": 2.143965005874634,
+          "test/l1_loss": 0.007766951806843281,
+          "test_loss_total": 4.291820992715657
+        },
+        "precision": 0.29687627436587555,
+        "recall": 0.47408179213336804,
+        "true_positives": 3640
+      },
+      "image_size": 960,
+      "loss_curve": {
+        "final_test": 4.291820992715657,
+        "training_final": 3.7024899999999996,
+        "training_initial": 4.37869,
+        "validation_final": 4.01843,
+        "validation_initial": 4.29267
+      },
+      "model": "yolo26s.pt",
+      "validation": {
+        "ap50": 0.2645741598706669,
+        "ap50_95": 0.0982969196041058,
+        "detection_accuracy": 0.2633127758820399,
+        "f1": 0.4168607820786044,
+        "false_negatives": 8162,
+        "false_positives": 15370,
+        "precision": 0.3536857154871536,
+        "recall": 0.5075122186689194,
+        "true_positives": 8411
+      }
+    }
+  ],
+  "selected_candidate": "yolo26s-960",
+  "selection_partition": "validation",
+  "selection_rule": "highest AP50-95, then AP50"
+}

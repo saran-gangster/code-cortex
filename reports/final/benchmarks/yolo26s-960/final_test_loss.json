@@ -1,0 +1,12 @@
+{
+  "batches": 198,
+  "checkpoint": "/kaggle/working/code-cortex-final/benchmark/yolo26s-960-trainheavy/runs/yolo26s-960-trainheavy/weights/best.pt",
+  "data_yaml": "/kaggle/working/code-cortex-final/benchmark/yolo26s-960-trainheavy/auair_trainheavy.yaml",
+  "images": 1580,
+  "mixed_precision": true,
+  "partition": "test",
+  "test/box_loss": 2.1400890350341797,
+  "test/cls_loss": 2.143965005874634,
+  "test/l1_loss": 0.007766951806843281,
+  "test_loss_total": 4.291820992715657
+}

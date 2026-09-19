@@ -1,0 +1,7 @@
+{
+  "AP50_gain_at_least_0.01": false,
+  "relative_F1_gain_at_least_0.03": false,
+  "false_alarms_not_worse": true,
+  "passed": false,
+  "large_state_run_started": false
+}

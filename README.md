@@ -10,6 +10,7 @@ AeroGuard combines a TorchVision FCOS detector with gated FiLM conditioning so t
 - A strict [FastAPI backend](docs/BACKEND_API.md) for health, capability discovery, model reports, inference/replay, and idempotent human review.
 - A responsive React review console that can start from bundled fixtures and connect to the API.
 - A documented [ONNX/TensorRT edge deployment stack](deployment/tensorrt/README.md) with export, engine-build, validation, and inference scripts.
+- A final pretrained YOLO26 benchmark on all 32,823 AU-AIR frames, with recording-safe train/validation/test splits, complete loss histories, conventional metrics, and a checked-in 20.3 MB selected checkpoint.
 - Reproducible Kaggle scripts for protocol construction, matched training, evaluation, and artifact capture.
 - A dual-T4 Lightning gate that ran matched E1 image-only and E2 paired-state arms from one hashed initialization and image schedule.
 - A deterministic evaluator for AP50, AP50:95, per-class support, per-root results, fixed-point recall, calibration, and VisDrone ignore regions.
@@ -28,10 +29,21 @@ Training and benchmark values appear only after a run writes machine-generated r
 - The Review 2 pair completed one full pass over all 18,523 training frames per arm. Every optimizer-step loss is stored and hashed, both arms use the same frame order and ImageNet warmstart, and physical GPUs 0 and 1 ran concurrently.
 - On the same held-out development flight after the full pass, image-plus-state E2 reached AP50 0.1698, best F1 0.4503, and detection accuracy 0.2906. Image-only E1 reached AP50 0.1146, best F1 0.2515, and detection accuracy 0.1438.
 - The corrective E3/E4 runs froze and byte-verified every E2 visual tensor while training only the FiLM adapter for 18,523 steps. E4 with 50% state dropout nearly matched E2 at AP50 0.1697, F1 0.4493, and detection accuracy 0.2897, but did not beat it. E2 therefore remains the development-selected model.
+- A new matched 1,000-step smoke test on the final split found only +0.00028 AP50 and +1.94% relative fixed-threshold F1 from paired flight state. It failed the predeclared promotion gate, so no large state-conditioned run or final-test evaluation was launched for that branch.
+- The final benchmark used 28,281 training frames (86.16%), 2,962 validation frames (9.02%), and 1,580 frozen test frames (4.81%), grouped by complete recording root.
+- Validation-only selection chose YOLO26s at 960 px over YOLO26m at 832 px. On the final test flight it achieved AP50 0.2083, AP50:95 0.0852, precision 0.2969, recall 0.4741, F1 0.3651, detection accuracy 0.2233, and total detector loss 4.2918.
 
 The smoke and 40-step runs are implementation gates. The separate [development results](docs/DEVELOPMENT_RESULTS.md) are real held-out development evidence, not final-test or safety evidence.
 
 ## Training and development graphs
+
+![Final pretrained-detector comparison](docs/assets/final-candidate-comparison.png)
+
+![Final selected-model training, validation, and test evidence](docs/assets/final-training-metrics.png)
+
+![Final selected-model loss components](docs/assets/final-loss-components.png)
+
+![Final matched flight-state smoke test](docs/assets/final-state-hypothesis.png)
 
 ![AU-AIR split by complete flight recording](docs/assets/review2-data-split.png)
 
@@ -98,12 +110,14 @@ Open the printed local URL. The bundled demonstration is explicitly labeled `FIX
 - `src/aeroguard/api`, `src/aeroguard/inference`: service and runtime contract.
 - `frontend`: operator review console.
 - `deployment/tensorrt`: reproducible ONNX/TensorRT edge-inference contract and tooling.
+- `models`: selected stripped PyTorch checkpoint for reproducible inference and export.
+- `reports/final`: final split, candidate metrics, complete epoch histories, loss graphs, final-test evidence, and flight-state gate.
 - `configs`: resolved experiment settings.
 - `docs`: architecture, model/data cards, Review 1 materials, and measured development evidence.
 
 ## Current limitations
 
-- Development metrics guide model selection only. The frozen-visual adapter follow-up is complete and did not beat E2; the release threshold and final-test metrics remain deliberately unfrozen and sealed.
+- The final detector test recording has now been opened exactly for final reporting; candidate selection still uses validation AP50:95, not test performance. The separate flight-state smoke branch did not pass its gate and kept its final test sealed.
 - The checked-in evaluation fixture proves software behavior only; it is not model performance.
 - AU-AIR provides paired annotation metadata, not proven zero-latency sensor timestamps.
 - With eight recording roots, evaluation is session-held-out but not broad new-location validation.

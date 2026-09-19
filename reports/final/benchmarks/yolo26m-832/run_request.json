@@ -1,0 +1,12 @@
+{
+  "batch": 4,
+  "cuda_device": "Tesla T4",
+  "device": "0",
+  "epochs_ceiling": 50,
+  "hours": 2.25,
+  "imgsz": 832,
+  "model": "yolo26m.pt",
+  "seed": 1337,
+  "started_unix": 1789777156.1812522,
+  "torch": "2.14.0+cu130"
+}

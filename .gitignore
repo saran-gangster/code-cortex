@@ -19,3 +19,5 @@ reviews/*.jsonl
 *.pt
 *.pth
 .env
+.codex-kaggle-final/
+.~lock.*#

@@ -1,0 +1,73 @@
+experiment_id: final-yolo26s-960-trainheavy
+artifact_kind: final_review_candidate_training
+
+dataset:
+  name: AU-AIR
+  total_frames: 32823
+  split_unit: complete_recording_root
+  train:
+    frames: 28281
+    percentage: 86.1621
+    roots:
+      - "20190829091111"
+      - "20190905091750"
+      - "20190905103112"
+      - "20190905111947"
+      - "20190905112522"
+      - "20190906150731"
+  validation:
+    frames: 2962
+    percentage: 9.0242
+    roots: ["20190905142119"]
+  final_test:
+    frames: 1580
+    percentage: 4.8137
+    roots: ["20190905143505"]
+
+model:
+  architecture: YOLO26s
+  initialization: pretrained_detection_weights
+  classes: 8
+  parameters: 9954056
+  image_size: 960
+
+training:
+  device: single_Tesla_T4
+  precision: automatic_mixed_precision
+  batch_size: 8
+  optimizer: AdamW
+  initial_learning_rate: 0.001
+  weight_decay: 0.001
+  schedule: cosine
+  maximum_hours: 2.05
+  maximum_epochs: 50
+  augmentation:
+    mosaic: 1.0
+    mixup: 0.1
+    multi_scale: 0.05
+    horizontal_flip: 0.5
+    translate: 0.1
+    scale: 0.5
+
+selection:
+  partition: validation
+  primary_metric: AP50_95
+  tie_breaker: AP50
+  final_test_is_not_used_for_candidate_selection: true
+
+reporting:
+  epoch_training_loss: true
+  epoch_validation_loss: true
+  frozen_final_test_loss: true
+  metrics:
+    - AP50
+    - AP50_95
+    - precision
+    - recall
+    - F1
+    - detection_accuracy
+    - true_positives
+    - false_positives
+    - false_negatives
+    - confusion_matrix
+    - per_class_metrics
