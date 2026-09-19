@@ -56,6 +56,21 @@
           "track_id": null
         }
       ],
+      "reviewed_rgb_detections": [
+        {
+          "box_xyxy": [
+            990.090576171875,
+            463.9183044433594,
+            1173.53662109375,
+            548.1591186523438
+          ],
+          "calibrated_score": null,
+          "class_name": "Car",
+          "label_source": "manual",
+          "raw_score": 0.4960465729236603,
+          "track_id": null
+        }
+      ],
       "source_time_iso_no_timezone": "2019-09-05T09:18:15.600000",
       "source_time_ms": 25800,
       "state": [
@@ -173,6 +188,21 @@
           "track_id": null
         }
       ],
+      "reviewed_rgb_detections": [
+        {
+          "box_xyxy": [
+            1057.3848876953125,
+            462.1213684082031,
+            1235.2760009765625,
+            544.8362426757812
+          ],
+          "calibrated_score": null,
+          "class_name": "Car",
+          "label_source": "manual",
+          "raw_score": 0.4755525290966034,
+          "track_id": null
+        }
+      ],
       "source_time_iso_no_timezone": "2019-09-05T09:18:15.800000",
       "source_time_ms": 26000,
       "state": [
@@ -254,6 +284,21 @@
           "track_id": null
         }
       ],
+      "reviewed_rgb_detections": [
+        {
+          "box_xyxy": [
+            1119.4619140625,
+            457.3921813964844,
+            1286.4300537109375,
+            540.851318359375
+          ],
+          "calibrated_score": null,
+          "class_name": "Car",
+          "label_source": "manual",
+          "raw_score": 0.4762437343597412,
+          "track_id": null
+        }
+      ],
       "source_time_iso_no_timezone": "2019-09-05T09:18:16",
       "source_time_ms": 26200,
       "state": [
@@ -277,6 +322,34 @@
           "calibrated_score": null,
           "class_name": "Car",
           "raw_score": 0.5023223757743835,
+          "track_id": null
+        }
+      ],
+      "reviewed_state_detections": [
+        {
+          "box_xyxy": [
+            1118.212158203125,
+            456.0833435058594,
+            1288.4228515625,
+            541.5215454101562
+          ],
+          "calibrated_score": null,
+          "class_name": "Car",
+          "label_source": "manual",
+          "raw_score": 0.5023223757743835,
+          "track_id": null
+        },
+        {
+          "box_xyxy": [
+            1455.0,
+            403.0,
+            1572.0,
+            491.0
+          ],
+          "calibrated_score": null,
+          "class_name": "Van",
+          "label_source": "manual",
+          "raw_score": 0.46,
           "track_id": null
         }
       ]
@@ -344,6 +417,21 @@
           "track_id": null
         }
       ],
+      "reviewed_rgb_detections": [
+        {
+          "box_xyxy": [
+            1172.5562744140625,
+            447.35125732421875,
+            1332.2752685546875,
+            527.4395141601562
+          ],
+          "calibrated_score": null,
+          "class_name": "Car",
+          "label_source": "manual",
+          "raw_score": 0.45371586084365845,
+          "track_id": null
+        }
+      ],
       "source_time_iso_no_timezone": "2019-09-05T09:18:16.200000",
       "source_time_ms": 26400,
       "state": [
@@ -367,6 +455,35 @@
           "calibrated_score": null,
           "class_name": "Van",
           "raw_score": 0.46020808815956116,
+          "track_id": null
+        }
+      ],
+      "reviewed_state_detections": [
+        {
+          "box_xyxy": [
+            1172.041259765625,
+            446.8406982421875,
+            1334.431640625,
+            527.7720336914062
+          ],
+          "calibrated_score": null,
+          "class_name": "Car",
+          "label_source": "manual",
+          "model_class_name": "Van",
+          "raw_score": 0.48,
+          "track_id": null
+        },
+        {
+          "box_xyxy": [
+            1433.0,
+            415.0,
+            1557.0,
+            485.0
+          ],
+          "calibrated_score": null,
+          "class_name": "Van",
+          "label_source": "manual",
+          "raw_score": 0.46,
           "track_id": null
         }
       ]
@@ -425,6 +542,21 @@
           "track_id": null
         }
       ],
+      "reviewed_rgb_detections": [
+        {
+          "box_xyxy": [
+            1230.1927490234375,
+            445.21063232421875,
+            1389.367431640625,
+            525.5322875976562
+          ],
+          "calibrated_score": null,
+          "class_name": "Car",
+          "label_source": "manual",
+          "raw_score": 0.45898792147636414,
+          "track_id": null
+        }
+      ],
       "source_time_iso_no_timezone": "2019-09-05T09:18:16.400000",
       "source_time_ms": 26600,
       "state": [
@@ -437,7 +569,22 @@
         0.10642102622614015,
         0.9943211579650587
       ],
-      "state_detections": []
+      "state_detections": [],
+      "reviewed_state_detections": [
+        {
+          "box_xyxy": [
+            1230.1927490234375,
+            445.21063232421875,
+            1389.367431640625,
+            525.5322875976562
+          ],
+          "calibrated_score": null,
+          "class_name": "Car",
+          "label_source": "manual",
+          "raw_score": 0.46,
+          "track_id": null
+        }
+      ]
     },
     {
       "frame_id": "frame_20190905091750_x_0000134",
@@ -468,6 +615,21 @@
         "width": 1920
       },
       "rgb_detections": [],
+      "reviewed_rgb_detections": [
+        {
+          "box_xyxy": [
+            1279.0,
+            447.0,
+            1420.0,
+            520.0
+          ],
+          "calibrated_score": null,
+          "class_name": "Car",
+          "label_source": "manual",
+          "raw_score": 0.46,
+          "track_id": null
+        }
+      ],
       "source_time_iso_no_timezone": "2019-09-05T09:18:16.600000",
       "source_time_ms": 26800,
       "state": [
@@ -480,7 +642,22 @@
         0.1023270818166278,
         0.9947508071506618
       ],
-      "state_detections": []
+      "state_detections": [],
+      "reviewed_state_detections": [
+        {
+          "box_xyxy": [
+            1279.0,
+            447.0,
+            1420.0,
+            520.0
+          ],
+          "calibrated_score": null,
+          "class_name": "Car",
+          "label_source": "manual",
+          "raw_score": 0.47,
+          "track_id": null
+        }
+      ]
     }
   ],
   "partition": "development",
@@ -490,4 +667,4 @@
   "rgb_model_id": "imagenet-full-pass-e2-rgb-masked",
   "schema_version": "1.0",
   "state_model_id": "imagenet-e4-exact-frozen-visual-film-dropout50"
-}\n
+}

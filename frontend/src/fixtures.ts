@@ -42,6 +42,8 @@ export const offlineFrames: InferenceRecord[] = developmentSequence.frames.map((
   original_size: frame.original_size, input_mode: 'paired_state', metadata_alignment: 'paired_annotation',
   detections: frame.state_detections as Detection[], rgb_detections: frame.rgb_detections as Detection[],
   state_detections: frame.state_detections as Detection[], rgb_model_id: developmentSequence.rgb_model_id,
+  reviewed_rgb_detections: 'reviewed_rgb_detections' in frame ? frame.reviewed_rgb_detections as Detection[] : undefined,
+  reviewed_state_detections: 'reviewed_state_detections' in frame ? frame.reviewed_state_detections as Detection[] : undefined,
   state_model_id: developmentSequence.state_model_id, state: frame.state, ground_truth: frame.ground_truth,
   quality_flags: [], latency: { preprocess_ms: null, model_ms: null, postprocess_ms: null, end_to_end_ms: null },
   image_url: `/assets/auair-demo/${frame.image_filename}`,
@@ -74,6 +76,8 @@ export const offlineModels: ModelSummary[] = documentedReports.map((report) => (
 }))
 
 export function fixtureDetections(frame: InferenceRecord, kind: 'e2' | 'e1'): Detection[] {
+  if (kind === 'e1' && frame.reviewed_rgb_detections) return frame.reviewed_rgb_detections
+  if (kind === 'e2' && frame.reviewed_state_detections) return frame.reviewed_state_detections
   if (kind === 'e1' && frame.rgb_detections) return frame.rgb_detections
   if (kind === 'e2' && frame.state_detections) return frame.state_detections
   if (kind === 'e2') return frame.detections

@@ -6,6 +6,7 @@ import {
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { api, API_BASE, errorMessage } from './api'
 import { containImage, replayImageUrl } from './replay-image'
+import MovingDemo from './MovingDemo'
 import { documentedReports, mergeDocumentedReports, fixtureDetections, OFFLINE_RUN_ID, offlineFrames, offlineModels, offlineRun } from './fixtures'
 import type {
   CapabilityResponse, Detection, EvaluationReport, HealthResponse, InferenceRecord, Intervention, ModelSummary,
@@ -27,6 +28,7 @@ const modelKind = (id: string): 'e2' | 'e1' | 'other' => {
 const sourceLabel = (source: InferenceRecord['prediction_source']) => source === 'annotation' ? 'ANNOTATIONS' : source === 'computed' ? 'COMPUTED' : source === 'cached' ? 'CACHED' : 'FIXTURE'
 const sourceTone = (source: InferenceRecord['prediction_source']) => source === 'computed' ? 'green' : source === 'cached' || source === 'annotation' ? 'cyan' : 'amber'
 const scoreLabel = (score: number | null) => score == null ? 'annotation' : score.toFixed(2)
+const detectionLabel = (detection: Detection) => `${detection.class_name} ${scoreLabel(detection.raw_score)}`
 const shortHash = (value: string) => value === '0'.repeat(64) ? 'not applicable' : `${value.slice(0, 12)}…`
 const formatTime = (milliseconds: number | null) => milliseconds == null ? 'Not supplied' : `${Math.floor(milliseconds / 60_000).toString().padStart(2, '0')}:${Math.floor((milliseconds % 60_000) / 1000).toString().padStart(2, '0')}.${Math.floor(milliseconds % 1000 / 100)}`
 const formatMetric = (value: number | null, digits = 4) => value == null ? '—' : value.toFixed(digits)
@@ -383,6 +385,7 @@ type LiveReviewProps = {
 }
 
 function LiveReview(props: LiveReviewProps) {
+  const [demoView, setDemoView] = useState<'static' | 'moving'>('static')
   const { serviceMode, workspaceError, activeRun, activeRunId, frames, framesState, framesError, selectedFrame, selectedFrameId, setSelectedFrameId, frameDetailWarning, modelView, setModelView, models, e2ModelId, e1ModelId, inspectModel, modelDetailNote, intervention, setIntervention, onOpenChooser, onOpenEvidence, onUseOffline, onRetry } = props
   const e2Models = models.filter((model) => modelKind(model.model_id) === 'e2')
   const e1Models = models.filter((model) => modelKind(model.model_id) === 'e1')
@@ -392,6 +395,14 @@ function LiveReview(props: LiveReviewProps) {
     {framesState === 'error' && <ErrorState title="Replay could not be loaded" message={framesError} onRetry={onRetry} secondary={{ label: 'Open AU-AIR replay', action: onUseOffline }} />}
     {framesState === 'empty' && <EmptyState onUseOffline={onUseOffline} />}
     {framesState === 'ready' && selectedFrame && <>
+      <div className="segmented demo-view-switch" role="group" aria-label="Demo view">
+        <button className={demoView === 'static' ? 'selected' : ''} aria-pressed={demoView === 'static'} onClick={() => setDemoView('static')}>Static</button>
+        <button className={demoView === 'moving' ? 'selected' : ''} aria-pressed={demoView === 'moving'} onClick={() => {
+          if (props.playing) props.onTogglePlayback()
+          setDemoView('moving')
+        }}>Moving</button>
+      </div>
+      {demoView === 'moving' ? <MovingDemo /> : <>
       <section className="review-panel"><div className="compare-head"><div><p className="eyebrow">Comparison lens — same frame / same protocol</p><h1>Live aerial review</h1></div><div className="segmented" role="group" aria-label="Model comparison view">{([['e1', 'E1 RGB'], ['e2', `${stateModelLabel(selectedFrame)} + STATE`], ['split', 'Split']] as const).map(([id, label]) => <button key={id} aria-pressed={modelView === id} className={modelView === id ? 'selected' : ''} onClick={() => setModelView(id)}>{label}</button>)}</div></div>
         {liveFrame && <div key={modelView} className={`feed-layout view-${modelView}`}><div className="feeds">{modelView !== 'e2' && <Feed kind="e1" modelId={e1ModelId} frame={liveFrame} offline={activeRunId === OFFLINE_RUN_ID} intervention={intervention} />}{modelView !== 'e1' && <Feed kind="e2" modelId={e2ModelId} frame={liveFrame} offline={activeRunId === OFFLINE_RUN_ID} intervention={intervention} />}</div><DetectionDetail frame={liveFrame} modelView={modelView} intervention={intervention} /></div>}
       </section>
@@ -404,6 +415,7 @@ function LiveReview(props: LiveReviewProps) {
         <div className="model-selectors" aria-label="Comparison models"><label>E2 model<select value={e2ModelId} onChange={(event) => void inspectModel('e2', event.target.value)}>{(e2Models.length ? e2Models : models).map((model) => <option key={model.model_id}>{model.model_id}</option>)}</select></label><label>E1 model<select value={e1ModelId} onChange={(event) => void inspectModel('e1', event.target.value)}>{(e1Models.length ? e1Models : models).map((model) => <option key={model.model_id}>{model.model_id}</option>)}</select></label>{modelDetailNote && <span className="model-note">{modelDetailNote}</span>}</div>
         <InterventionPanel value={intervention} onChange={setIntervention} />
       </details>
+      </>}
     </>}
   </div>
 }
@@ -435,7 +447,7 @@ function FrameVisual({ frame, detections, label, compact = false }: { frame: Inf
     {!hasImage && <div className="protocol-canvas" aria-hidden><span className="terrain terrain-a" /></div>}
     <div className="frame-image-space" style={fitted}>
     {hasImage && <img key={image} src={image} alt={`AU-AIR replay frame ${frame.frame_id}`} onLoad={() => setLoadedImage(image!)} onError={() => setFailedImage(image!)} style={{ opacity: loadedImage === image ? 1 : 0 }} />}
-    {(!hasImage || loadedImage === image) && detections.map((detection, index) => { const [x1, y1, x2, y2] = detection.box_xyxy; const color = detection.class_name === 'Human' ? 'lime' : index % 2 ? 'cyan' : 'amber'; return <span key={`${frame.frame_id}-${detection.class_name}-${index}`} className={`detection-box ${color}`} style={{ left: `${x1 / width * 100}%`, top: `${y1 / height * 100}%`, width: `${(x2 - x1) / width * 100}%`, height: `${(y2 - y1) / height * 100}%` }}><i>{detection.class_name} {scoreLabel(detection.raw_score)}</i></span> })}
+    {(!hasImage || loadedImage === image) && detections.map((detection, index) => { const [x1, y1, x2, y2] = detection.box_xyxy; const color = detection.class_name === 'Human' ? 'lime' : index % 2 ? 'cyan' : 'amber'; return <span key={`${frame.frame_id}-${detection.class_name}-${index}`} className={`detection-box ${color}`} style={{ left: `${x1 / width * 100}%`, top: `${y1 / height * 100}%`, width: `${(x2 - x1) / width * 100}%`, height: `${(y2 - y1) / height * 100}%` }}><i>{detectionLabel(detection)}</i></span> })}
     </div>
     {hasImage && loadedImage !== image && <span className="image-loading"><LoaderCircle className="spin" size={16} />Loading source frame</span>}
     {!compact && <span className="capture-label">{frame.prediction_source === 'fixture' ? 'FIXTURE FRAME' : 'RECORDED FRAME'}</span>}
@@ -469,7 +481,7 @@ function HistoryDetail({ frame }: { frame: InferenceRecord }) {
   return <aside className="history-detail"><SectionLabel>History frame detection detail</SectionLabel><h3>Frame {frameNumber(frame)} · {formatTime(frame.source_time_ms)}</h3><div className="history-scene"><SectionLabel>Scene</SectionLabel><p>{frame.input_mode.replace(/_/g, ' ')}</p><p>{frame.state ? `Altitude ${frame.state[0].toFixed(2)} m` : frame.metadata_alignment.replace(/_/g, ' ')} · {frame.original_size.width} × {frame.original_size.height}</p></div>{(['e2', 'e1'] as const).map((kind) => {
     const available = offline || modelKind(frame.model_id) === kind || modelKind(frame.model_id) === 'other'
     const detections = offline ? fixtureDetections(frame, kind) : available ? frame.detections : []
-    return <div key={kind} className={`history-model ${kind}`}><strong>{kind === 'e1' ? 'E1 RGB' : `${stateModelLabel(frame)} + STATE`} · {available ? `${detections.length} detections` : 'No output'}</strong><p>{detections.map((item) => `${item.class_name} ${scoreLabel(item.raw_score)}`).join(' · ') || 'No replay evidence available'}</p>{kind === 'e2' && <p>{frame.prediction_source === 'fixture' ? 'Illustrative fixture — not measured evidence' : `${sourceLabel(frame.prediction_source)} · ${frame.latency.end_to_end_ms == null ? 'Latency not recorded' : `${frame.latency.end_to_end_ms.toFixed(1)} ms`}`}</p>}</div>
+    return <div key={kind} className={`history-model ${kind}`}><strong>{kind === 'e1' ? 'E1 RGB' : `${stateModelLabel(frame)} + STATE`} · {available ? `${detections.length} detections` : 'No output'}</strong><p>{detections.map(detectionLabel).join(' · ') || 'No replay evidence available'}</p>{kind === 'e2' && <p>{frame.prediction_source === 'fixture' ? 'Illustrative fixture — not measured evidence' : `${sourceLabel(frame.prediction_source)} · ${frame.latency.end_to_end_ms == null ? 'Latency not recorded' : `${frame.latency.end_to_end_ms.toFixed(1)} ms`}`}</p>}</div>
   })}</aside>
 }
 

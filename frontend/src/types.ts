@@ -13,6 +13,8 @@ export type Detection = {
   raw_score: number | null
   calibrated_score: number | null
   track_id: string | null
+  label_source?: 'model' | 'manual'
+  model_class_name?: Detection['class_name']
 }
 
 export type InferenceRecord = {
@@ -39,6 +41,8 @@ export type InferenceRecord = {
   state?: number[]
   rgb_detections?: Detection[]
   state_detections?: Detection[]
+  reviewed_rgb_detections?: Detection[]
+  reviewed_state_detections?: Detection[]
   rgb_model_id?: string
   state_model_id?: string
   ground_truth?: Array<{ class_name: string; box_xyxy: number[] }>

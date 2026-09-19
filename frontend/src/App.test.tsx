@@ -3,7 +3,7 @@ import { act, cleanup, fireEvent, render, screen, within } from '@testing-librar
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import App from './App'
 import { api } from './api'
-import { documentedReports, offlineFrames, offlineModels } from './fixtures'
+import { documentedReports, fixtureDetections, offlineFrames, offlineModels } from './fixtures'
 import { containImage, replayImageUrl } from './replay-image'
 
 const flush = async () => { await act(async () => { await Promise.resolve(); await Promise.resolve() }) }
@@ -26,6 +26,24 @@ beforeEach(() => {
 afterEach(() => { cleanup(); vi.useRealTimers(); vi.restoreAllMocks() })
 
 describe('real replay workflow', () => {
+  it('shows only Car for E1 and Car plus Van for E4 with confidence', async () => {
+    const frame131 = offlineFrames.find((frame) => frame.frame_id.endsWith('0000131'))!
+    const frame132 = offlineFrames.find((frame) => frame.frame_id.endsWith('0000132'))!
+    expect(frame131.rgb_detections?.map((item) => item.class_name)).toEqual(['Car', 'Van'])
+    expect(offlineFrames.flatMap((frame) => fixtureDetections(frame, 'e1')).every((item) => item.class_name === 'Car')).toBe(true)
+    expect(fixtureDetections(frame131, 'e2').map((item) => item.class_name)).toEqual(['Car', 'Van'])
+    expect(fixtureDetections(frame132, 'e1')).toMatchObject([{ class_name: 'Car', raw_score: 0.45371586084365845 }])
+    expect(fixtureDetections(frame132, 'e2')).toMatchObject([{ class_name: 'Car', raw_score: 0.48 }, { class_name: 'Van', raw_score: 0.46 }])
+    render(<App />); await flush()
+    fireEvent.click(screen.getByRole('button', { name: 'Frame 132, 00:26.4, valid' }))
+    fireEvent.load(document.querySelector('.feed-e1 img')!)
+    fireEvent.load(document.querySelector('.feed-e2 img')!)
+    expect(document.querySelectorAll('.feed-e1 .detection-box')).toHaveLength(1)
+    expect(document.querySelector('.feed-e1 .detection-box')?.textContent).toBe('Car 0.45')
+    expect(document.querySelectorAll('.feed-e2 .detection-box')).toHaveLength(2)
+    expect([...document.querySelectorAll('.feed-e2 .detection-box')].map((item) => item.textContent)).toEqual(['Car 0.48', 'Van 0.46'])
+  })
+
   it('defaults to real AU-AIR replay when API offers only fixtures or single-frame runs, preserving the chooser', async () => {
     vi.mocked(api.runs).mockResolvedValue([
       { run_id: 'fixture-run', frame_count: 1, prediction_source: 'fixture' },
@@ -49,7 +67,7 @@ describe('real replay workflow', () => {
   it('advances API frames and synchronizes timeline, detail, images and history; pauses and seeks', async () => {
     render(<App />); await flush()
     expect(screen.getByRole('heading', { name: 'Frame 129' })).toBeTruthy()
-    expect(document.querySelector('.feed-e1 footer')?.textContent).toContain('2 detections')
+    expect(document.querySelector('.feed-e1 footer')?.textContent).toContain('1 detections')
     expect(document.querySelector('.feed-e2 footer')?.textContent).toContain('1 detections')
     await tick()
     expect(screen.getByRole('heading', { name: 'Frame 130' })).toBeTruthy()
@@ -59,7 +77,7 @@ describe('real replay workflow', () => {
     await tick(2400)
     expect(screen.getByRole('heading', { name: 'Frame 130' })).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: 'Frame 133, 00:26.6, valid' }))
-    expect(document.querySelector('.feed-e2 footer')?.textContent).toContain('0 detections')
+    expect(document.querySelector('.feed-e2 footer')?.textContent).toContain('1 detections')
     expect(screen.getByRole('button', { name: 'Play replay' })).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: 'Play replay' })); await tick(); await tick()
     expect(screen.getByRole('heading', { name: 'Frame 129' })).toBeTruthy()

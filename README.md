@@ -10,6 +10,7 @@ AeroGuard combines a TorchVision FCOS detector with gated FiLM conditioning so t
 - A strict [FastAPI backend](docs/BACKEND_API.md) for health, capability discovery, model reports, inference/replay, and idempotent human review.
 - A responsive React review console that can start from bundled fixtures and connect to the API.
 - A documented [ONNX/TensorRT edge deployment stack](deployment/tensorrt/README.md) with export, engine-build, validation, and inference scripts.
+- An [experimental native C++/CUDA runner](deployment/native/README.md) for the final YOLO26s-960 Jetson engine, with fused GPU preprocessing, TensorRT 10 execution, and explicit YOLO output handling.
 - A final pretrained YOLO26 benchmark on all 32,823 AU-AIR frames, with recording-safe train/validation/test splits, complete loss histories, conventional metrics, and a checked-in 20.3 MB selected checkpoint.
 - Reproducible Kaggle scripts for protocol construction, matched training, evaluation, and artifact capture.
 - A dual-T4 Lightning gate that ran matched E1 image-only and E2 paired-state arms from one hashed initialization and image schedule.
@@ -120,6 +121,7 @@ Open the printed local URL. The bundled demonstration is explicitly labeled `FIX
 - `src/aeroguard/api`, `src/aeroguard/inference`: service and runtime contract.
 - `frontend`: operator review console.
 - `deployment/tensorrt`: reproducible ONNX/TensorRT edge-inference contract and tooling.
+- `deployment/native`: experimental C++17/CUDA/TensorRT runner for the selected Jetson engine.
 - `models`: selected stripped PyTorch checkpoint for reproducible inference and export.
 - `reports/final`: final split, candidate metrics, complete epoch histories, loss graphs, final-test evidence, and flight-state gate.
 - `configs`: resolved experiment settings.
