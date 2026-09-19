@@ -71,6 +71,16 @@ The smoke and 40-step runs are implementation gates. The separate [development r
 
 The Review 2 plots are generated from complete, committed 18,523-step histories by `python scripts/generate_review2_graphs.py`. Older Review 1 plots remain for traceability and only claim what their earlier artifacts support.
 
+## Jetson edge validation
+
+The selected 960-pixel YOLO26s model has now been exported and measured on an 8 GB
+Jetson Orin Nano. On six genuine AU-AIR frames, the FP16 TensorRT engine achieved
+**31.90 ms end-to-end latency (31.35 FPS)**, compared with **41.64 ms (24.01 FPS)**
+for FP16 PyTorch under the same batch-one protocol. All six PyTorch detections were
+preserved; mean matched-box IoU was 0.941, with one additional borderline TensorRT
+detection. See [`reports/final/JETSON_VALIDATION.md`](reports/final/JETSON_VALIDATION.md)
+for the protocol, limitations, raw artifact map, and engine checksum.
+
 
 ## Quick start
 
@@ -123,4 +133,4 @@ Open the printed local URL. The bundled demonstration is explicitly labeled `FIX
 - With eight recording roots, evaluation is session-held-out but not broad new-location validation.
 - Supplied AU-AIR frames do not validate genuinely empty-scene behavior.
 - This prototype is for supervised offline perception review, not certified autonomous control.
-- TensorRT scripts are implemented and CPU-tested; no `.engine` is claimed until a checkpoint is exported and validated on the target NVIDIA device.
+- The checked-in FP16 TensorRT engine is validated only for the recorded Jetson Orin Nano / TensorRT 10.3 environment and must be rebuilt for other boards or JetPack versions.

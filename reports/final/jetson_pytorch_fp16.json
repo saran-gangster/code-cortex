@@ -1,0 +1,107 @@
+{
+  "model": "/home/bionexus/aeroguard-jetson/models/AeroGuard_YOLO26s_960.pt",
+  "backend": "pt",
+  "model_bytes": 20331781,
+  "images": 6,
+  "image_names": [
+    "frame_20190905091750_x_0000129.jpg",
+    "frame_20190905091750_x_0000130.jpg",
+    "frame_20190905091750_x_0000131.jpg",
+    "frame_20190905091750_x_0000132.jpg",
+    "frame_20190905091750_x_0000133.jpg",
+    "frame_20190905091750_x_0000134.jpg"
+  ],
+  "imgsz": 960,
+  "precision": "fp16",
+  "confidence": 0.25,
+  "warmup_iterations": 10,
+  "timed_iterations": 50,
+  "latency_ms": {
+    "mean_end_to_end": 41.64180996000141,
+    "median_end_to_end": 41.89135549995626,
+    "p95_end_to_end": 42.55608900007246,
+    "minimum_end_to_end": 39.71467300016229,
+    "mean_preprocess": 4.727807899985237,
+    "mean_inference": 32.179837180001414,
+    "mean_postprocess": 3.5554260799744952
+  },
+  "throughput_fps_batch_1": 24.014326009377093,
+  "cuda_peak_memory_bytes": 80824320,
+  "detections": [
+    {
+      "image": "frame_20190905091750_x_0000129.jpg",
+      "count": 1,
+      "detections": [
+        {
+          "class_id": 1,
+          "class_name": "Car",
+          "confidence": 0.445557
+        }
+      ]
+    },
+    {
+      "image": "frame_20190905091750_x_0000130.jpg",
+      "count": 1,
+      "detections": [
+        {
+          "class_id": 1,
+          "class_name": "Car",
+          "confidence": 0.44165
+        }
+      ]
+    },
+    {
+      "image": "frame_20190905091750_x_0000131.jpg",
+      "count": 1,
+      "detections": [
+        {
+          "class_id": 1,
+          "class_name": "Car",
+          "confidence": 0.430176
+        }
+      ]
+    },
+    {
+      "image": "frame_20190905091750_x_0000132.jpg",
+      "count": 1,
+      "detections": [
+        {
+          "class_id": 1,
+          "class_name": "Car",
+          "confidence": 0.397949
+        }
+      ]
+    },
+    {
+      "image": "frame_20190905091750_x_0000133.jpg",
+      "count": 2,
+      "detections": [
+        {
+          "class_id": 1,
+          "class_name": "Car",
+          "confidence": 0.394287
+        },
+        {
+          "class_id": 2,
+          "class_name": "Truck",
+          "confidence": 0.275146
+        }
+      ]
+    },
+    {
+      "image": "frame_20190905091750_x_0000134.jpg",
+      "count": 0,
+      "detections": []
+    }
+  ],
+  "environment": {
+    "platform": "Linux-5.15.148-tegra-aarch64-with-glibc2.35",
+    "python": "3.10.12",
+    "torch": "2.3.0",
+    "cuda": "12.4",
+    "ultralytics": "8.4.155",
+    "numpy": "1.26.4",
+    "opencv": "4.10.0",
+    "gpu": "Orin"
+  }
+}

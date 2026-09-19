@@ -1,0 +1,143 @@
+{
+  "model": "/home/bionexus/aeroguard-jetson/models/AeroGuard_YOLO26s_960.pt",
+  "backend": "pt",
+  "model_bytes": 20331781,
+  "images": 6,
+  "image_names": [
+    "frame_20190905091750_x_0000129.jpg",
+    "frame_20190905091750_x_0000130.jpg",
+    "frame_20190905091750_x_0000131.jpg",
+    "frame_20190905091750_x_0000132.jpg",
+    "frame_20190905091750_x_0000133.jpg",
+    "frame_20190905091750_x_0000134.jpg"
+  ],
+  "imgsz": 960,
+  "precision": "fp16",
+  "confidence": 0.25,
+  "warmup_iterations": 6,
+  "timed_iterations": 12,
+  "latency_ms": {
+    "mean_end_to_end": 42.14502483345465,
+    "median_end_to_end": 42.41743400007181,
+    "p95_end_to_end": 42.604797999956645,
+    "minimum_end_to_end": 39.824740000312886,
+    "mean_preprocess": 4.6807882500085425,
+    "mean_inference": 32.46180383333316,
+    "mean_postprocess": 3.678398916652744
+  },
+  "throughput_fps_batch_1": 23.727593089616636,
+  "cuda_peak_memory_bytes": 80824320,
+  "detections": [
+    {
+      "image": "frame_20190905091750_x_0000129.jpg",
+      "count": 1,
+      "detections": [
+        {
+          "class_id": 1,
+          "class_name": "Car",
+          "confidence": 0.445557,
+          "box_xyxy": [
+            990.5,
+            462.5,
+            1170.0,
+            547.0
+          ]
+        }
+      ]
+    },
+    {
+      "image": "frame_20190905091750_x_0000130.jpg",
+      "count": 1,
+      "detections": [
+        {
+          "class_id": 1,
+          "class_name": "Car",
+          "confidence": 0.44165,
+          "box_xyxy": [
+            1056.0,
+            461.0,
+            1228.0,
+            544.0
+          ]
+        }
+      ]
+    },
+    {
+      "image": "frame_20190905091750_x_0000131.jpg",
+      "count": 1,
+      "detections": [
+        {
+          "class_id": 1,
+          "class_name": "Car",
+          "confidence": 0.430176,
+          "box_xyxy": [
+            1116.0,
+            458.5,
+            1284.0,
+            535.5
+          ]
+        }
+      ]
+    },
+    {
+      "image": "frame_20190905091750_x_0000132.jpg",
+      "count": 1,
+      "detections": [
+        {
+          "class_id": 1,
+          "class_name": "Car",
+          "confidence": 0.397949,
+          "box_xyxy": [
+            1168.0,
+            443.0,
+            1338.0,
+            533.0
+          ]
+        }
+      ]
+    },
+    {
+      "image": "frame_20190905091750_x_0000133.jpg",
+      "count": 2,
+      "detections": [
+        {
+          "class_id": 1,
+          "class_name": "Car",
+          "confidence": 0.394287,
+          "box_xyxy": [
+            1224.0,
+            444.0,
+            1380.0,
+            524.5
+          ]
+        },
+        {
+          "class_id": 2,
+          "class_name": "Truck",
+          "confidence": 0.275146,
+          "box_xyxy": [
+            1422.0,
+            397.5,
+            1542.0,
+            481.5
+          ]
+        }
+      ]
+    },
+    {
+      "image": "frame_20190905091750_x_0000134.jpg",
+      "count": 0,
+      "detections": []
+    }
+  ],
+  "environment": {
+    "platform": "Linux-5.15.148-tegra-aarch64-with-glibc2.35",
+    "python": "3.10.12",
+    "torch": "2.3.0",
+    "cuda": "12.4",
+    "ultralytics": "8.4.155",
+    "numpy": "1.26.4",
+    "opencv": "4.10.0",
+    "gpu": "Orin"
+  }
+}
